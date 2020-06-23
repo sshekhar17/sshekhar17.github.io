@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Adaptive Sampling | My Webpage</title>
+    <link>https://sshekhar17.githuo.io/tag/adaptive-sampling/</link>
+      <atom:link href="https://sshekhar17.githuo.io/tag/adaptive-sampling/index.xml" rel="self" type="application/rss+xml" />
+    <description>Adaptive Sampling</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 22 Jun 2020 02:09:31 -0700</lastBuildDate>
+    <image>
+      <url>https://sshekhar17.githuo.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Adaptive Sampling</title>
+      <link>https://sshekhar17.githuo.io/tag/adaptive-sampling/</link>
+    </image>
+    
+    <item>
+      <title>Active Learning in Bandits and MDPs</title>
+      <link>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</link>
+      <pubDate>Mon, 22 Jun 2020 02:09:31 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</guid>
+      <description>&lt;p&gt;A $K$-armed bandit problem involves designing a sampling strategy to identify the distribution (i.e., arm) with the largest mean. A related problem, called &lt;em&gt;active learning in bandits&lt;/em&gt; considers the objective of learning the means of all the $K$ distributions uniformly well in terms of squared error (&lt;span style=&#34;color:blue&#34;&gt; (Antos et al., 2008)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; and &lt;span style=&#34;color:blue&#34;&gt; (Carpentier et al., 2011)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.
+However, in many applications, it is required to learn the entire distribution in terms of some distance metric $D$, and not just the mean.
+For instance, consider the task of constructing an accurate model of an MDP given an exploration budget.
+This can be framed as the problem of learning the transition probability vectors corresponding to all state-action pairs uniformly well in $\ell_1$ distance. The techniques developed in prior work are not applicable to this problem.&lt;/p&gt;
+&lt;h4 id=&#34;learning-distributions-with-bandit-feedback&#34;&gt;Learning distributions with bandit feedback&lt;/h4&gt;
+&lt;p&gt;In &lt;span style=&#34;color:blue&#34;&gt; (Shekhar et al., 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we proposed a general sampling scheme for learning multiple distributions uniformly well in terms of several commonly used distance metrics such as $\ell_2^2$, &lt;em&gt;total variation&lt;/em&gt;, &lt;em&gt;$f$-divergence&lt;/em&gt;, and &lt;em&gt;separation distance&lt;/em&gt;.  Our main contributions were:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We began by studying an abstract version of this &lt;em&gt;tracking&lt;/em&gt; problem, and proposed and analyzed a general optimistic tracking algorithm.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, we instantiated this algorithm for the specific problem instances arising in the case of the four distance metrics mentioned above, and obtained high probability bounds on the regret.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We showed that the allocation performance of our algorithm cannot be improved by deriving matching lower bounds on the allocation performance on any reasonable algorithm.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, we showed through empirical evaluation that our proposed scheme works better than &lt;em&gt;uniform sampling&lt;/em&gt;, &lt;em&gt;greedy sampling&lt;/em&gt; and &lt;em&gt;forced exploration sampling&lt;/em&gt; baselines.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;learning-mdp-models&#34;&gt;Learning MDP models&lt;/h4&gt;
+&lt;p&gt;An obtacle in applying the above ideas to learn MDP models, i.e., the $S \times A$ conditional distributions, is that we cannot draw observe arbitrary state-action trasitions in an MDP. This can be addressed by designing policies which spend an appropriate proportion of the time in different state-action pairs, as proposed in &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech &amp;amp; Lazaric, 2019)&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech et al. 2020)&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we took this approach and proposed an algorithm and derived sample complexity results of estimating the model of a finite MDP with $\epsilon$ accuracy. Next, we also proposed a heuristic exploration strategy, based on weighted maximum entropy, which outperforms some baselines in experiments&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Antos, A., Grover, V., &amp;amp; Szepesvári, C. (2008). Active learning in multi-armed bandits.&lt;em&gt;ALT&lt;/em&gt; 
+&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-540-87987-9_25&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Carpentier, A., Lazaric, A., Ghavamzadeh, M., Munos, R., &amp;amp; Auer, P. (2011). Upper-confidence-bound algorithms for active learning in multi-armed bandits. &lt;em&gt;ALT&lt;/em&gt; 
+&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-642-24412-4_17&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., Ghavamzadeh, M., &amp;amp; Javidi, T. (2020). Adaptive Sampling for Estimating Multiple Probability Distributions. &lt;em&gt;ICML&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/1910.12406&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Tarbouriech, J., &amp;amp; Lazaric, A. (2019). Active exploration in markov decision processes.&lt;em&gt;AISTATS&lt;/em&gt;. 
+&lt;a href=&#34;https://arxiv.org/abs/1902.11199&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Tarbouriech, J., Shekhar, S., Pirotta, M., Ghavamzadeh, M., &amp;amp; Lazaric, A. (2020). Active Model Estimation in Markov Decision Processes. &lt;em&gt;UAI&lt;/em&gt;.
+&lt;a href=&#34;https://arxiv.org/abs/2003.03297&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

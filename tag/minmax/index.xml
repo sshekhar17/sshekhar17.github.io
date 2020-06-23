@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>minmax | My Webpage</title>
+    <link>https://sshekhar17.githuo.io/tag/minmax/</link>
+      <atom:link href="https://sshekhar17.githuo.io/tag/minmax/index.xml" rel="self" type="application/rss+xml" />
+    <description>minmax</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 22 Jun 2020 02:08:54 -0700</lastBuildDate>
+    <image>
+      <url>https://sshekhar17.githuo.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>minmax</title>
+      <link>https://sshekhar17.githuo.io/tag/minmax/</link>
+    </image>
+    
+    <item>
+      <title>Active Learning for Classification With Abstention</title>
+      <link>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</link>
+      <pubDate>Mon, 22 Jun 2020 02:08:54 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</guid>
+      <description>&lt;p&gt;Classification with abstention refers to the classification problems in which the learner can also abstain from declaring a label, i.e., a &lt;em&gt;&amp;ldquo;don&amp;rsquo;t know&amp;rdquo;&lt;/em&gt; option.
+It  models  several applications such as  medical diagnostic systems,  voice assistant devices and content filtering.
+In 
+&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt;, we proposed and analyzed the first active learning algorithm for this problem  motivated by the  approach used in our GP bandits work 
+&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018)&lt;/span&gt;&lt;/a&gt;.
+The  scheme works for two abstention models: &lt;em&gt;fixed-cost&lt;/em&gt; and &lt;em&gt;bounded-rate&lt;/em&gt; and is general enough to work under several active learning paradigms (pool-based, stream-based and membership query).
+The algorithm proposed in 
+&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt; performs better than prior passive methods, both theoretically and in experiments.
+Furthermore, we also demonstrate the optimality of our algorithm by deriving &lt;em&gt;matching  lower bounds&lt;/em&gt; on excess risk.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
