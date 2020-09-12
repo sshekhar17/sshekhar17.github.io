@@ -37,7 +37,7 @@ maximum information that can be gained about $f$ from $n$ samples.&lt;/p&gt;
 &lt;p&gt;Our main contributions were:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;We constructed two Gaussian Processes for which we showed that the $\gamma_n$ based bounds were very loose.&lt;/p&gt;
+&lt;p&gt;Following the above intuition, we first constructed two Gaussian Processes for which we showed that the $\gamma_n$ based bounds were very loose.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Next, we proposed an algorithm which constructs a non-uniform partition of the input space and focuses sampling in the near optimal regions. For this algorithm we obtained bounds on $\mathcal{R}_n$ which were tighter than the existing results. In particular, we obtained the &lt;strong&gt;first sublinear regret bounds&lt;/strong&gt; for the exponential kernel, and &lt;strong&gt;strictly better regret bounds for Matern kernels&lt;/strong&gt; when $D&amp;gt;\nu-1$, where $D$ is the dimension of the input space, and $\nu$ is the smoothness parameter of the Matern kernel.&lt;/p&gt;
