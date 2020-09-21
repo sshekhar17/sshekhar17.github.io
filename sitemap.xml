@@ -3,6 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://sshekhar17.githuo.io/project/bayesian-optimization/</loc>
+    <lastmod>2020-06-22T02:02:52-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</loc>
+    <lastmod>2020-06-22T02:09:31-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</loc>
+    <lastmod>2020-06-22T02:08:26-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</loc>
+    <lastmod>2020-06-22T02:08:54-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</loc>
+    <lastmod>2020-06-22T02:10:42-07:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://sshekhar17.githuo.io/post/le-cam/</loc>
     <lastmod>2020-08-26T23:36:19-07:00</lastmod>
   </url>
@@ -43,22 +68,12 @@
   </url>
   
   <url>
-    <loc>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</loc>
-    <lastmod>2020-06-22T02:10:42-07:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://sshekhar17.githuo.io/tags/</loc>
     <lastmod>2020-06-22T02:10:42-07:00</lastmod>
   </url>
   
   <url>
     <loc>https://sshekhar17.githuo.io/category/active-learning/</loc>
-    <lastmod>2020-06-22T02:09:31-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</loc>
     <lastmod>2020-06-22T02:09:31-07:00</lastmod>
   </url>
   
@@ -79,11 +94,6 @@
   
   <url>
     <loc>https://sshekhar17.githuo.io/tag/abstention/</loc>
-    <lastmod>2020-06-22T02:08:54-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</loc>
     <lastmod>2020-06-22T02:08:54-07:00</lastmod>
   </url>
   
@@ -118,11 +128,6 @@
   </url>
   
   <url>
-    <loc>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</loc>
-    <lastmod>2020-06-22T02:08:26-07:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://sshekhar17.githuo.io/category/optimization/</loc>
     <lastmod>2020-06-22T02:08:26-07:00</lastmod>
   </url>
@@ -134,11 +139,6 @@
   
   <url>
     <loc>https://sshekhar17.githuo.io/tag/bayesian-optimization/</loc>
-    <lastmod>2020-06-22T02:02:52-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://sshekhar17.githuo.io/project/bayesian-optimization/</loc>
     <lastmod>2020-06-22T02:02:52-07:00</lastmod>
   </url>
   
@@ -283,6 +283,10 @@
   
   <url>
     <loc>https://sshekhar17.githuo.io/author/shubhanshu-shekhar/</loc>
+  </url>
+  
+  <url>
+    <loc>https://sshekhar17.githuo.io/summary/</loc>
   </url>
   
 </urlset>

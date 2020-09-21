@@ -13,6 +13,230 @@
     </image>
     
     <item>
+      <title>Bayesian Optimization</title>
+      <link>https://sshekhar17.githuo.io/project/bayesian-optimization/</link>
+      <pubDate>Mon, 22 Jun 2020 02:02:52 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/bayesian-optimization/</guid>
+      <description>&lt;p&gt;Several applications, such as hyperparameter tuning, can be formulated as the problem
+of optimizing a noisy black-box function ($f$) that is expensive to evaluate. In the field of 
+&lt;a href=&#34;https://distill.pub/2020/bayesian-optimization/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bayesian Optimization&lt;/a&gt; (also referred to as &lt;em&gt;Gaussian Process Bandits&lt;/em&gt;), the process of optimization is driven by utilizing a 
+&lt;a href=&#34;&#34;&gt;Gaussian Process&lt;/a&gt; surrogate model to guide the search for optimum.&lt;/p&gt;
+&lt;p&gt;Under the assumption that the unknown function $f$ is a sample from a zero mean Gaussian Process (GP) with known covariance function $K$, and given a sampling budget $n$, the goal of the agent is to design a sequential strategy to query
+the black-box function (noisy zeroth order oracle), in order to learn about its
+maximizer. The performance of an algorithm is measured  by its &lt;strong&gt;cumulative regret&lt;/strong&gt; $\mathcal{R}_n$,
+defined as $\mathcal{R}_n=\sum_{t=1}^n f(x^*) - f(x_t)$.&lt;/p&gt;
+&lt;p&gt;Existing results in literature have obtained
+regret bounds of the form $\mathcal{R}_n = \mathcal{O} \left ( \sqrt{n \log n \gamma_n}\right)$, where $\gamma_n$ is the
+maximum information that can be gained about $f$ from $n$ samples.&lt;/p&gt;
+&lt;h3 id=&#34;improved-bounds-for--bayesian-gp-banditshttpsprojecteuclidorgeuclidejs1543892564&#34;&gt;
+&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Improved Bounds for  Bayesian GP Bandits&lt;/a&gt;.&lt;/h3&gt;
+&lt;p&gt;Our work in this area was motivated by the following informal idea:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Since our goal is to learn about a maximizer of $f$, and not necessarily about the whole function, can we identify cases in which the $\gamma_n$ based bounds are loose.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Our main contributions were:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Following the above intuition, we first constructed two Gaussian Processes for which we showed that the $\gamma_n$ based bounds were very loose.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, we proposed an algorithm which constructs a non-uniform partition of the input space and focuses sampling in the near optimal regions. For this algorithm we obtained bounds on $\mathcal{R}_n$ which were tighter than the existing results. In particular, we obtained the &lt;strong&gt;first sublinear regret bounds&lt;/strong&gt; for the exponential kernel, and &lt;strong&gt;strictly better regret bounds for Matern kernels&lt;/strong&gt; when $D&amp;gt;\nu-1$, where $D$ is the dimension of the input space, and $\nu$ is the smoothness parameter of the Matern kernel.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We then extended our algorithm to the case of Contextual GP bandits, and obtained improvements over the results of &lt;span style=&#34;color:blue&#34;&gt;(Krause and Ong, 2011)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, we also showed that the techniques developed can also be used to propose a Bayesian version of the Zooming algorithm of &lt;span style=&#34;color:blue&#34;&gt; (Kleinberg et al., 2008)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;extension-to-gp-level-set-estimationhttpproceedingsmlrpressv89shekhar19ahtml&#34;&gt;
+&lt;a href=&#34;http://proceedings.mlr.press/v89/shekhar19a.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Extension to GP Level Set Estimation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In some problems the goal is not to learn about the optimizer of $f$, but instead to
+estimate the $\lambda$-level set of the function, i.e., the region of the input space where $f$ is above a threshold $\lambda$. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; , we extended the techniques developed in &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018) &lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; to propose a GP level set estimation algorithm with &lt;strong&gt;improved convergence rates&lt;/strong&gt; and &lt;strong&gt;lower computational complexity&lt;/strong&gt; than the previous known results of &lt;span style=&#34;color:blue&#34;&gt; Gotovos et al., 2013 &lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In addition, by exploiting the structured nature of the evaluation points of our proposed algorithm, we also obtained &lt;strong&gt;tighter bounds on the information gain&lt;/strong&gt; of our algorithm.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Krause, A., &amp;amp; Ong, C. S. (2011). Contextual gaussian process bandit optimization. &lt;em&gt;Neurips&lt;/em&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Kleinberg, R., Slivkins, A., &amp;amp; Upfal, E. (2008). Multi-armed bandits in metric spaces. &lt;em&gt;STOC&lt;/em&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2019). Multi-Scale Gaussian Process Level Set Estimation. &lt;em&gt;AISTATS&lt;/em&gt;. &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2018). Gaussian Process Bandits with Adaptive Discretization. &lt;em&gt;Electronic Journal of Statistics&lt;/em&gt;. &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Gotovos, A., Casati, N., Hitz, G., &amp;amp; Krause, A. (2013). Active learning for level set estimation. &lt;em&gt;IJCAI&lt;/em&gt;. &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Active Learning in Bandits and MDPs</title>
+      <link>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</link>
+      <pubDate>Mon, 22 Jun 2020 02:09:31 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</guid>
+      <description>&lt;p&gt;A $K$-armed bandit problem involves designing a sampling strategy to identify the distribution (i.e., arm) with the largest mean. A related problem, called &lt;em&gt;active learning in bandits&lt;/em&gt; considers the objective of learning the means of all the $K$ distributions uniformly well in terms of squared error (&lt;span style=&#34;color:blue&#34;&gt; (Antos et al., 2008)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; and &lt;span style=&#34;color:blue&#34;&gt; (Carpentier et al., 2011)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.
+However, in many applications, it is required to learn the entire distribution in terms of some distance metric $D$, and not just the mean.
+For instance, consider the task of constructing an accurate model of an MDP given an exploration budget.
+This can be framed as the problem of learning the transition probability vectors corresponding to all state-action pairs uniformly well in $\ell_1$ distance. The techniques developed in prior work are not applicable to this problem.&lt;/p&gt;
+&lt;h4 id=&#34;learning-distributions-with-bandit-feedback&#34;&gt;Learning distributions with bandit feedback&lt;/h4&gt;
+&lt;p&gt;In &lt;span style=&#34;color:blue&#34;&gt; (Shekhar et al., 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we proposed a general sampling scheme for learning multiple distributions uniformly well in terms of several commonly used distance metrics such as $\ell_2^2$, &lt;em&gt;total variation&lt;/em&gt;, &lt;em&gt;$f$-divergence&lt;/em&gt;, and &lt;em&gt;separation distance&lt;/em&gt;.  Our main contributions were:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We began by studying an abstract version of this &lt;em&gt;tracking&lt;/em&gt; problem, and proposed and analyzed a general optimistic tracking algorithm.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, we instantiated this algorithm for the specific problem instances arising in the case of the four distance metrics mentioned above, and obtained high probability bounds on the regret.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We showed that the allocation performance of our algorithm cannot be improved by deriving matching lower bounds on the allocation performance on any reasonable algorithm.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, we showed through empirical evaluation that our proposed scheme works better than &lt;em&gt;uniform sampling&lt;/em&gt;, &lt;em&gt;greedy sampling&lt;/em&gt; and &lt;em&gt;forced exploration sampling&lt;/em&gt; baselines.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;learning-mdp-models&#34;&gt;Learning MDP models&lt;/h4&gt;
+&lt;p&gt;An obstacle in applying the above ideas to learn MDP models, i.e., the $S \times A$ conditional distributions, is that we cannot  observe arbitrary state-action trasitions in an MDP. This can be addressed by designing policies which spend an appropriate proportion of the time in different state-action pairs, as proposed in &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech &amp;amp; Lazaric, 2019)&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech et al. 2020)&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we took this approach and proposed an algorithm and derived sample complexity results of estimating the model of a finite MDP with $\epsilon$ accuracy. Next, we also proposed a heuristic exploration strategy, based on weighted maximum entropy, which outperforms some baselines in experiments.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Antos, A., Grover, V., &amp;amp; Szepesvári, C. (2008). Active learning in multi-armed bandits.&lt;em&gt;ALT&lt;/em&gt; 
+&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-540-87987-9_25&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Carpentier, A., Lazaric, A., Ghavamzadeh, M., Munos, R., &amp;amp; Auer, P. (2011). Upper-confidence-bound algorithms for active learning in multi-armed bandits. &lt;em&gt;ALT&lt;/em&gt; 
+&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-642-24412-4_17&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., Ghavamzadeh, M., &amp;amp; Javidi, T. (2020). Adaptive Sampling for Estimating Multiple Probability Distributions. &lt;em&gt;ICML&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/1910.12406&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Tarbouriech, J., &amp;amp; Lazaric, A. (2019). Active exploration in markov decision processes.&lt;em&gt;AISTATS&lt;/em&gt;. 
+&lt;a href=&#34;https://arxiv.org/abs/1902.11199&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Tarbouriech, J., Shekhar, S., Pirotta, M., Ghavamzadeh, M., &amp;amp; Lazaric, A. (2020). Active Model Estimation in Markov Decision Processes. &lt;em&gt;UAI&lt;/em&gt;.
+&lt;a href=&#34;https://arxiv.org/abs/2003.03297&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Kernelized Bandits</title>
+      <link>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</link>
+      <pubDate>Mon, 22 Jun 2020 02:08:26 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</guid>
+      <description>&lt;p&gt;Kernelized bandits refers to a non-Bayesian formulation of the problem of optimizing a black-box function $f$ which can only be accessed through a noisy zero-order oracle. Here, instead of assuming that $f$ is a sample from a Gaussian Process (GP), we assume that the function $f$ has bounded norm in the RKHS associated with the positive-definite kernel $K$. Existing algorithms in this area admit an upper bound on the cumulative regret of the form $$ \mathcal{R}_n = \tilde{\mathcal{O}}\left( \gamma_n \sqrt{n} \right)$$ where $\gamma_n = \max_{S} I(y_S; f)$ is the &lt;em&gt;maximum information gain&lt;/em&gt; associated with kernel $K$, where the maximum is over subsets $S$ of cardinality $n$.&lt;/p&gt;
+&lt;p&gt;Recent work by &lt;span style=&#34;color:blue&#34;&gt;(Scarlett et al., 2017)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; demonstrated a large gap in the existing upper bounds on $\mathcal{R}_n$ and algorithm-independent lower bounds for am important family of kernels. Our work&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; seeks to address this issue by proposing an novel algorithm for kernelized bandits with uniformly tighter regret bounds.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The key idea of our work is to augment the global GP surrogate with Local Polynomial (LP) estimators on the elements of an adaptively constructed partition, $\mathcal{P}_t$ of the input space $\mathcal{X}$.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This idea, combined with an embedding result, which imples that the elements of the RKHS associated with the Matern family of kernels can be embedded into certain Holder spaces, allows us to derive uniformly better regret bounds.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Our main contributions are:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We first propose an algorithm, called LP-GP-UCB, which uses LP estimators along with the global GP surrogate to construct tighter UCB for $f$ to guide the query strategy.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Under assumptions that $f$ has finite norm in RKHS and in a Holder space, we obtain general regret bounds for our proposed algorithm.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;For commonly used kernels, we then obtain embedding results which show that for these kernels the Holder assumption follows from the bounded RKHS norm assumption. This allows us to specialize the general regret bounds for several important kernel families such as Squared Exponential, Matern, Rational-Quadratic and Gamma-Exponential kernels.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, we propose a computationally efficient heuristic, which employs standard regression trees to construct the non-uniform partition of the input space. Experiments with benchmark functions as well as a hyperparameter tuning task demonstrate the benefits of our proposed approach.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For more details please refer to the overview slides 
+&lt;a href=&#34;./slides.pdf&#34;&gt;here&lt;/a&gt; and the preprint 
+&lt;a href=&#34;https://arxiv.org/abs/2005.04832&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Scarlett, J., Bogunovic, I., &amp;amp; Cevher, V. (2017). Lower bounds on regret for noisy gaussian process bandit optimization. &lt;em&gt;COLT&lt;/em&gt;. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2020). Multi-scale Zero Order Optimization of Smooth Functions in an RKHS. &lt;em&gt;preprint&lt;/em&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Active Learning for Classification With Abstention</title>
+      <link>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</link>
+      <pubDate>Mon, 22 Jun 2020 02:08:54 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</guid>
+      <description>&lt;p&gt;Classification with abstention refers to the classification problems in which the learner can also abstain from declaring a label, i.e., a &lt;em&gt;&amp;ldquo;don&amp;rsquo;t know&amp;rdquo;&lt;/em&gt; option.
+It  models  several applications such as  medical diagnostic systems,  voice assistant devices and content filtering.
+In 
+&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt;, we proposed and analyzed the first active learning algorithm for this problem  motivated by the  approach used in our GP bandits work 
+&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018)&lt;/span&gt;&lt;/a&gt;.
+The  scheme works for two abstention models: &lt;em&gt;fixed-cost&lt;/em&gt; and &lt;em&gt;bounded-rate&lt;/em&gt; and is general enough to work under several active learning paradigms (pool-based, stream-based and membership query).
+The algorithm proposed in 
+&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt; performs better than prior passive methods, both theoretically and in experiments.
+Furthermore, we also demonstrate the optimality of our algorithm by deriving &lt;em&gt;matching  lower bounds&lt;/em&gt; on excess risk.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Sample Complexity of Species Tree Estimation</title>
+      <link>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</link>
+      <pubDate>Mon, 22 Jun 2020 02:10:42 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</guid>
+      <description>&lt;p&gt;ASTRAL &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt; is a method of reconstructing species trees from a given set of gene trees that have been reconstructed from sequence data. While it was shown to be statistically consistent in &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014) &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt;, not much was known about its sample complexity, i.e., the number of gene trees ($m$) required to reconstruct the true species tree with high probability. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2018)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we provided a tight characterization of the data requirement (i.e., $m$) of ASTRAL in terms of the number of leaves ($n$) and the length of the shortest branch ($f$).&lt;/p&gt;
+&lt;p&gt;More formally, under the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Multispecies_coalescent_process&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multispecies Coalescent&lt;/a&gt; (MSC) model, for the class of species trees with $n$ leaves and the shortest branch length ($f$) sufficiently small,  we obtained the following results:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We first showed that $\mathcal{O} \left( f^{-2} \log n \right)$ gene trees are sufficient for ASTRAL to output the true species tree with high probability. This result follows from the standard argument of applying Hoeffding’s inequality followed by a union bound.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Proving that $m= \Omega\left ( f^{-2} \log n \right)$ is also necessary was more involved. We proceeded in the following steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We began by proving a weaker result. We showed that with $m \leq \mathcal{O} \left (f^{-2}\right)$ gene trees, a quartet species tree is wrongly reconstructed by ASTRAL with probability close to 0.5. For obtaining this result, we reduced the error event to the study the deviation of a binomial random variable and then used the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Berry%E2%80%93Esseen_theorem&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Berry-Esseen theorem&lt;/a&gt; to approximate this binomial. Having obtained the result for the quartet ($n=4$) case, we extended this result to the general case by constructing a species tree consisting of a triplet joined to the rest of the tree by a long branch.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Using the insights from the previous result, we then strengthened it to match the sufficient conditions on $m$. In particular, by allowing an extra  $\log(n)$ factor and using stronger deviation inequalities for binomial random variables, we showed that the error in reconstructing the quartet species tree is at least $1/n^{a}$  for some $a&amp;gt;0$ . Then by considering a tree with $n/3$ triplets joined by long branches, we showed that the reconstruction error can be made arbitrarily close to $1$, for $m \leq (a/5)f^{-2} \log n$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These results imply that for ASTRAL to guarantee correct reconstruction with high probability uniformly over the space of all species trees, $\Theta\left(f^{-2}\log n\right)$ gene trees are both necessary and sufficient.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Mirarab, S., Reaz, R., Bayzid, M. S., Zimmermann, T., Swenson, M. S., &amp;amp; Warnow, T. (2014). ASTRAL: genome-scale coalescent-based species tree estimation. &lt;em&gt;Bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., Roch, S., &amp;amp; Mirarab, S. (2017). Species tree estimation using ASTRAL: how many genes are enough?. &lt;em&gt;IEEE/ACM transactions on computational biology and bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Lower Bound for Active Learning in Bandits via Le Cam&#39;s method</title>
       <link>https://sshekhar17.githuo.io/post/le-cam/</link>
       <pubDate>Wed, 26 Aug 2020 23:36:19 -0700</pubDate>
@@ -220,230 +444,6 @@ from the previous proposition.&lt;/p&gt;
     </item>
     
     <item>
-      <title>Sample Complexity of Species Tree Estimation</title>
-      <link>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</link>
-      <pubDate>Mon, 22 Jun 2020 02:10:42 -0700</pubDate>
-      <guid>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</guid>
-      <description>&lt;p&gt;ASTRAL &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt; is a method of reconstructing species trees from a given set of gene trees that have been reconstructed from sequence data. While it was shown to be statistically consistent in &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014) &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt;, not much was known about its sample complexity, i.e., the number of gene trees ($m$) required to reconstruct the true species tree with high probability. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2018)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we provided a tight characterization of the data requirement (i.e., $m$) of ASTRAL in terms of the number of leaves ($n$) and the length of the shortest branch ($f$).&lt;/p&gt;
-&lt;p&gt;More formally, under the 
-&lt;a href=&#34;https://en.wikipedia.org/wiki/Multispecies_coalescent_process&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multispecies Coalescent&lt;/a&gt; (MSC) model, for the class of species trees with $n$ leaves and the shortest branch length ($f$) sufficiently small,  we obtained the following results:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;We first showed that $\mathcal{O} \left( f^{-2} \log n \right)$ gene trees are sufficient for ASTRAL to output the true species tree with high probability. This result follows from the standard argument of applying Hoeffding’s inequality followed by a union bound.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Proving that $m= \Omega\left ( f^{-2} \log n \right)$ is also necessary was more involved. We proceeded in the following steps:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;We began by proving a weaker result. We showed that with $m \leq \mathcal{O} \left (f^{-2}\right)$ gene trees, a quartet species tree is wrongly reconstructed by ASTRAL with probability close to 0.5. For obtaining this result, we reduced the error event to the study the deviation of a binomial random variable and then used the 
-&lt;a href=&#34;https://en.wikipedia.org/wiki/Berry%E2%80%93Esseen_theorem&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Berry-Esseen theorem&lt;/a&gt; to approximate this binomial. Having obtained the result for the quartet ($n=4$) case, we extended this result to the general case by constructing a species tree consisting of a triplet joined to the rest of the tree by a long branch.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Using the insights from the previous result, we then strengthened it to match the sufficient conditions on $m$. In particular, by allowing an extra  $\log(n)$ factor and using stronger deviation inequalities for binomial random variables, we showed that the error in reconstructing the quartet species tree is at least $1/n^{a}$  for some $a&amp;gt;0$ . Then by considering a tree with $n/3$ triplets joined by long branches, we showed that the reconstruction error can be made arbitrarily close to $1$, for $m \leq (a/5)f^{-2} \log n$.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;These results imply that for ASTRAL to guarantee correct reconstruction with high probability uniformly over the space of all species trees, $\Theta\left(f^{-2}\log n\right)$ gene trees are both necessary and sufficient.&lt;/p&gt;
-&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
-&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
-&lt;hr&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Mirarab, S., Reaz, R., Bayzid, M. S., Zimmermann, T., Swenson, M. S., &amp;amp; Warnow, T. (2014). ASTRAL: genome-scale coalescent-based species tree estimation. &lt;em&gt;Bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Shekhar, S., Roch, S., &amp;amp; Mirarab, S. (2017). Species tree estimation using ASTRAL: how many genes are enough?. &lt;em&gt;IEEE/ACM transactions on computational biology and bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Active Learning in Bandits and MDPs</title>
-      <link>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</link>
-      <pubDate>Mon, 22 Jun 2020 02:09:31 -0700</pubDate>
-      <guid>https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/</guid>
-      <description>&lt;p&gt;A $K$-armed bandit problem involves designing a sampling strategy to identify the distribution (i.e., arm) with the largest mean. A related problem, called &lt;em&gt;active learning in bandits&lt;/em&gt; considers the objective of learning the means of all the $K$ distributions uniformly well in terms of squared error (&lt;span style=&#34;color:blue&#34;&gt; (Antos et al., 2008)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; and &lt;span style=&#34;color:blue&#34;&gt; (Carpentier et al., 2011)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.
-However, in many applications, it is required to learn the entire distribution in terms of some distance metric $D$, and not just the mean.
-For instance, consider the task of constructing an accurate model of an MDP given an exploration budget.
-This can be framed as the problem of learning the transition probability vectors corresponding to all state-action pairs uniformly well in $\ell_1$ distance. The techniques developed in prior work are not applicable to this problem.&lt;/p&gt;
-&lt;h4 id=&#34;learning-distributions-with-bandit-feedback&#34;&gt;Learning distributions with bandit feedback&lt;/h4&gt;
-&lt;p&gt;In &lt;span style=&#34;color:blue&#34;&gt; (Shekhar et al., 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we proposed a general sampling scheme for learning multiple distributions uniformly well in terms of several commonly used distance metrics such as $\ell_2^2$, &lt;em&gt;total variation&lt;/em&gt;, &lt;em&gt;$f$-divergence&lt;/em&gt;, and &lt;em&gt;separation distance&lt;/em&gt;.  Our main contributions were:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;We began by studying an abstract version of this &lt;em&gt;tracking&lt;/em&gt; problem, and proposed and analyzed a general optimistic tracking algorithm.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Next, we instantiated this algorithm for the specific problem instances arising in the case of the four distance metrics mentioned above, and obtained high probability bounds on the regret.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;We showed that the allocation performance of our algorithm cannot be improved by deriving matching lower bounds on the allocation performance on any reasonable algorithm.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Finally, we showed through empirical evaluation that our proposed scheme works better than &lt;em&gt;uniform sampling&lt;/em&gt;, &lt;em&gt;greedy sampling&lt;/em&gt; and &lt;em&gt;forced exploration sampling&lt;/em&gt; baselines.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id=&#34;learning-mdp-models&#34;&gt;Learning MDP models&lt;/h4&gt;
-&lt;p&gt;An obstacle in applying the above ideas to learn MDP models, i.e., the $S \times A$ conditional distributions, is that we cannot  observe arbitrary state-action trasitions in an MDP. This can be addressed by designing policies which spend an appropriate proportion of the time in different state-action pairs, as proposed in &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech &amp;amp; Lazaric, 2019)&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In &lt;span style=&#34;color:blue&#34;&gt;(Tarbouriech et al. 2020)&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we took this approach and proposed an algorithm and derived sample complexity results of estimating the model of a finite MDP with $\epsilon$ accuracy. Next, we also proposed a heuristic exploration strategy, based on weighted maximum entropy, which outperforms some baselines in experiments.&lt;/p&gt;
-&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
-&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
-&lt;hr&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Antos, A., Grover, V., &amp;amp; Szepesvári, C. (2008). Active learning in multi-armed bandits.&lt;em&gt;ALT&lt;/em&gt; 
-&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-540-87987-9_25&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Carpentier, A., Lazaric, A., Ghavamzadeh, M., Munos, R., &amp;amp; Auer, P. (2011). Upper-confidence-bound algorithms for active learning in multi-armed bandits. &lt;em&gt;ALT&lt;/em&gt; 
-&lt;a href=&#34;https://link.springer.com/chapter/10.1007/978-3-642-24412-4_17&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Shekhar, S., Ghavamzadeh, M., &amp;amp; Javidi, T. (2020). Adaptive Sampling for Estimating Multiple Probability Distributions. &lt;em&gt;ICML&lt;/em&gt; 
-&lt;a href=&#34;https://arxiv.org/abs/1910.12406&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Tarbouriech, J., &amp;amp; Lazaric, A. (2019). Active exploration in markov decision processes.&lt;em&gt;AISTATS&lt;/em&gt;. 
-&lt;a href=&#34;https://arxiv.org/abs/1902.11199&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Tarbouriech, J., Shekhar, S., Pirotta, M., Ghavamzadeh, M., &amp;amp; Lazaric, A. (2020). Active Model Estimation in Markov Decision Processes. &lt;em&gt;UAI&lt;/em&gt;.
-&lt;a href=&#34;https://arxiv.org/abs/2003.03297&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Active Learning for Classification With Abstention</title>
-      <link>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</link>
-      <pubDate>Mon, 22 Jun 2020 02:08:54 -0700</pubDate>
-      <guid>https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention/</guid>
-      <description>&lt;p&gt;Classification with abstention refers to the classification problems in which the learner can also abstain from declaring a label, i.e., a &lt;em&gt;&amp;ldquo;don&amp;rsquo;t know&amp;rdquo;&lt;/em&gt; option.
-It  models  several applications such as  medical diagnostic systems,  voice assistant devices and content filtering.
-In 
-&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt;, we proposed and analyzed the first active learning algorithm for this problem  motivated by the  approach used in our GP bandits work 
-&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018)&lt;/span&gt;&lt;/a&gt;.
-The  scheme works for two abstention models: &lt;em&gt;fixed-cost&lt;/em&gt; and &lt;em&gt;bounded-rate&lt;/em&gt; and is general enough to work under several active learning paradigms (pool-based, stream-based and membership query).
-The algorithm proposed in 
-&lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;&lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2019)&lt;/span&gt;&lt;/a&gt; performs better than prior passive methods, both theoretically and in experiments.
-Furthermore, we also demonstrate the optimality of our algorithm by deriving &lt;em&gt;matching  lower bounds&lt;/em&gt; on excess risk.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Kernelized Bandits</title>
-      <link>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</link>
-      <pubDate>Mon, 22 Jun 2020 02:08:26 -0700</pubDate>
-      <guid>https://sshekhar17.githuo.io/project/rkhs-function-optimization/</guid>
-      <description>&lt;p&gt;Kernelized bandits refers to a non-Bayesian formulation of the problem of optimizing a black-box function $f$ which can only be accessed through a noisy zero-order oracle. Here, instead of assuming that $f$ is a sample from a Gaussian Process (GP), we assume that the function $f$ has bounded norm in the RKHS associated with the positive-definite kernel $K$. Existing algorithms in this area admit an upper bound on the cumulative regret of the form $$ \mathcal{R}_n = \tilde{\mathcal{O}}\left( \gamma_n \sqrt{n} \right)$$ where $\gamma_n = \max_{S} I(y_S; f)$ is the &lt;em&gt;maximum information gain&lt;/em&gt; associated with kernel $K$, where the maximum is over subsets $S$ of cardinality $n$.&lt;/p&gt;
-&lt;p&gt;Recent work by &lt;span style=&#34;color:blue&#34;&gt;(Scarlett et al., 2017)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; demonstrated a large gap in the existing upper bounds on $\mathcal{R}_n$ and algorithm-independent lower bounds for am important family of kernels. Our work&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; seeks to address this issue by proposing an novel algorithm for kernelized bandits with uniformly tighter regret bounds.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;The key idea of our work is to augment the global GP surrogate with Local Polynomial (LP) estimators on the elements of an adaptively constructed partition, $\mathcal{P}_t$ of the input space $\mathcal{X}$.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;This idea, combined with an embedding result, which imples that the elements of the RKHS associated with the Matern family of kernels can be embedded into certain Holder spaces, allows us to derive uniformly better regret bounds.&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;Our main contributions are:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;We first propose an algorithm, called LP-GP-UCB, which uses LP estimators along with the global GP surrogate to construct tighter UCB for $f$ to guide the query strategy.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Under assumptions that $f$ has finite norm in RKHS and in a Holder space, we obtain general regret bounds for our proposed algorithm.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;For commonly used kernels, we then obtain embedding results which show that for these kernels the Holder assumption follows from the bounded RKHS norm assumption. This allows us to specialize the general regret bounds for several important kernel families such as Squared Exponential, Matern, Rational-Quadratic and Gamma-Exponential kernels.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Next, we propose a computationally efficient heuristic, which employs standard regression trees to construct the non-uniform partition of the input space. Experiments with benchmark functions as well as a hyperparameter tuning task demonstrate the benefits of our proposed approach.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;For more details please refer to the overview slides 
-&lt;a href=&#34;./slides.pdf&#34;&gt;here&lt;/a&gt; and the preprint 
-&lt;a href=&#34;https://arxiv.org/abs/2005.04832&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
-&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
-&lt;hr&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Scarlett, J., Bogunovic, I., &amp;amp; Cevher, V. (2017). Lower bounds on regret for noisy gaussian process bandit optimization. &lt;em&gt;COLT&lt;/em&gt;. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2020). Multi-scale Zero Order Optimization of Smooth Functions in an RKHS. &lt;em&gt;preprint&lt;/em&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Bayesian Optimization</title>
-      <link>https://sshekhar17.githuo.io/project/bayesian-optimization/</link>
-      <pubDate>Mon, 22 Jun 2020 02:02:52 -0700</pubDate>
-      <guid>https://sshekhar17.githuo.io/project/bayesian-optimization/</guid>
-      <description>&lt;p&gt;Several applications, such as hyperparameter tuning, can be formulated as the problem
-of optimizing a noisy black-box function ($f$) that is expensive to evaluate. In the field of 
-&lt;a href=&#34;https://distill.pub/2020/bayesian-optimization/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bayesian Optimization&lt;/a&gt; (also referred to as &lt;em&gt;Gaussian Process Bandits&lt;/em&gt;), the process of optimization is driven by utilizing a 
-&lt;a href=&#34;&#34;&gt;Gaussian Process&lt;/a&gt; surrogate model to guide the search for optimum.&lt;/p&gt;
-&lt;p&gt;Under the assumption that the unknown function $f$ is a sample from a zero mean Gaussian Process (GP) with known covariance function $K$, and given a sampling budget $n$, the goal of the agent is to design a sequential strategy to query
-the black-box function (noisy zeroth order oracle), in order to learn about its
-maximizer. The performance of an algorithm is measured  by its &lt;strong&gt;cumulative regret&lt;/strong&gt; $\mathcal{R}_n$,
-defined as $\mathcal{R}_n=\sum_{t=1}^n f(x^*) - f(x_t)$.&lt;/p&gt;
-&lt;p&gt;Existing results in literature have obtained
-regret bounds of the form $\mathcal{R}_n = \mathcal{O} \left ( \sqrt{n \log n \gamma_n}\right)$, where $\gamma_n$ is the
-maximum information that can be gained about $f$ from $n$ samples.&lt;/p&gt;
-&lt;h3 id=&#34;improved-bounds-for--bayesian-gp-banditshttpsprojecteuclidorgeuclidejs1543892564&#34;&gt;
-&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Improved Bounds for  Bayesian GP Bandits&lt;/a&gt;.&lt;/h3&gt;
-&lt;p&gt;Our work in this area was motivated by the following informal idea:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Since our goal is to learn about a maximizer of $f$, and not necessarily about the whole function, can we identify cases in which the $\gamma_n$ based bounds are loose.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;Our main contributions were:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Following the above intuition, we first constructed two Gaussian Processes for which we showed that the $\gamma_n$ based bounds were very loose.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Next, we proposed an algorithm which constructs a non-uniform partition of the input space and focuses sampling in the near optimal regions. For this algorithm we obtained bounds on $\mathcal{R}_n$ which were tighter than the existing results. In particular, we obtained the &lt;strong&gt;first sublinear regret bounds&lt;/strong&gt; for the exponential kernel, and &lt;strong&gt;strictly better regret bounds for Matern kernels&lt;/strong&gt; when $D&amp;gt;\nu-1$, where $D$ is the dimension of the input space, and $\nu$ is the smoothness parameter of the Matern kernel.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;We then extended our algorithm to the case of Contextual GP bandits, and obtained improvements over the results of &lt;span style=&#34;color:blue&#34;&gt;(Krause and Ong, 2011)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Finally, we also showed that the techniques developed can also be used to propose a Bayesian version of the Zooming algorithm of &lt;span style=&#34;color:blue&#34;&gt; (Kleinberg et al., 2008)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;extension-to-gp-level-set-estimationhttpproceedingsmlrpressv89shekhar19ahtml&#34;&gt;
-&lt;a href=&#34;http://proceedings.mlr.press/v89/shekhar19a.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Extension to GP Level Set Estimation&lt;/a&gt;&lt;/h3&gt;
-&lt;p&gt;In some problems the goal is not to learn about the optimizer of $f$, but instead to
-estimate the $\lambda$-level set of the function, i.e., the region of the input space where $f$ is above a threshold $\lambda$. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; , we extended the techniques developed in &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018) &lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; to propose a GP level set estimation algorithm with &lt;strong&gt;improved convergence rates&lt;/strong&gt; and &lt;strong&gt;lower computational complexity&lt;/strong&gt; than the previous known results of &lt;span style=&#34;color:blue&#34;&gt; Gotovos et al., 2013 &lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In addition, by exploiting the structured nature of the evaluation points of our proposed algorithm, we also obtained &lt;strong&gt;tighter bounds on the information gain&lt;/strong&gt; of our algorithm.&lt;/p&gt;
-&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
-&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
-&lt;hr&gt;
-&lt;ol&gt;
-&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Krause, A., &amp;amp; Ong, C. S. (2011). Contextual gaussian process bandit optimization. &lt;em&gt;Neurips&lt;/em&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Kleinberg, R., Slivkins, A., &amp;amp; Upfal, E. (2008). Multi-armed bandits in metric spaces. &lt;em&gt;STOC&lt;/em&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2019). Multi-Scale Gaussian Process Level Set Estimation. &lt;em&gt;AISTATS&lt;/em&gt;. &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2018). Gaussian Process Bandits with Adaptive Discretization. &lt;em&gt;Electronic Journal of Statistics&lt;/em&gt;. &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
-&lt;p&gt;Gotovos, A., Casati, N., Hitz, G., &amp;amp; Krause, A. (2013). Active learning for level set estimation. &lt;em&gt;IJCAI&lt;/em&gt;. &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-</description>
-    </item>
-    
-    <item>
       <title>Multi-Scale Zero-Order Optimization of Smooth Functions in an RKHS</title>
       <link>https://sshekhar17.githuo.io/publication/shekhar-2020-multi/</link>
       <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
@@ -525,6 +525,136 @@ estimate the $\lambda$-level set of the function, i.e., the region of the input 
 &lt;p&gt;&lt;strong&gt;[05/14/20]&lt;/strong&gt; Our paper &lt;a href=&#34;https://arxiv.org/abs/2003.03297&#34;&gt;Active Model Estimation in Markov Decision Processes&lt;/a&gt; got accepted at &lt;a href=&#34;http://www.auai.org/uai2020/&#34;&gt;UAI 2020&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;[04/22/20]&lt;/strong&gt; Our paper &lt;a href=&#34;https://arxiv.org/abs/1906.00303&#34;&gt;Active Learning for Classification with Abstention&lt;/a&gt; got accepted at &lt;a href=&#34;https://2020.ieee-isit.org/&#34;&gt;ISIT 2020&lt;/a&gt;. &lt;span style=&#34;color:red&#34;&gt; Update: &lt;a href=&#34;https://2020.ieee-isit.org/StudentAwardFinalists.asp&#34;&gt;Nomimated for Jack Wolf Student paper award&lt;/a&gt;. &lt;/span&gt;&lt;/p&gt;
 
+</description>
+    </item>
+    
+    <item>
+      <title>Summary of Research</title>
+      <link>https://sshekhar17.githuo.io/summary/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/summary/</guid>
+      <description>&lt;p&gt;My research interests mainly lie  in the general area of &lt;span style=&#34;color:blue&#34;&gt;sequential decision making under uncertainty&lt;/span&gt;, where an agent interacts sequentially with an unknown environment in order to maximize some specified reward. As the environment is unknown, the agent is faced with the dilemma between &lt;span style=&#34;color:blue&#34;&gt; exploitation and exploration&lt;/span&gt;, i.e., acting optimally based on current knowledge of the environment or selecting actions which are most informative about the environment. The goal here is to design appropriate strategies for the agent which have low &lt;span style=&#34;color:blue&#34;&gt;regret&lt;/span&gt;, i.e., sub-optimality w.r.t. a hypothetical agent which acts optimally with full knowledge of the environment.&lt;/p&gt;
+&lt;p&gt;I have worked on the design and analysis of information acquisition strategies for the following problems which lie within the general framework described above:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;span style=&#34;color:DarkRed&#34;&gt; Sequential Model Based Optimization&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;color:DarkRed&#34;&gt;Active Learning  &lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span style=&#34;color:DarkRed&#34;&gt; Adaptive Resource Allocation for Statistical Estimation&lt;/span&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Besides these, I have also worked on some other problems such as phylogenetic reconstruction and control of parallel queues which are described in the &lt;span style=&#34;color:DarkRed&#34;&gt; &amp;ldquo;Other Results&amp;quot;&lt;/span&gt; section below.&lt;/p&gt;
+&lt;h3 id=&#34;1-sequential-model-based-optimization-smbo&#34;&gt;1. Sequential Model Based Optimization (SMBO).&lt;/h3&gt;
+&lt;p&gt;In SMBO, the goal of an agent is to design an adaptive strategy to query a noisy and expensive black-box function $f:\mathcal{X}=[0,1]^d\mapsto \mathbb{R}$,   guided by a surrogate model to efficiently learn about its maximizer.
+Most algorithms in this area use Gaussian Processes~(GPs) as surrogates, and  are analyzed either in the fully Bayesian framework~(Bayesian Optimization) or in the frequentist setting~(Kernelized Bandits).
+&lt;em&gt;In my research in this area, I have proposed new algorithms with the best-known theoretical guarantees and lower computational complexity and also derived   algorithm-independent impossibility results characterizing the fundamental performance limits&lt;/em&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/bayesian-optimization&#34;&gt;Bayesian Optimization~(BO):&lt;/a&gt; In &lt;span style=&#34;color:green&#34;&gt;(Shekhar and Javidi, 2018)&lt;/span&gt;&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;, we proposed an algorithm which adaptively partitions the input space and zooms into the near-optimal regions.     The main technical result underlying this adaptive partitioning was a  bound on the supremum of a  class of GPs in terms of the radius of their index sets.
+The proposed algorithm has lower comlexity and better regret bounds than existing baselines, and can also be extended to deal with &lt;em&gt;contextual bandits&lt;/em&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/rkhs-function-optimization&#34;&gt;Kernelized Bandits:&lt;/a&gt; Here, $f$ is assumed to be a fixed but unknown element of the RKHS (Reproducing Kernel Hilbert Space) of a given kernel $K$. In &lt;span style=&#34;color:green&#34;&gt;(Shekhar and Javidi, 2020a)&lt;/span&gt; &lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;, we proposed an algorithm which  exploits the embedding of certain RKHS into Holder spaces, to  augment the global GP surrogate with local estimators over an adaptively constructed partition to guide the querying strategy.
+The proposed algorithm again achieves improved, and in some cases even minimax near-optimal regret bounds and was also shown to outperform several baselines in empirical benchmarking tasks.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Incorporating Gradient Information in BO.&lt;/strong&gt;
+Most prior works  in BO literature only use the &lt;em&gt;zeroth-order&lt;/em&gt; information about the unknown function $f$. However, in practice, the agent often has access to the noisy gradient (i.e., first-order) information as well.
+In &lt;span style=&#34;color:green&#34;&gt;(Shekhar and Javidi, 2020b)&lt;/span&gt;&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;, we  &lt;em&gt;provided a precise characterization of the  benefits of incorporating gradient information in BO&lt;/em&gt;  by&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;deriving information theoretic lower bound of $\Omega(\sqrt{2^d n})$ for any zeroth-order algorithm, and&lt;/li&gt;
+&lt;li&gt;proposing a first-order algorithm which, under some conditions, achieves a $\mathcal{O}(d (\log n)^2 )$ regret.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-non-parametric-active-learning&#34;&gt;2. Non-parametric Active Learning&lt;/h3&gt;
+&lt;p&gt;The general ideas of using adaptive partitioning and local estimators introduced in our BO and kernelized bandits work is quite versatile, and it can also be utilized  in several related problems with appropriate low-level technical modifications. In &lt;span style=&#34;color:green&#34;&gt; (Shekhar and Javidi, 2019) &lt;/span&gt;&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt; and
+&lt;span style=&#34;color:green&#34;&gt; (Shekhar, Ghavamzadeh and Javidi, 2020) &lt;/span&gt;&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;,    we showed that these ideas are  well suited to the problems of active non-parametric estimation and classification.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/bayesian-optimization&#34;&gt;GP Level Set Estimation.&lt;/a&gt;
+In the level-set estimation problem~(LSE), given a budget $n$, the goal of an agent is to adaptively query a black-box function $f:\mathcal{X}\mapsto \mathbb{R}$, in order to accurately estimate its
+$\tau-$level set of $f$, i.e., the region of $\mathcal{X}$ where $f-$value is at least $\tau$.
+In &lt;span style=&#34;color:green&#34;&gt; (Shekhar and Javidi, 2019) &lt;/span&gt;&lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;, we proposed an algorithm for the LSE problem, which combines the adaptive partitioning strategy  along with a novel point-selection rule  to &lt;em&gt;achieve tighter theoretical bound&lt;/em&gt; than existing results.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/active-learning-for-classification-with-abstention&#34;&gt;Active Classification with Abstention.&lt;/a&gt;
+Classification with abstention refers to the classification problems in which the learner can also abstain from declaring a label, i.e., a &lt;em&gt;&amp;ldquo;don&amp;rsquo;t know&amp;rdquo;&lt;/em&gt; option. It  models  several applications such as  medical diagnostic systems,  voice assistant devices and content filtering. In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, Ghavamzadeh and Javidi, 2020) &lt;/span&gt;&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;, we proposed  the first active learning algorithm for this problem and &lt;strong&gt;precisely characterized the benefits of active over passive learning   for this problem&lt;/strong&gt;. We first obtained information-theoretic lower bound of $ \Omega(n^{-\beta(\alpha+1)/(2\beta + d + \alpha\beta)})$ for the excess risk of any passive algorithm~(here $\alpha$ and $\beta$ are the &lt;em&gt;margin&lt;/em&gt; and &lt;em&gt;smoothness&lt;/em&gt; parameters resp.). Then, we showed that the corresponding minmax rate in the active setting is $\Theta\left( n^{-\beta(1+\alpha)/(d+2\beta)}\right)$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-adaptive-resource-allocation&#34;&gt;2. Adaptive Resource Allocation.&lt;/h3&gt;
+&lt;p&gt;In the next project, I worked on the problem of 
+&lt;a href=&#34;https://arxiv.org/abs/1412.6613&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;adaptive resource allocation&lt;/a&gt; among $K$ probability distributions to estimate all of them uniformly well.
+This is motivated by the problem of constructing a uniformly accurate model of the transition structure of an unknown Markov Decision Process (MDP), given a finite exploration budget.
+We studied this problem in two settings:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/&#34;&gt;Learning probability distributions with bandit feedback.&lt;/a&gt;
+In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, Javidi and Ghavamzadeh, 2020) &lt;/span&gt;&lt;sup id=&#34;fnref:6&#34;&gt;&lt;a href=&#34;#fn:6&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;6&lt;/a&gt;&lt;/sup&gt;, we worked under the simplifying assumption that the agent can transition between any pair of the $K$ distributions and provided a general treatment for various distance measures such as &lt;em&gt;total-variation&lt;/em&gt;, &lt;em&gt;KL-divergence&lt;/em&gt; and &lt;em&gt;separation distace&lt;/em&gt;.
+Our result greatly expands the scope of this problem, referred to as &lt;em&gt;active learning in bandits&lt;/em&gt;, as the prior work was restricted to learning the means of $K$ distribution in squared-error sense.
+Additionally, we also proved the optimality of our proposed allocation scheme by deriving information-theoretic lower bounds.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/adaptive-sampling-for-estimating-probability-distributions/&#34;&gt;Estimating Transition Structure of MDPs.&lt;/a&gt; In  &lt;span style=&#34;color:green&#34;&gt; (Tarbouriech et al, 2020) &lt;/span&gt;&lt;sup id=&#34;fnref:7&#34;&gt;&lt;a href=&#34;#fn:7&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;7&lt;/a&gt;&lt;/sup&gt;, we relaxed the assumption of access to generative model, and proposed an adaptive non-stationary policy to estimate the transition structure of an unknown MDP~(i.e., $K= SA$) in $\ell_1$ distance. Since, here we cannot sample from arbitrary distributions (i.e, the $(s,a)$ pair), the key idea was to implement policies which spend an &lt;em&gt;appropriate&lt;/em&gt; fraction of time in the different states.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;4-other-results&#34;&gt;4. Other Results&lt;/h3&gt;
+&lt;p&gt;Besides my work on sequential learning and optimization described above, I have also worked on the following problems:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/&#34;&gt;Sample Complexity of Species-Tree Estimation&lt;/a&gt;. In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, Roch and Mirarab, 2018) &lt;/span&gt; &lt;sup id=&#34;fnref:8&#34;&gt;&lt;a href=&#34;#fn:8&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;8&lt;/a&gt;&lt;/sup&gt; we showed that $\Theta (f^{-2} \log n)$ gene trees are both necessary and sufficient for efficiently reconstructing the underlying species tree for the popular reconstruction algorithm ASTRAL. Here $f$ is the length of the shortest branch and $n$ is the number of leaves (i.e., extant species).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/Queues.pdf&#34;&gt;Control of Parallel Queues with Observation Delay.&lt;/a&gt; In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, 2017) &lt;/span&gt; &lt;sup id=&#34;fnref:9&#34;&gt;&lt;a href=&#34;#fn:9&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;9&lt;/a&gt;&lt;/sup&gt;, we obtained the optimal policy for a system of parallel queues with one server under a fixed observation delay $D&amp;gt;0$. The optimal policy is the one which allocates the server to the queue whose occupancy stochastically dominates that of all other queues. This result generalizes the Longest Connected First (LCF) policy of Tassiulas and Ephreimedes~(1993) to the case of delayed observations.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h4 id=&#34;related-publications&#34;&gt;Related Publications&lt;/h4&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar and Javidi, (2018): Gaussian Process Bandits with Adaptive Discretization. &lt;em&gt;Electronic Journal of Statistics&lt;/em&gt; 
+&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar and Javidi, (2020): Multi-scale zero order optimization of smooth functions in an RKHS. &lt;em&gt;preprint&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/2005.04832&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar and Javidi, (2020): Significance of Gradient Information in Bayesian Optimization. &lt;em&gt;in preparation&lt;/em&gt; &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar and Javidi, (2019): Multiscale Gaussian Process Level Set Estimation.&lt;em&gt;AISTATS&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/1902.09682&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, Ghavamzadeh and Javidi, (2020): Active Learning for Classification with Abstention. &lt;em&gt;ISIT&lt;/em&gt; 
+&lt;a href=&#34;https://ieeexplore.ieee.org/abstract/document/9174242&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:6&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, Javidi and Ghavamzadeh, (2020): Adaptive Sampling for Learning Probability Distributions. &lt;em&gt;ICML&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/1910.12406&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:6&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:7&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Tarbouriech, Shekhar, Pirotta, Ghavamzadeh and Lazaric, (2020): Active Model Estimation in MDPs. &lt;em&gt;UAI&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/2003.03297&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:7&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:8&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, Roch and Mirarab, (2018): Species tree estimation using ASTAL: how many genes are enough? &lt;em&gt;IEEE TCBB&lt;/em&gt; 
+&lt;a href=&#34;https://arxiv.org/abs/1704.06831&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:8&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:9&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar: Dynamic Server Allocation with Observation Delays. &lt;em&gt;unpublished&lt;/em&gt; 
+&lt;a href=&#34;https://sshekhar17.githuo.io/Queues.pdf&#34;&gt;link&lt;/a&gt; &lt;a href=&#34;#fnref:9&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
 </description>
     </item>
     
