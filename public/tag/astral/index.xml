@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ASTRAL | My Webpage</title>
+    <link>https://sshekhar17.githuo.io/tag/astral/</link>
+      <atom:link href="https://sshekhar17.githuo.io/tag/astral/index.xml" rel="self" type="application/rss+xml" />
+    <description>ASTRAL</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 22 Jun 2020 02:10:42 -0700</lastBuildDate>
+    <image>
+      <url>https://sshekhar17.githuo.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>ASTRAL</title>
+      <link>https://sshekhar17.githuo.io/tag/astral/</link>
+    </image>
+    
+    <item>
+      <title>Sample Complexity of Species Tree Estimation</title>
+      <link>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</link>
+      <pubDate>Mon, 22 Jun 2020 02:10:42 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/sample-complexity-of-species-tree-estimation/</guid>
+      <description>&lt;p&gt;ASTRAL &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt; is a method of reconstructing species trees from a given set of gene trees that have been reconstructed from sequence data. While it was shown to be statistically consistent in &lt;span style=&#34;color:blue&#34;&gt; (Mirarab et al., 2014) &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt; &lt;/span&gt;, not much was known about its sample complexity, i.e., the number of gene trees ($m$) required to reconstruct the true species tree with high probability. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar et al., 2018)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;, we provided a tight characterization of the data requirement (i.e., $m$) of ASTRAL in terms of the number of leaves ($n$) and the length of the shortest branch ($f$).&lt;/p&gt;
+&lt;p&gt;More formally, under the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Multispecies_coalescent_process&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Multispecies Coalescent&lt;/a&gt; (MSC) model, for the class of species trees with $n$ leaves and the shortest branch length ($f$) sufficiently small,  we obtained the following results:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We first showed that $\mathcal{O} \left( f^{-2} \log n \right)$ gene trees are sufficient for ASTRAL to output the true species tree with high probability. This result follows from the standard argument of applying Hoeffding’s inequality followed by a union bound.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Proving that $m= \Omega\left ( f^{-2} \log n \right)$ is also necessary was more involved. We proceeded in the following steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;We began by proving a weaker result. We showed that with $m \leq \mathcal{O} \left (f^{-2}\right)$ gene trees, a quartet species tree is wrongly reconstructed by ASTRAL with probability close to 0.5. For obtaining this result, we reduced the error event to the study the deviation of a binomial random variable and then used the 
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Berry%E2%80%93Esseen_theorem&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Berry-Esseen theorem&lt;/a&gt; to approximate this binomial. Having obtained the result for the quartet ($n=4$) case, we extended this result to the general case by constructing a species tree consisting of a triplet joined to the rest of the tree by a long branch.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Using the insights from the previous result, we then strengthened it to match the sufficient conditions on $m$. In particular, by allowing an extra  $\log(n)$ factor and using stronger deviation inequalities for binomial random variables, we showed that the error in reconstructing the quartet species tree is at least $1/n^{a}$  for some $a&amp;gt;0$ . Then by considering a tree with $n/3$ triplets joined by long branches, we showed that the reconstruction error can be made arbitrarily close to $1$, for $m \leq (a/5)f^{-2} \log n$.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These results imply that for ASTRAL to guarantee correct reconstruction with high probability uniformly over the space of all species trees, $\Theta\left(f^{-2}\log n\right)$ gene trees are both necessary and sufficient.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Mirarab, S., Reaz, R., Bayzid, M. S., Zimmermann, T., Swenson, M. S., &amp;amp; Warnow, T. (2014). ASTRAL: genome-scale coalescent-based species tree estimation. &lt;em&gt;Bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., Roch, S., &amp;amp; Mirarab, S. (2017). Species tree estimation using ASTRAL: how many genes are enough?. &lt;em&gt;IEEE/ACM transactions on computational biology and bioinformatics&lt;/em&gt;. &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

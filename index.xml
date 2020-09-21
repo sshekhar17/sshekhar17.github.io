@@ -541,7 +541,7 @@ from the previous proposition.&lt;/p&gt;
 &lt;li&gt;&lt;span style=&#34;color:DarkRed&#34;&gt; Adaptive Resource Allocation for Statistical Estimation&lt;/span&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Besides these, I have also worked on some other problems such as phylogenetic reconstruction and control of parallel queues which are described in the &lt;span style=&#34;color:DarkRed&#34;&gt; &amp;ldquo;Other Results&amp;quot;&lt;/span&gt; section below.&lt;/p&gt;
-&lt;h3 id=&#34;1-sequential-model-based-optimization-smbo&#34;&gt;1. Sequential Model Based Optimization (SMBO).&lt;/h3&gt;
+&lt;h3 id=&#34;1-sequential-model-based-optimization-smbo&#34;&gt;1. Sequential Model Based Optimization (SMBO)&lt;/h3&gt;
 &lt;p&gt;In SMBO, the goal of an agent is to design an adaptive strategy to query a noisy and expensive black-box function $f:\mathcal{X}=[0,1]^d\mapsto \mathbb{R}$,   guided by a surrogate model to efficiently learn about its maximizer.
 Most algorithms in this area use Gaussian Processes~(GPs) as surrogates, and  are analyzed either in the fully Bayesian framework~(Bayesian Optimization) or in the frequentist setting~(Kernelized Bandits).
 &lt;em&gt;In my research in this area, I have proposed new algorithms with the best-known theoretical guarantees and lower computational complexity and also derived   algorithm-independent impossibility results characterizing the fundamental performance limits&lt;/em&gt;.&lt;/p&gt;
@@ -583,7 +583,7 @@ In &lt;span style=&#34;color:green&#34;&gt; (Shekhar and Javidi, 2019) &lt;/span
 Classification with abstention refers to the classification problems in which the learner can also abstain from declaring a label, i.e., a &lt;em&gt;&amp;ldquo;don&amp;rsquo;t know&amp;rdquo;&lt;/em&gt; option. It  models  several applications such as  medical diagnostic systems,  voice assistant devices and content filtering. In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, Ghavamzadeh and Javidi, 2020) &lt;/span&gt;&lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;, we proposed  the first active learning algorithm for this problem and &lt;strong&gt;precisely characterized the benefits of active over passive learning   for this problem&lt;/strong&gt;. We first obtained information-theoretic lower bound of $ \Omega(n^{-\beta(\alpha+1)/(2\beta + d + \alpha\beta)})$ for the excess risk of any passive algorithm~(here $\alpha$ and $\beta$ are the &lt;em&gt;margin&lt;/em&gt; and &lt;em&gt;smoothness&lt;/em&gt; parameters resp.). Then, we showed that the corresponding minmax rate in the active setting is $\Theta\left( n^{-\beta(1+\alpha)/(d+2\beta)}\right)$.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&#34;2-adaptive-resource-allocation&#34;&gt;2. Adaptive Resource Allocation.&lt;/h3&gt;
+&lt;h3 id=&#34;3-adaptive-resource-allocation&#34;&gt;3. Adaptive Resource Allocation&lt;/h3&gt;
 &lt;p&gt;In the next project, I worked on the problem of 
 &lt;a href=&#34;https://arxiv.org/abs/1412.6613&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;adaptive resource allocation&lt;/a&gt; among $K$ probability distributions to estimate all of them uniformly well.
 This is motivated by the problem of constructing a uniformly accurate model of the transition structure of an unknown Markov Decision Process (MDP), given a finite exploration budget.
@@ -610,7 +610,7 @@ Additionally, we also proved the optimality of our proposed allocation scheme by
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;
-&lt;a href=&#34;https://sshekhar17.githuo.io/Queues.pdf&#34;&gt;Control of Parallel Queues with Observation Delay.&lt;/a&gt; In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, 2017) &lt;/span&gt; &lt;sup id=&#34;fnref:9&#34;&gt;&lt;a href=&#34;#fn:9&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;9&lt;/a&gt;&lt;/sup&gt;, we obtained the optimal policy for a system of parallel queues with one server under a fixed observation delay $D&amp;gt;0$. The optimal policy is the one which allocates the server to the queue whose occupancy stochastically dominates that of all other queues. This result generalizes the Longest Connected First (LCF) policy of Tassiulas and Ephreimedes~(1993) to the case of delayed observations.&lt;/p&gt;
+&lt;a href=&#34;https://sshekhar17.githuo.io/Queues.pdf&#34;&gt;Control of Parallel Queues with Observation Delay.&lt;/a&gt; In &lt;span style=&#34;color:green&#34;&gt; (Shekhar, 2017) &lt;/span&gt; &lt;sup id=&#34;fnref:9&#34;&gt;&lt;a href=&#34;#fn:9&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;9&lt;/a&gt;&lt;/sup&gt;, we obtained the optimal policy for a system of parallel queues with one server under a fixed observation delay $D&amp;gt;0$. The optimal policy is the one which allocates the server to the queue whose occupancy stochastically dominates that of all other queues. This result generalizes the Longest Connected First (LCF) policy of Tassiulas and Ephremides~(1993) to the case of delayed observations.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;hr&gt;

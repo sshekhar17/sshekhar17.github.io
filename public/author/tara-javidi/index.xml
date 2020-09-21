@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tara Javidi | My Webpage</title>
+    <link>https://sshekhar17.githuo.io/author/tara-javidi/</link>
+      <atom:link href="https://sshekhar17.githuo.io/author/tara-javidi/index.xml" rel="self" type="application/rss+xml" />
+    <description>Tara Javidi</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 01 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>https://sshekhar17.githuo.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Tara Javidi</title>
+      <link>https://sshekhar17.githuo.io/author/tara-javidi/</link>
+    </image>
+    
+    <item>
+      <title>Multi-Scale Zero-Order Optimization of Smooth Functions in an RKHS</title>
+      <link>https://sshekhar17.githuo.io/publication/shekhar-2020-multi/</link>
+      <pubDate>Mon, 01 Jun 2020 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/shekhar-2020-multi/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Adaptive Sampling for Estimating Multiple Probability Distributions</title>
+      <link>https://sshekhar17.githuo.io/publication/shekhar-2019-adaptive/</link>
+      <pubDate>Fri, 01 May 2020 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/shekhar-2019-adaptive/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Active learning for binary classification with abstention</title>
+      <link>https://sshekhar17.githuo.io/publication/shekhar-2019-active/</link>
+      <pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/shekhar-2019-active/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Multiscale Gaussian Process Level Set Estimation</title>
+      <link>https://sshekhar17.githuo.io/publication/shekhar-2019-multiscale/</link>
+      <pubDate>Tue, 01 Jan 2019 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/shekhar-2019-multiscale/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Fully decentralized federated learning</title>
+      <link>https://sshekhar17.githuo.io/publication/lalitha-2018-fully/</link>
+      <pubDate>Thu, 01 Nov 2018 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/lalitha-2018-fully/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Gaussian process bandits with adaptive discretization</title>
+      <link>https://sshekhar17.githuo.io/publication/shekhar-2018-gaussian/</link>
+      <pubDate>Sun, 01 Apr 2018 00:00:00 +0000</pubDate>
+      <guid>https://sshekhar17.githuo.io/publication/shekhar-2018-gaussian/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

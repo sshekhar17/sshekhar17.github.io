@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bayesian Optimization | My Webpage</title>
+    <link>https://sshekhar17.githuo.io/tag/bayesian-optimization/</link>
+      <atom:link href="https://sshekhar17.githuo.io/tag/bayesian-optimization/index.xml" rel="self" type="application/rss+xml" />
+    <description>Bayesian Optimization</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><lastBuildDate>Mon, 22 Jun 2020 02:02:52 -0700</lastBuildDate>
+    <image>
+      <url>https://sshekhar17.githuo.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
+      <title>Bayesian Optimization</title>
+      <link>https://sshekhar17.githuo.io/tag/bayesian-optimization/</link>
+    </image>
+    
+    <item>
+      <title>Bayesian Optimization</title>
+      <link>https://sshekhar17.githuo.io/project/bayesian-optimization/</link>
+      <pubDate>Mon, 22 Jun 2020 02:02:52 -0700</pubDate>
+      <guid>https://sshekhar17.githuo.io/project/bayesian-optimization/</guid>
+      <description>&lt;p&gt;Several applications, such as hyperparameter tuning, can be formulated as the problem
+of optimizing a noisy black-box function ($f$) that is expensive to evaluate. In the field of 
+&lt;a href=&#34;https://distill.pub/2020/bayesian-optimization/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Bayesian Optimization&lt;/a&gt; (also referred to as &lt;em&gt;Gaussian Process Bandits&lt;/em&gt;), the process of optimization is driven by utilizing a 
+&lt;a href=&#34;&#34;&gt;Gaussian Process&lt;/a&gt; surrogate model to guide the search for optimum.&lt;/p&gt;
+&lt;p&gt;Under the assumption that the unknown function $f$ is a sample from a zero mean Gaussian Process (GP) with known covariance function $K$, and given a sampling budget $n$, the goal of the agent is to design a sequential strategy to query
+the black-box function (noisy zeroth order oracle), in order to learn about its
+maximizer. The performance of an algorithm is measured  by its &lt;strong&gt;cumulative regret&lt;/strong&gt; $\mathcal{R}_n$,
+defined as $\mathcal{R}_n=\sum_{t=1}^n f(x^*) - f(x_t)$.&lt;/p&gt;
+&lt;p&gt;Existing results in literature have obtained
+regret bounds of the form $\mathcal{R}_n = \mathcal{O} \left ( \sqrt{n \log n \gamma_n}\right)$, where $\gamma_n$ is the
+maximum information that can be gained about $f$ from $n$ samples.&lt;/p&gt;
+&lt;h3 id=&#34;improved-bounds-for--bayesian-gp-banditshttpsprojecteuclidorgeuclidejs1543892564&#34;&gt;
+&lt;a href=&#34;https://projecteuclid.org/euclid.ejs/1543892564&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Improved Bounds for  Bayesian GP Bandits&lt;/a&gt;.&lt;/h3&gt;
+&lt;p&gt;Our work in this area was motivated by the following informal idea:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Since our goal is to learn about a maximizer of $f$, and not necessarily about the whole function, can we identify cases in which the $\gamma_n$ based bounds are loose.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Our main contributions were:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Following the above intuition, we first constructed two Gaussian Processes for which we showed that the $\gamma_n$ based bounds were very loose.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Next, we proposed an algorithm which constructs a non-uniform partition of the input space and focuses sampling in the near optimal regions. For this algorithm we obtained bounds on $\mathcal{R}_n$ which were tighter than the existing results. In particular, we obtained the &lt;strong&gt;first sublinear regret bounds&lt;/strong&gt; for the exponential kernel, and &lt;strong&gt;strictly better regret bounds for Matern kernels&lt;/strong&gt; when $D&amp;gt;\nu-1$, where $D$ is the dimension of the input space, and $\nu$ is the smoothness parameter of the Matern kernel.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We then extended our algorithm to the case of Contextual GP bandits, and obtained improvements over the results of &lt;span style=&#34;color:blue&#34;&gt;(Krause and Ong, 2011)&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Finally, we also showed that the techniques developed can also be used to propose a Bayesian version of the Zooming algorithm of &lt;span style=&#34;color:blue&#34;&gt; (Kleinberg et al., 2008)&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;extension-to-gp-level-set-estimationhttpproceedingsmlrpressv89shekhar19ahtml&#34;&gt;
+&lt;a href=&#34;http://proceedings.mlr.press/v89/shekhar19a.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Extension to GP Level Set Estimation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;In some problems the goal is not to learn about the optimizer of $f$, but instead to
+estimate the $\lambda$-level set of the function, i.e., the region of the input space where $f$ is above a threshold $\lambda$. In &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2019)&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; , we extended the techniques developed in &lt;span style=&#34;color:blue&#34;&gt;(Shekhar and Javidi, 2018) &lt;sup id=&#34;fnref:4&#34;&gt;&lt;a href=&#34;#fn:4&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;4&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt; to propose a GP level set estimation algorithm with &lt;strong&gt;improved convergence rates&lt;/strong&gt; and &lt;strong&gt;lower computational complexity&lt;/strong&gt; than the previous known results of &lt;span style=&#34;color:blue&#34;&gt; Gotovos et al., 2013 &lt;sup id=&#34;fnref:5&#34;&gt;&lt;a href=&#34;#fn:5&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;5&lt;/a&gt;&lt;/sup&gt;&lt;/span&gt;. In addition, by exploiting the structured nature of the evaluation points of our proposed algorithm, we also obtained &lt;strong&gt;tighter bounds on the information gain&lt;/strong&gt; of our algorithm.&lt;/p&gt;
+&lt;h3 id=&#34;references&#34;&gt;References&lt;/h3&gt;
+&lt;section class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Krause, A., &amp;amp; Ong, C. S. (2011). Contextual gaussian process bandit optimization. &lt;em&gt;Neurips&lt;/em&gt; &lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Kleinberg, R., Slivkins, A., &amp;amp; Upfal, E. (2008). Multi-armed bandits in metric spaces. &lt;em&gt;STOC&lt;/em&gt; &lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2019). Multi-Scale Gaussian Process Level Set Estimation. &lt;em&gt;AISTATS&lt;/em&gt;. &lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:4&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Shekhar, S., &amp;amp; Javidi, T. (2018). Gaussian Process Bandits with Adaptive Discretization. &lt;em&gt;Electronic Journal of Statistics&lt;/em&gt;. &lt;a href=&#34;#fnref:4&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:5&#34; role=&#34;doc-endnote&#34;&gt;
+&lt;p&gt;Gotovos, A., Casati, N., Hitz, G., &amp;amp; Krause, A. (2013). Active learning for level set estimation. &lt;em&gt;IJCAI&lt;/em&gt;. &lt;a href=&#34;#fnref:5&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
