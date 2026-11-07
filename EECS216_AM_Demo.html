@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive amplitude modulation laboratory for EECS 216, Signals and Systems.">
+  <title>Amplitude Modulation Demo | EECS 216</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #14253b;
+      --muted: #53657b;
+      --line: #dbe3ee;
+      --panel: #fff;
+      --page: #f4f7fb;
+      --blue: #2365b5;
+      --orange: #d16b26;
+      --purple: #8447a9;
+      --magenta: #ad4269;
+      --green: #138461;
+      --gold: #ac7b00;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+    .shell { max-width: 1260px; padding: 25px 24px 48px; margin: auto; }
+    header { margin: 0 0 19px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; }
+    .brand { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: #28649a; }
+    .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: #52718e; }
+    h1 { font-size: clamp(28px,4vw,41px); line-height: 1.12; margin: 9px 0; letter-spacing: -.03em; }
+    h2 { font-size: 18px; line-height: 1.2; letter-spacing: -.01em; margin: 0 0 9px; }
+    h3 { font-size: 14px; font-weight: 750; margin: 0 0 7px; }
+    .intro { color: var(--muted); max-width: 850px; font-size: 15px; margin: 0 0 21px; }
+    .tiny { font-size: 12px; color: var(--muted); }
+    .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 2px 6px rgba(16,38,64,.025); }
+    .setup { padding: 20px 22px; margin-bottom: 17px; }
+    .setup-grid { display: grid; grid-template-columns: minmax(280px,1fr) minmax(220px,1fr) minmax(220px,1fr); gap: 22px; align-items: start; }
+    .source-choice { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 9px; }
+    button, .upload-label { font-family: inherit; cursor: pointer; touch-action: manipulation; }
+    .softbtn { padding: 8px 12px; border: 1px solid #cfdaea; color: #29445f; background: #fff; border-radius: 9px; font-weight: 650; font-size: 13px; }
+    .softbtn:hover { border-color: #87b1dd; background: #f6faff; }
+    .softbtn.active { background: #eaf2fd; border-color: #6e9fd6; color: #154c8b; }
+    .fileinput { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .upload-label { display: inline-block; }
+    .status { font-size: 12px; color: var(--muted); margin-top: 10px; overflow-wrap: anywhere; }
+    .controls { padding: 20px 22px 18px; margin-bottom: 17px; }
+    .control-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 26px; }
+    .control-head { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+    output { font-variant-numeric: tabular-nums; color: #174f8f; white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: #708096; font-size: 11px; }
+    .control-head label { min-width: 0; }
+    .angular-readout { white-space: normal; text-align: right; font-size: 12px; line-height: 1.35; }
+    .phase-meter { margin-top: 8px; border-top: 1px solid #e5ebf3; padding-top: 7px; }
+    .phase-meter-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; gap: 7px; color: #617388; }
+    .phase-meter-row output { font-size: 13px; font-weight: 800; color: #174f8f; }
+    .phase-meter progress { width: 100%; display: block; height: 7px; margin-top: 5px; border: 0; border-radius: 999px; overflow: hidden; appearance: none; -webkit-appearance: none; }
+    .phase-meter progress::-webkit-progress-bar { background: #e4ebf3; border-radius: 999px; }
+    .phase-meter progress::-webkit-progress-value { background: #2365b5; border-radius: 999px; }
+    .phase-meter progress::-moz-progress-bar { background: #2365b5; border-radius: 999px; }
+    .reset { background: white; color: #385c7a; border: 1px solid var(--line); border-radius: 9px; padding: 6px 11px; font-weight: 700; font-size: 12px; }
+    .reset:hover { background: #f5f8fb; }
+    .chain { display: flex; align-items: center; justify-content: center; gap: 7px; flex-wrap: wrap; padding: 14px; margin-bottom: 17px; }
+    .try-panel { padding: 15px 21px 13px; margin-bottom: 17px; }
+    .try-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+    .try-heading h2 { margin-bottom: 4px; }
+    .try-heading p { margin: 0; font-size: 12px; color: var(--muted); }
+    .try-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 23px; padding: 0; margin: 8px 0 0; list-style: none; }
+    .try-list li { position: relative; padding-left: 14px; font-size: 13px; line-height: 1.45; color: #415973; }
+    .try-list li::before { content: '•'; position: absolute; left: 0; color: #2365b5; font-weight: 700; }
+    .try-list strong { color: #1c3e60; }
+    .node { padding: 7px 11px; border-radius: 8px; border: 1px solid var(--line); background: white; white-space: nowrap; text-align: center; font-weight: 700; font-size: 12px; }
+    .node span { display: block; font-weight: 450; font-size: 11px; color: var(--muted); }
+    .arrow { font-size: 18px; color: #718397; }
+    .main-panel { padding: 18px 21px 20px; }
+    .chart-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .stage-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+    .stage-tab { border-radius: 9px; background: #fff; border: 1px solid var(--line); color: #455972; padding: 10px 13px; font-size: 13px; font-weight: 700; }
+    .stage-tab:hover { background: #f6faff; }
+    .stage-tab[aria-pressed="true"] { color: white; background: #1f568e; border-color: #1f568e; }
+    .plottools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px; color: var(--muted); }
+    .plottools label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+    .plottools select { border: 1px solid var(--line); border-radius: 7px; padding: 5px 6px; background: white; color: var(--ink); font-size: 13px; }
+    .plot-grid { display: grid; grid-template-columns: minmax(0,1.28fr) minmax(0,.72fr); gap: 24px; }
+    .plotbox { min-width: 0; border: 1px solid #e4eaf2; border-radius: 11px; padding: 11px 12px 7px; background: white; }
+    .plot-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 0 4px 3px; }
+    .plot-title { font-size: 14px; font-weight: 750; }
+    .plot-subtitle { font-size: 11px; color: #697b91; }
+    canvas { width: 100%; height: 290px; display: block; }
+    .line-legend { display: flex; gap: 18px; margin-top: 6px; flex-wrap: wrap; padding-left: 5px; color: #627387; font-size: 12px; }
+    .legend-key { display: inline-flex; gap: 7px; align-items: center; }
+    .swatch { display: inline-block; width: 21px; height: 0; border-top: 3px solid; }
+    .readout { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; margin-top: 17px; }
+    .info { padding: 14px 17px; background: #f7faff; border: 1px solid #dfe8f4; border-radius: 11px; }
+    .formula { font-family: Georgia, "Times New Roman", serif; font-size: 17px; color: #234d79; line-height: 1.5; }
+    .info p { margin: 3px 0 0; color: #4d6278; font-size: 13px; }
+    .listen { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
+    .transport { display: flex; align-items: center; gap: 13px; margin-top: 16px; padding: 12px 14px; background: #f5f9fd; border: 1px solid #e0e9f3; border-radius: 10px; }
+    .transport input[type="range"] { flex: 1; min-width: 70px; }
+    .timecode { font-size: 12px; color: #48617c; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sources-detail { margin-top: 9px; font-size: 12px; color: #5b6e83; }
+    .sources-detail a { color: #1d5b94; }
+    .source-choice button { white-space: nowrap; }
+    .empty-note { font-size: 12px; color: #6b7f95; }
+    .play { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; background: #1d5c95; border: 1px solid #1d5c95; color: #fff; border-radius: 10px; font-weight: 700; font-size: 13px; }
+    .play:hover { background: #174776; }
+    .play.alt { background: white; color: #204f7b; border-color: #bad1e5; }
+    .play.alt:hover { background: #f3f9ff; }
+    .foot { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 19px; color: #65778c; font-size: 12px; }
+    .foot a { color: #1d5b94; }
+    .hidden { display: none!important; }
+    @media (max-width: 1000px) { .control-grid { grid-template-columns: 1fr 1fr; } .setup-grid { grid-template-columns: 1fr 1fr; } .plot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) { .try-list { grid-template-columns: 1fr; } }
+    @media (max-width: 660px) { .shell { padding: 16px 12px 40px; } .setup-grid,.readout,.control-grid { grid-template-columns: 1fr; } .setup,.controls,.main-panel,.try-panel { padding: 15px; } .node { flex: 1; } canvas { height: 230px; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header><div class="brand">University of Michigan · EECS 216</div><div class="eyebrow">Signals and Systems</div></header>
+    <h1>Amplitude Modulation Demo</h1>
+    <p class="intro">Follow an audio signal through carrier modulation, noise, coherent demodulation, and low-pass filtering. Move any slider to adjust the simulated RF processing and live spectra. <strong>Listen to the recovered sound</strong> as the receiver loses phase synchronization.</p>
+
+    <section class="panel setup" aria-label="Audio source">
+      <div class="setup-grid">
+        <div>
+          <h2>1. Choose your audio</h2>
+          <div class="source-choice">
+            <button type="button" class="softbtn active" id="beethovenBtn" aria-pressed="true">Beethoven · Symphony No. 5</button>
+            <button type="button" class="softbtn" id="joplinBtn" aria-pressed="false">Joplin · The Entertainer</button>
+            <button type="button" class="softbtn" id="twoToneBtn" aria-pressed="false">Two tones</button>
+            <button type="button" class="softbtn" id="melodyBtn" aria-pressed="false">Melody</button>
+            <label class="softbtn upload-label" for="audioFile">Upload audio…</label>
+            <input id="audioFile" type="file" class="fileinput" accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac">
+          </div>
+          <div class="status" id="fileStatus" role="status">Beethoven selected by default · 8:20 · press Play to stream the recording.</div>
+          <div class="sources-detail" id="sourceCredit">Beethoven, Symphony No. 5 (first movement), Skidmore College Orchestra. Public-domain recording via <a href="https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor,_op._67_-_i._allegro_con_brio.ogg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>.</div>
+        </div>
+        <div>
+          <h3>What happens to the spectrum?</h3>
+          <div class="formula">y(t) = x(t) cos(ω<sub>c</sub>t)</div>
+          <div class="tiny">Creates two spectral copies centered at ±ω<sub>c</sub> in the angular-frequency spectrum.</div>
+        </div>
+        <div>
+          <h3>What will you discover?</h3>
+          <div class="formula">x̂(t) ≈ x(t) cos(φ)</div>
+          <div class="tiny">After demodulation and low-pass filtering, a phase error attenuates the desired signal.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel controls" aria-label="Signal processing controls">
+      <div class="chart-top"><h2>2. Change the signal-processing parameters</h2><button class="reset" type="button" id="resetBtn">Reset controls</button></div>
+      <div class="control-grid">
+        <div>
+          <div class="control-head"><label for="carrier">Carrier angular frequency ω<sub>c</sub></label><output class="angular-readout" id="carrierVal">2π × 50,000 rad/s</output></div>
+          <input id="carrier" type="range" min="12000" max="55000" step="1000" value="50000">
+          <div class="range-ends"><span>12 kHz</span><span>55 kHz</span></div>
+        </div>
+        <div>
+          <div class="control-head"><label for="noise">RF channel noise</label><output id="noiseVal">15%</output></div>
+          <input id="noise" type="range" min="0" max="100" step="1" value="15">
+          <div class="range-ends"><span>None</span><span>1 × signal RMS</span></div>
+        </div>
+        <div>
+          <div class="control-head"><label for="phase">Receiver phase error φ</label><output id="phaseVal">0°</output></div>
+          <input id="phase" type="range" min="0" max="90" step="1" value="0">
+          <div class="range-ends"><span>0° (synchronized)</span><span>90°</span></div>
+          <div class="phase-meter" aria-label="Ideal recovered signal amplitude gain">
+            <div class="phase-meter-row"><span>Ideal gain · cos(φ)</span><output id="phaseGainVal" aria-live="polite">1.000</output></div>
+            <progress id="phaseGainMeter" value="1" max="1" aria-label="Ideal recovered signal amplitude gain"></progress>
+          </div>
+        </div>
+        <div>
+          <div class="control-head"><label for="cutoff">LPF cutoff ω<sub>LPF</sub></label><output class="angular-readout" id="cutoffVal">2π × 5,500 rad/s</output></div>
+          <input id="cutoff" type="range" min="500" max="8000" step="100" value="5500">
+          <div class="range-ends"><span>0.5 kHz</span><span>8 kHz</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="chain" aria-label="Block diagram">
+      <div class="node">x(t)<span>baseband</span></div><div class="arrow">→</div>
+      <div class="node">× cos(ω<sub>c</sub>t)<span>modulator</span></div><div class="arrow">→</div>
+      <div class="node">+ n(t)<span>channel</span></div><div class="arrow">→</div>
+      <div class="node">× 2cos(ω<sub>c</sub>t + φ)<span>receiver mixer</span></div><div class="arrow">→</div>
+      <div class="node">LPF<span>recovery</span></div>
+    </section>
+
+    <section class="panel try-panel" aria-labelledby="tryTitle">
+      <div class="try-heading"><h2 id="tryTitle">Things to try and observe</h2><p>For clean spectral peaks, begin with <strong>Two tones</strong>.</p></div>
+      <ul class="try-list">
+        <li><strong>Modulation:</strong> Adjust ω<sub>c</sub> and watch the baseband spectrum shift to ±ω<sub>c</sub>.</li>
+        <li><strong>Demodulation:</strong> Select Mixer output, then <strong>±120 kHz</strong> to see images at ±2ω<sub>c</sub>; the LPF removes them.</li>
+        <li><strong>Phase error:</strong> Increase φ toward 90°. The desired recovered amplitude falls as cos(φ), reaching zero without noise.</li>
+        <li><strong>Noise:</strong> Turn up channel noise and listen. The LPF cannot remove noise overlapping the audio band.</li>
+      </ul>
+    </section>
+
+    <section class="panel main-panel" aria-label="Signal visualization">
+      <div class="chart-top"><h2>3. Inspect each stage</h2><div class="plottools">
+        <label><input id="compare" type="checkbox" checked> Overlay original</label>
+        <label for="zoom">Spectrum window <select id="zoom"><option value="standard">±60 kHz (fixed)</option><option value="extended" selected>±120 kHz (mixer images)</option></select></label>
+        <label for="timeWindow">Time view <select id="timeWindow"><option value="auto">Automatic</option><option value="0.5">0.5 ms</option><option value="2">2 ms</option><option value="12">12 ms</option></select></label>
+      </div></div>
+      <div class="stage-tabs" role="group" aria-label="Choose a signal processing stage">
+        <button class="stage-tab" type="button" data-stage="x" aria-pressed="false">1 · Original</button>
+        <button class="stage-tab" type="button" data-stage="y" aria-pressed="true">2 · Modulated</button>
+        <button class="stage-tab" type="button" data-stage="r" aria-pressed="false">3 · With noise</button>
+        <button class="stage-tab" type="button" data-stage="z" aria-pressed="false">4 · Mixer output</button>
+        <button class="stage-tab" type="button" data-stage="hat" aria-pressed="false">5 · After LPF</button>
+      </div>
+      <div class="plot-grid">
+        <div class="plotbox">
+          <div class="plot-head"><span class="plot-title">Magnitude spectrum |S(jω)|</span><span class="plot-subtitle">Live frequency spectrum · fixed amplitude scale</span></div>
+          <canvas id="spectrum" role="img" aria-label="Magnitude spectrum of the selected signal, compared with the original signal"></canvas>
+          <div class="line-legend" id="spectrumLegend"></div>
+        </div>
+        <div class="plotbox">
+          <div class="plot-head"><span class="plot-title">Time-domain signal</span><span class="plot-subtitle">Rolling waveform · same amplitude scale</span></div>
+          <canvas id="waveform" role="img" aria-label="Time-domain waveform of selected signal"></canvas>
+          <div class="line-legend" id="waveLegend"></div>
+        </div>
+      </div>
+      <div class="readout">
+        <div class="info" aria-live="polite">
+          <h3 id="stageHeading">Modulated signal</h3>
+          <div class="formula" id="stageFormula">y(t) = x(t) cos(ω<sub>c</sub>t)</div>
+          <p id="stageInfo">The spectrum has two copies centered at ±ω<sub>c</sub>, each half the unmodulated amplitude.</p>
+        </div>
+        <div class="info" aria-live="polite">
+          <h3>Receiver synchronization</h3>
+          <div class="formula" id="attenuation">cos(0°) = 1.000</div>
+          <p id="phaseInfo">At 0° the desired baseband is preserved. Increasing phase error weakens the recovered signal, not the expected noise power.</p>
+        </div>
+      </div>
+      <div class="transport" aria-label="Full-song playback timeline">
+        <label class="timecode" for="seek">Position</label>
+        <input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="Seek within full recording">
+        <span class="timecode" id="timeLabel">0:00 / 8:20</span>
+      </div>
+      <div class="listen">
+        <button type="button" class="play" id="playX">▶ Play original</button>
+        <button type="button" class="play alt" id="inspectR">Inspect modulated signal spectrum</button>
+        <button type="button" class="play" id="playHat">▶ Play recovered</button>
+        <button type="button" class="reset" id="pauseBtn">Ⅱ Pause</button>
+        <button type="button" class="reset" id="stopBtn">■ Stop</button>
+        <span id="playStatus" class="tiny" role="status">The 50 kHz radio-frequency signal is visualized, not sent to your speakers. Listen to Original or Recovered audio.</span>
+      </div>
+    </section>
+
+    <div class="foot"><span>Teaching model: DSB suppressed-carrier AM at 256 kHz RF simulation rate. Input is approximately limited to 5 kHz. Coherent recovery uses an equivalent low-rate I/Q noise model and a fourth-order Butterworth LPF. Spectra update during playback.</span><span>EECS 216 · browser-only · uploaded files stay local</span></div>
+  </div>
+<script>
+'use strict';
+(() => {
+  /*
+   * The source audio and loudspeaker run at the device's audio rate (usually
+   * 44.1/48 kHz). The selected RF spectra and waveforms are calculated from
+   * streaming 32-ms audio windows at RF_FS=256 kHz, so 50 kHz carriers and
+   * ±100-kHz mixer images are represented without aliasing.
+   *
+   * The *audible recovered signal* uses the exact low-frequency equivalent of
+   * coherent DSB-SC demodulation of a narrowband Gaussian RF channel:
+   *   r(t) = [x(t)+nI(t)] cos(wc t) + nQ(t) sin(wc t),
+   *   LPF[2r(t)cos(wc t+phi)] = LPF[x cos(phi) + nI cos(phi) - nQ sin(phi)].
+   * nI,nQ are independent lowpassed white Gaussian noise processes. Their
+   * joint distribution is rotationally symmetric, so the recovered noise
+   * power does not depend on the receiver phase.
+   *
+   * RF stages are not sent to the loudspeakers (50 kHz is inaudible and
+   * a 48-kHz soundcard cannot reproduce it). The entire song is streamed;
+   * only finite rolling windows are simulated at RF rate, never 8 min at once.
+   */
+  const SOURCE_BW=5000,RF_FS=256000,FFT_SIZE=8192;
+  const SOURCES={
+    beethoven:{name:'Beethoven — Symphony No. 5, movement I',duration:500,
+      local:'audio/beethoven_symphony5_movement1.ogg',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor%2C_op._67_-_i._allegro_con_brio.ogg',
+      credit:'Beethoven, Symphony No. 5, first movement, performed by the Skidmore College Orchestra. Public-domain recording.',
+      page:'https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor,_op._67_-_i._allegro_con_brio.ogg'},
+    joplin:{name:'Scott Joplin — The Entertainer',duration:306,
+      local:'audio/joplin_the_entertainer.mp3',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/b/bd/%22The_Entertainer%22_%281902%29%2C_by_Scott_Joplin.mp3',
+      credit:'Scott Joplin, The Entertainer, performed by James Brigham (2018). Recording CC0 1.0.',
+      page:'https://commons.wikimedia.org/wiki/File:%22The_Entertainer%22_(1902),_by_Scott_Joplin.mp3'}
+  };
+  const names={x:'Original (baseband)',y:'Modulated',r:'Received + RF noise',z:'Receiver mixer output',hat:'Recovered after LPF'};
+  const colors={x:'#2365b5',y:'#d16b26',r:'#ad4269',z:'#8447a9',hat:'#138461'};
+  const byId=id=>document.getElementById(id);
+  const controls={carrier:byId('carrier'),noise:byId('noise'),phase:byId('phase'),cutoff:byId('cutoff')};
+  const audio=document.createElement('audio'); audio.preload='metadata';audio.crossOrigin='anonymous';audio.playsInline=true;
+  document.body.append(audio);
+  let context=null,graph=null,stage='y',listening='hat';
+  let sourceName='beethoven',blobUrl=null,usingLocal=false,triedRemote=false;
+  let animationTimer=null,inputRMS=.16,draggingSeek=false,readyForVisualization=false;
+  const traces={};
+  const showStatus=s=>{byId('fileStatus').textContent=s;};
+  const showPlayback=s=>{byId('playStatus').textContent=s;};
+  const formatTime=seconds=>{
+    if(!Number.isFinite(seconds)||seconds<0)seconds=0;
+    return Math.floor(seconds/60)+':'+String(Math.floor(seconds%60)).padStart(2,'0');
+  };
+  function duration(){
+    return Number.isFinite(audio.duration)&&audio.duration>0?audio.duration:(SOURCES[sourceName]?.duration||6);
+  }
+  function updateTimeline(){
+    const d=duration(),t=Number.isFinite(audio.currentTime)?audio.currentTime:0;
+    byId('seek').max=String(d||100);
+    if(!draggingSeek)byId('seek').value=String(Math.min(t,d||100));
+    byId('timeLabel').textContent=formatTime(t)+' / '+formatTime(d);
+  }
+  function setChoice(choice){
+    sourceName=choice;
+    for(const [key,id] of [['beethoven','beethovenBtn'],['joplin','joplinBtn'],['twoTone','twoToneBtn'],['melody','melodyBtn']]){
+      byId(id).classList.toggle('active',choice===key);
+      byId(id).setAttribute('aria-pressed',String(choice===key));
+    }
+  }
+  function setCredits(text,href){
+    const el=byId('sourceCredit');el.textContent=text;
+    if(href){const a=document.createElement('a');a.href=href;a.textContent=' Recording and license on Wikimedia Commons.';a.target='_blank';a.rel='noopener noreferrer';el.append(a);}
+  }
+  function resetMusicPlayback(){
+    audio.pause();try{audio.currentTime=0;}catch(_){}
+    readyForVisualization=false;inputRMS=.16;
+    if(graph)for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(0,context.currentTime,.015);
+    updateTimeline();blankCharts();
+  }
+  function selectSource(which){
+    resetMusicPlayback();if(blobUrl){URL.revokeObjectURL(blobUrl);blobUrl=null;}
+    setChoice(which);usingLocal=false;triedRemote=false;
+    if(which==='beethoven'||which==='joplin'){
+      const item=SOURCES[which];setCredits(item.credit,item.page);
+      usingLocal=location.protocol==='http:'||location.protocol==='https:';
+      audio.src=usingLocal?item.local:item.remote;audio.load();
+      showStatus('Selected '+item.name+' ('+formatTime(item.duration)+'). Press Play to stream the complete recording.');
+    }else{
+      const data=which==='twoTone'?makeTwoTone():makeMelody();
+      blobUrl=URL.createObjectURL(makeWaveBlob(data,48000));audio.src=blobUrl;audio.load();
+      setCredits('Synthesized example generated inside your browser; no external audio required.',null);
+      showStatus('Built-in '+(which==='twoTone'?'two-tone test':'melody')+' · 6 seconds. Both long recordings remain available.');
+    }
+    updateTimeline();
+  }
+  function makeTwoTone(){
+    const fs=48000,n=6*fs,x=new Float32Array(n);
+    for(let i=0;i<n;i++){const t=i/fs;x[i]=.55*Math.sin(2*Math.PI*440*t)+.3*Math.sin(2*Math.PI*1100*t);}
+    return x;
+  }
+  function makeMelody(){
+    const fs=48000,n=6*fs,x=new Float32Array(n),notes=[330,392,494,440,392,330,294,392,440,523];
+    for(let i=0;i<n;i++){
+      const t=i/fs,index=Math.min(notes.length-1,Math.floor(t/.6)),local=t-index*.6,f=notes[index];
+      const env=Math.max(0,Math.min(1,local/.028,(.6-local)/.07));
+      x[i]=env*(.68*Math.sin(2*Math.PI*f*local)+.21*Math.sin(2*Math.PI*2*f*local)+.1*Math.sin(2*Math.PI*3*f*local));
+    }
+    return x;
+  }
+  function makeWaveBlob(data,fs){
+    const buffer=new ArrayBuffer(44+data.length*2),dv=new DataView(buffer);
+    const str=(off,txt)=>{for(let i=0;i<txt.length;i++)dv.setUint8(off+i,txt.charCodeAt(i));};
+    str(0,'RIFF');dv.setUint32(4,36+data.length*2,true);str(8,'WAVE');
+    str(12,'fmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
+    dv.setUint32(24,fs,true);dv.setUint32(28,fs*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);
+    str(36,'data');dv.setUint32(40,data.length*2,true);
+    for(let i=0;i<data.length;i++)dv.setInt16(44+i*2,Math.round(Math.max(-1,Math.min(1,data[i]))*32767),true);
+    return new Blob([buffer],{type:'audio/wav'});
+  }
+  function makeLowPass(q,cutoff){
+    const b=context.createBiquadFilter();b.type='lowpass';b.frequency.value=cutoff;b.Q.value=q;return b;
+  }
+  function lowPassPair(cutoff){
+    return [makeLowPass(.541196100146,cutoff),makeLowPass(1.306562964876,cutoff)];
+  }
+  function makeAnalyzer(){const a=context.createAnalyser();a.fftSize=FFT_SIZE;a.smoothingTimeConstant=0;return a;}
+  function makeNoise(){
+    const fs=context.sampleRate,buf=context.createBuffer(1,fs*7,fs),ch=buf.getChannelData(0);
+    for(let i=0;i<ch.length;i+=2){
+      const u=Math.max(1e-12,Math.random()),v=Math.random(),s=Math.sqrt(-2*Math.log(u));
+      ch[i]=s*Math.cos(2*Math.PI*v);if(i+1<ch.length)ch[i+1]=s*Math.sin(2*Math.PI*v);
+    }
+    const n=context.createBufferSource();n.buffer=buf;n.loop=true;return n;
+  }
+  function createGraph(){
+    if(graph)return graph;
+    context=new (window.AudioContext||window.webkitAudioContext)();
+    const fs=context.sampleRate,media=context.createMediaElementSource(audio);
+    const [src1,src2]=lowPassPair(SOURCE_BW),aX=makeAnalyzer(),aNI=makeAnalyzer(),aNQ=makeAnalyzer(),aHat=makeAnalyzer();
+    media.connect(src1).connect(src2).connect(aX);
+    const signalGain=context.createGain();aX.connect(signalGain);
+    const noiseI=makeNoise(),noiseQ=makeNoise(),gateI=context.createGain(),gateQ=context.createGain();
+    gateI.gain.value=0;gateQ.gain.value=0;
+    const [niLP1,niLP2]=lowPassPair(SOURCE_BW),[nqLP1,nqLP2]=lowPassPair(SOURCE_BW);
+    const niLevel=context.createGain(),nqLevel=context.createGain(),niPhase=context.createGain(),nqPhase=context.createGain();
+    noiseI.connect(gateI).connect(niLP1).connect(niLP2).connect(niLevel).connect(aNI).connect(niPhase);
+    noiseQ.connect(gateQ).connect(nqLP1).connect(nqLP2).connect(nqLevel).connect(aNQ).connect(nqPhase);
+    const [rxLP1,rxLP2]=lowPassPair(+controls.cutoff.value);
+    for(const node of [signalGain,niPhase,nqPhase])node.connect(rxLP1);
+    rxLP1.connect(rxLP2).connect(aHat);
+    // Analyzers need to be in a rendered graph even when not selected for listening.
+    const silent=context.createGain();silent.gain.value=0;silent.connect(context.destination);
+    for(const a of [aX,aNI,aNQ,aHat])a.connect(silent);
+    const master=context.createGain();master.gain.value=.65;master.connect(context.destination);
+    const t=context.currentTime+.03;noiseI.start(t);noiseQ.start(t);
+    graph={fs,aX,aNI,aNQ,aHat,signalGain,niLevel,nqLevel,niPhase,nqPhase,gateI,gateQ,rxLP1,rxLP2,master,heard:null,
+      analyzers:{x:aX,ni:aNI,nq:aNQ,hat:aHat}};
+    applyControls();chooseListening(listening);
+    return graph;
+  }
+  function chooseListening(which){
+    listening=which;
+    if(!graph)return;
+    const node=which==='x'?graph.aX:graph.aHat;
+    if(graph.heard&&graph.heard!==node)graph.heard.disconnect(graph.master);
+    if(graph.heard!==node){node.connect(graph.master);graph.heard=node;}
+  }
+  function applyControls(){
+    refreshLabels();if(!graph)return;
+    const g=graph,now=context.currentTime,phi=(+controls.phase.value)*Math.PI/180;
+    g.signalGain.gain.setTargetAtTime(Math.cos(phi),now,.012);
+    g.niPhase.gain.setTargetAtTime(Math.cos(phi),now,.012);
+    g.nqPhase.gain.setTargetAtTime(-Math.sin(phi),now,.012);
+    for(const lpf of [g.rxLP1,g.rxLP2])lpf.frequency.setTargetAtTime(+controls.cutoff.value,now,.02);
+    adjustNoiseGain();
+  }
+  function adjustNoiseGain(){
+    if(!graph)return;
+    const r=(+controls.noise.value)/100,fs=context.sampleRate;
+    // Calibrate Gaussian white noise after a 4th-order Butterworth input LPF.
+    // Its approximate one-sided noise-equivalent BW is 1.026 * fc.
+    const filterRms=Math.sqrt(Math.min(.99,2*1.026*SOURCE_BW/fs));
+    const level=r*inputRMS/(Math.SQRT2*filterRms);
+    graph.niLevel.gain.setTargetAtTime(level,context.currentTime,.07);
+    graph.nqLevel.gain.setTargetAtTime(level,context.currentTime,.07);
+  }
+  function refreshLabels(){
+    const fc=+controls.carrier.value,noise=+controls.noise.value,ph=+controls.phase.value,cut=+controls.cutoff.value;
+    byId('carrierVal').textContent='2π × '+fc.toLocaleString('en-US')+' rad/s';
+    byId('noiseVal').textContent=noise+'%';byId('phaseVal').textContent=ph+'°';
+    byId('cutoffVal').textContent='2π × '+cut.toLocaleString('en-US')+' rad/s';
+    const a=Math.cos(ph*Math.PI/180);
+    byId('phaseGainVal').textContent=Math.abs(a)<1e-10?'0.000':a.toFixed(3);
+    byId('phaseGainMeter').value=Math.max(0,a);
+    byId('attenuation').textContent='cos('+ph+'°) = '+(Math.abs(a)<1e-10?'0.000':a.toFixed(3));
+    byId('phaseInfo').textContent=ph===0?'At 0°, the oscillators are synchronized; the LPF preserves the desired baseband.':
+      ph===90?'At 90°, ideal demodulation eliminates the desired audio; filtered noise remains.':
+      'The desired recovered amplitude is about '+Math.round(100*a)+'% of its value at 0°. The expected output noise power stays unchanged.';
+    updateStageDescription();
+  }
+  function updateStageDescription(){
+    const fc=+controls.carrier.value;
+    const descriptions={
+      x:['Original baseband signal','x(t)','The original recording is low-pass filtered to approximately 5 kHz.'],
+      y:['Suppressed-carrier modulation','y(t) = x(t) cos(ω<sub>c</sub>t)','The input spectrum shifts to ±ωc (±'+(fc/1000).toFixed(0)+' kHz on the ω/(2π) axis).'],
+      r:['Received signal with RF channel noise','r(t) = y(t) + n<sub>RF</sub>(t)','Independent in-phase and quadrature Gaussian noise produces noise within the RF signal band.'],
+      z:['Output of receiver mixer','z(t) = 2r(t) cos(ω<sub>c</sub>t + φ)','The spectrum returns to baseband, with images near ±2ωc (±'+(2*fc/1000).toFixed(0)+' kHz on the axis). Use ±120 kHz view.'],
+      hat:['Recovered signal after LPF','x̂(t) = LPF{z(t)}','The LPF removes the high-frequency images; phase attenuation and in-band noise remain.']
+    };
+    const [head,formula,detail]=descriptions[stage];
+    byId('stageHeading').textContent=head;byId('stageFormula').innerHTML=formula;byId('stageInfo').textContent=detail;
+    for(const b of document.querySelectorAll('[data-stage]'))b.setAttribute('aria-pressed',String(b.dataset.stage===stage));
+  }
+  function setupCanvas(id){
+    const canvas=byId(id),rect=canvas.getBoundingClientRect(),scale=Math.min(window.devicePixelRatio||1,2);
+    const width=Math.max(250,rect.width),height=Math.max(150,rect.height);
+    if(canvas.width!==Math.round(width*scale)||canvas.height!==Math.round(height*scale)){
+      canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);
+    }
+    const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);
+    return {ctx,width,height};
+  }
+  function drawAxes(ctx,dims,view,xLabel,yLabel,xTicks,yTicks,xFormatter,yFormatter){
+    const {width,height}=dims,pad={left:55,right:15,top:18,bottom:35};
+    const plot={x:pad.left,y:pad.top,w:width-pad.left-pad.right,h:height-pad.top-pad.bottom};
+    ctx.clearRect(0,0,width,height);ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);
+    ctx.font='11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    for(const yt of yTicks){
+      const yy=plot.y+(view.ymax-yt)/(view.ymax-view.ymin)*plot.h;
+      if(yy<plot.y-1||yy>plot.y+plot.h+1)continue;
+      ctx.strokeStyle='#e8edf4';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(plot.x,yy);ctx.lineTo(plot.x+plot.w,yy);ctx.stroke();
+      ctx.fillStyle='#6c7c8d';ctx.fillText(yFormatter(yt),plot.x-8,yy);
+    }
+    ctx.textAlign='center';ctx.textBaseline='top';
+    for(const xt of xTicks){
+      const xx=plot.x+(xt-view.xmin)/(view.xmax-view.xmin)*plot.w;
+      if(xx<plot.x-1||xx>plot.x+plot.w+1)continue;
+      ctx.strokeStyle=xt===0?'#cbd7e4':'#edf1f6';ctx.lineWidth=xt===0?1.2:1;
+      ctx.beginPath();ctx.moveTo(xx,plot.y);ctx.lineTo(xx,plot.y+plot.h);ctx.stroke();
+      ctx.fillStyle='#6c7c8d';ctx.fillText(xFormatter(xt),xx,plot.y+plot.h+7);
+    }
+    ctx.strokeStyle='#9cadbe';ctx.lineWidth=1;ctx.strokeRect(plot.x,plot.y,plot.w,plot.h);
+    ctx.fillStyle='#52677f';ctx.textAlign='center';ctx.fillText(xLabel,plot.x+plot.w/2,height-15);
+    ctx.save();ctx.translate(13,plot.y+plot.h/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLabel,0,0);ctx.restore();
+    return plot;
+  }
+  function ticks(lo,hi,maxTicks=9){
+    const rough=(hi-lo)/Math.max(1,maxTicks-1),power=10**Math.floor(Math.log10(Math.max(rough,1e-9)));
+    const step=([1,2,2.5,5,10].find(v=>v*power>=rough)||10)*power;
+    const out=[];for(let k=Math.ceil(lo/step);k*step<=hi+1e-8;k++)out.push(k*step);return out;
+  }
+  // A shared frequency frame: selecting a processing stage NEVER rescales the x-axis.
+  function freqRange(){
+    return byId('zoom').value==='extended'?120000:60000;
+  }
+  function drawTrace(ctx,plot,which,range,style){
+    const db=traces[which]?.frequency;if(!db)return;
+    const maxima=new Float32Array(Math.ceil(plot.w)+1);maxima.fill(-110);
+    for(let k=0;k<db.length;k++){
+      const f=k*RF_FS/FFT_SIZE;if(f>range)break;
+      const v=Number.isFinite(db[k])?db[k]:-110;
+      for(const sign of [1,-1]){
+        const ix=Math.round(((sign*f+range)/(2*range))*plot.w);
+        if(ix>=0&&ix<maxima.length)maxima[ix]=Math.max(maxima[ix],v);
+      }
+    }
+    ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();
+    ctx.strokeStyle=colors[which];ctx.lineWidth=style==='primary'?1.9:1.5;
+    ctx.globalAlpha=style==='primary'?1:.55;if(style!=='primary')ctx.setLineDash([5,4]);
+    ctx.beginPath();for(let i=0;i<maxima.length;i++){
+      const val=Math.max(-100,Math.min(0,maxima[i]));
+      const yy=plot.y+(0-val)/100*plot.h,xx=plot.x+i;
+      if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  function drawSpectrum(){
+    const dims=setupCanvas('spectrum'),{ctx}=dims,range=freqRange()/1000;
+    const view={xmin:-range,xmax:range,ymin:-100,ymax:0};
+    const xTicks=range===60?[-60,-40,-20,0,20,40,60]:[-120,-80,-40,0,40,80,120];
+    const plot=drawAxes(ctx,dims,view,'ω / (2π) (kHz)','Magnitude (dBFS)',xTicks,[-100,-80,-60,-40,-20,0],x=>Number(x.toFixed(1)).toString(),String);
+    if(stage==='z'||stage==='hat'){
+      const c=+controls.cutoff.value/1000;
+      const p0=plot.x+(-c-view.xmin)/(view.xmax-view.xmin)*plot.w,p1=plot.x+(c-view.xmin)/(view.xmax-view.xmin)*plot.w;
+      ctx.fillStyle='rgba(19,132,97,.055)';ctx.fillRect(Math.max(plot.x,p0),plot.y,Math.max(0,Math.min(plot.x+plot.w,p1)-Math.max(plot.x,p0)),plot.h);
+      for(const xx of [p0,p1])if(xx>=plot.x&&xx<=plot.x+plot.w){ctx.strokeStyle='rgba(19,132,97,.5)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xx,plot.y);ctx.lineTo(xx,plot.y+plot.h);ctx.stroke();ctx.setLineDash([]);}
+    }
+    if(readyForVisualization){
+      if(byId('compare').checked&&stage!=='x')drawTrace(ctx,plot,'x',range*1000,'comparison');
+      drawTrace(ctx,plot,stage,range*1000,'primary');
+    }else{
+      ctx.fillStyle='#73859a';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('Press Play to see the live spectrum',plot.x+plot.w/2,plot.y+plot.h/2);
+    }
+    updateLegend('spectrumLegend');
+  }
+  function timeSpanMs(){
+    const option=byId('timeWindow').value;
+    return option==='auto'?(stage==='x'||stage==='hat'?12:.5):Number(option);
+  }
+  function waveTrace(ctx,plot,which,amp,style,spanMs){
+    const samples=traces[which]?.time;if(!samples)return;
+    const count=Math.min(samples.length,Math.floor(RF_FS*spanMs/1000));
+    ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();
+    ctx.strokeStyle=colors[which];ctx.lineWidth=style==='primary'?1.5:1.2;
+    ctx.globalAlpha=style==='primary'?1:.55;if(style!=='primary')ctx.setLineDash([4,4]);
+    ctx.beginPath();for(let i=0;i<count;i++){
+      const xx=plot.x+i/Math.max(1,count-1)*plot.w;
+      const yy=plot.y+(amp-samples[samples.length-count+i])/(2*amp)*plot.h;
+      if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  function drawWaveform(){
+    const dims=setupCanvas('waveform'),{ctx}=dims,spanMs=timeSpanMs(),count=Math.floor(RF_FS*spanMs/1000);
+    let amp=.25;
+    if(readyForVisualization){
+      const seq=[traces[stage]?.time,...(byId('compare').checked?[traces.x?.time]:[])];
+      for(const arr of seq){
+        if(!arr)continue;
+        for(let i=Math.max(0,arr.length-count);i<arr.length;i+=2)amp=Math.max(amp,Math.abs(arr[i]));
+      }
+    }
+    amp=Math.min(4,Math.max(.25,Math.ceil(amp*2)/2));
+    const plot=drawAxes(ctx,dims,{xmin:0,xmax:spanMs,ymin:-amp,ymax:amp},'Time (ms)','Amplitude',
+      [0,spanMs/4,spanMs/2,3*spanMs/4,spanMs],[-amp,-amp/2,0,amp/2,amp],
+      x=>Number(x.toFixed(3)).toString(),x=>Number(x.toFixed(1)).toString());
+    if(readyForVisualization){
+      if(byId('compare').checked&&stage!=='x')waveTrace(ctx,plot,'x',amp,'comparison',spanMs);
+      waveTrace(ctx,plot,stage,amp,'primary',spanMs);
+    }else{ctx.fillStyle='#73859a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Live waveform',plot.x+plot.w/2,plot.y+plot.h/2);}
+    updateLegend('waveLegend');
+  }
+  function updateLegend(id){
+    const keys=byId('compare').checked&&stage!=='x'?['x',stage]:[stage];
+    byId(id).innerHTML=keys.map(k=>'<span class="legend-key"><span class="swatch" style="border-color:'+colors[k]+';'+(k==='x'&&stage!=='x'?'border-top-style:dashed;':'')+'"></span>'+names[k]+'</span>').join('');
+  }
+  function blankCharts(){
+    for(const k of ['x','y','r','z','hat'])delete traces[k];
+    readyForVisualization=false;drawSpectrum();drawWaveform();
+  }
+  // Bandlimited 16-tap Lanczos interpolation from audio rate to RF_FS.
+  // A small fixed headroom avoids lookahead at the analyser buffer boundary.
+  // Precomputed fractional-delay kernels avoid trig work in the live loop.
+  const INTERP_PHASES=512, INTERP_TAPS=16;
+  const interpKernels=(()=>{
+    const all=[];
+    const sinc=x=>Math.abs(x)<1e-9?1:Math.sin(Math.PI*x)/(Math.PI*x);
+    for(let p=0;p<INTERP_PHASES;p++){
+      const frac=p/INTERP_PHASES,kernel=new Float32Array(INTERP_TAPS);let sum=0;
+      for(let j=0;j<INTERP_TAPS;j++){
+        const offset=j-7,d=frac-offset;
+        kernel[j]=Math.abs(d)<8?sinc(d)*sinc(d/8):0;
+        sum+=kernel[j];
+      }
+      for(let j=0;j<INTERP_TAPS;j++)kernel[j]/=sum;
+      all.push(kernel);
+    }
+    return all;
+  })();
+  function interpolate(src,fs,out){
+    const ratio=fs/RF_FS,n=out.length,headroom=10;
+    for(let i=0;i<n;i++){
+      const pos=src.length-1-headroom-(n-1-i)*ratio,k=Math.floor(pos),frac=pos-k;
+      const kernel=interpKernels[Math.min(INTERP_PHASES-1,Math.round(frac*(INTERP_PHASES-1)))];
+      let v=0;
+      for(let j=0;j<INTERP_TAPS;j++)v+=src[k+j-7]*kernel[j];
+      out[i]=v;
+    }
+  }
+  // Radix-2 FFT of a Hann-windowed real signal, plotted as amplitude in dBFS.
+  function spectrumDb(samples){
+    const n=samples.length,re=new Float64Array(n),im=new Float64Array(n);
+    for(let i=0;i<n;i++)re[i]=samples[i]*(.5-.5*Math.cos(2*Math.PI*i/(n-1)));
+    for(let i=1,j=0;i<n;i++){
+      let bit=n>>1;while(j&bit){j^=bit;bit>>=1;}j^=bit;
+      if(i<j){const temp=re[i];re[i]=re[j];re[j]=temp;}
+    }
+    for(let size=2;size<=n;size*=2){
+      const half=size/2,theta=-2*Math.PI/size;
+      for(let start=0;start<n;start+=size){
+        for(let j=0;j<half;j++){
+          const angle=theta*j,c=Math.cos(angle),ss=Math.sin(angle),p=start+j,q=p+half;
+          const tr=re[q]*c-im[q]*ss,ti=re[q]*ss+im[q]*c;
+          re[q]=re[p]-tr;im[q]=im[p]-ti;re[p]+=tr;im[p]+=ti;
+        }
+      }
+    }
+    const out=new Float32Array(n/2),scale=4/(n-1);
+    for(let i=0;i<out.length;i++)out[i]=Math.max(-110,20*Math.log10(Math.max(1e-8,Math.hypot(re[i],im[i])*scale)));
+    return out;
+  }
+  function refreshAnalyzers(){
+    if(!graph||audio.paused||audio.readyState<2)return;
+    const raw={};for(const [key,a] of Object.entries(graph.analyzers)){
+      const data=new Float32Array(FFT_SIZE);a.getFloatTimeDomainData(data);raw[key]=data;
+    }
+    // Calibrate noise to the RMS of the current passage of music.
+    let sum=0;for(let i=0;i<raw.x.length;i++)sum+=raw.x[i]*raw.x[i];
+    const rms=Math.sqrt(sum/raw.x.length);
+    if(rms>1e-4)inputRMS=.985*inputRMS+.015*rms;
+    adjustNoiseGain();
+    const x=new Float32Array(FFT_SIZE),ni=new Float32Array(FFT_SIZE),nq=new Float32Array(FFT_SIZE),hat=new Float32Array(FFT_SIZE);
+    for(const [dst,src] of [[x,raw.x],[ni,raw.ni],[nq,raw.nq],[hat,raw.hat]])interpolate(src,graph.fs,dst);
+    const y=new Float32Array(FFT_SIZE),r=new Float32Array(FFT_SIZE),z=new Float32Array(FFT_SIZE);
+    const wc=2*Math.PI*+controls.carrier.value/RF_FS,phi=(+controls.phase.value)*Math.PI/180;
+    let theta=2*Math.PI*+controls.carrier.value*(audio.currentTime-(FFT_SIZE-1)/RF_FS);
+    for(let i=0;i<FFT_SIZE;i++,theta+=wc){
+      const cc=Math.cos(theta),ss=Math.sin(theta);
+      y[i]=x[i]*cc;
+      r[i]=y[i]+ni[i]*cc+nq[i]*ss;
+      z[i]=2*r[i]*Math.cos(theta+phi);
+    }
+    for(const [key,data] of Object.entries({x,y,r,z,hat}))traces[key]={time:data,frequency:spectrumDb(data)};
+    readyForVisualization=true;drawSpectrum();drawWaveform();updateTimeline();
+  }
+  function ensureTicker(){
+    if(animationTimer!==null)return;
+    animationTimer=window.setInterval(()=>{if(!audio.paused)refreshAnalyzers();},160);
+  }
+  async function startPlayback(which){
+    try{
+      const AudioContextCtor=window.AudioContext||window.webkitAudioContext;
+      if(!AudioContextCtor){showPlayback('This browser does not support the Web Audio API.');return;}
+      createGraph();chooseListening(which);
+      const resume=context.resume(),play=audio.play();await Promise.all([resume,play]);
+      for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(1,context.currentTime,.02);
+      ensureTicker();showPlayback('Playing '+(which==='x'?'original':'recovered')+' audio. RF spectra simulated at 256 kHz; audio output uses '+Math.round(context.sampleRate/1000)+' kHz.');
+    }catch(err){
+      showPlayback('Playback failed: '+err.message+'. Check the Commons link above or upload an audio file.');
+    }
+  }
+  function pause(){
+    audio.pause();if(graph)for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(0,context.currentTime,.015);
+    showPlayback('Paused at '+formatTime(audio.currentTime)+'. Press Play to resume.');
+  }
+  function stop(){pause();try{audio.currentTime=0;}catch(_){}updateTimeline();showPlayback('Stopped. Choose Original or Recovered.');}
+  audio.addEventListener('loadedmetadata',()=>{
+    updateTimeline();if(['beethoven','joplin'].includes(sourceName))showStatus(SOURCES[sourceName].name+' · '+formatTime(duration())+' available. Play or seek anywhere in the piece.');
+  });
+  audio.addEventListener('timeupdate',updateTimeline);
+  audio.addEventListener('ended',()=>{
+    if(graph)for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(0,context.currentTime,.015);
+    updateTimeline();showPlayback('Finished '+formatTime(duration())+'. Seek or play again.');
+  });
+  audio.addEventListener('error',()=>{
+    const item=SOURCES[sourceName];
+    if(item&&usingLocal&&!triedRemote){
+      triedRemote=true;usingLocal=false;showStatus('Local file not found; trying Wikimedia Commons…');
+      audio.src=item.remote;audio.load();return;
+    }
+    if(item)showStatus('Cannot stream '+item.name+'. Download from its Commons link and choose Upload audio, or host the file in audio/.');
+    else showStatus('Audio could not load; try another file.');
+  });
+  byId('beethovenBtn').addEventListener('click',()=>selectSource('beethoven'));
+  byId('joplinBtn').addEventListener('click',()=>selectSource('joplin'));
+  byId('twoToneBtn').addEventListener('click',()=>selectSource('twoTone'));
+  byId('melodyBtn').addEventListener('click',()=>selectSource('melody'));
+  byId('audioFile').addEventListener('change',event=>{
+    const file=event.target.files?.[0];if(!file)return;resetMusicPlayback();
+    if(blobUrl)URL.revokeObjectURL(blobUrl);blobUrl=URL.createObjectURL(file);
+    setChoice('upload');usingLocal=false;triedRemote=false;audio.src=blobUrl;audio.load();
+    setCredits('Uploaded audio stays in your browser session and is never sent to a server.',null);
+    showStatus('Uploaded '+file.name+' · loading metadata.');event.target.value='';
+  });
+  byId('seek').addEventListener('input',event=>{
+    draggingSeek=true;const value=+event.target.value;
+    byId('timeLabel').textContent=formatTime(value)+' / '+formatTime(duration());
+    if(Number.isFinite(audio.duration)&&audio.duration>0)audio.currentTime=Math.min(value,audio.duration);
+  });
+  byId('seek').addEventListener('change',()=>{draggingSeek=false;updateTimeline();});
+  byId('resetBtn').addEventListener('click',()=>{
+    controls.carrier.value=50000;controls.noise.value=15;controls.phase.value=0;controls.cutoff.value=5500;
+    applyControls();if(readyForVisualization){refreshAnalyzers();}
+  });
+  Object.values(controls).forEach(el=>el.addEventListener('input',()=>{applyControls();if(readyForVisualization){refreshAnalyzers();}}));
+  byId('compare').addEventListener('change',()=>{drawSpectrum();drawWaveform();});
+  byId('zoom').addEventListener('change',drawSpectrum);
+  byId('timeWindow').addEventListener('change',drawWaveform);
+  document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>{
+    stage=b.dataset.stage;updateStageDescription();drawSpectrum();drawWaveform();
+  }));
+  byId('playX').addEventListener('click',()=>startPlayback('x'));
+  byId('playHat').addEventListener('click',()=>startPlayback('hat'));
+  byId('inspectR').addEventListener('click',()=>{
+    stage='r';updateStageDescription();drawSpectrum();drawWaveform();
+    showPlayback('The RF signal (ωc / 2π = '+(+controls.carrier.value/1000)+' kHz) is shown in the spectrum. It cannot be played directly through normal audio hardware.');
+  });
+  byId('pauseBtn').addEventListener('click',pause);
+  byId('stopBtn').addEventListener('click',stop);
+  window.addEventListener('resize',()=>{drawSpectrum();drawWaveform();});
+  window.addEventListener('pagehide',()=>{audio.pause();if(blobUrl)URL.revokeObjectURL(blobUrl);});
+  if(window.__EECS216_AM_TEST__){window.__EECS216_AM_DIAGNOSTICS__=()=>({traces,contextRate:context?.sampleRate,phase:+controls.phase.value,carrier:+controls.carrier.value,inputRMS});}
+  refreshLabels();selectSource('beethoven');
+})();
+</script>
+</body>
+</html>
