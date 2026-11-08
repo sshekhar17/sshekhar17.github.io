@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Interactive EECS 216 single-sideband modulation demo: sideband filtering, coherent recovery, phase-error attenuation and waveform distortion.">
+<title>Single-Sideband Amplitude Modulation Demo | EECS 216</title>
+<style>
+
+    :root {
+      color-scheme: light;
+      --ink: #14253b;
+      --muted: #53657b;
+      --line: #dbe3ee;
+      --panel: #fff;
+      --page: #f4f7fb;
+      --blue: #2365b5;
+      --orange: #d16b26;
+      --purple: #8447a9;
+      --magenta: #ad4269;
+      --green: #138461;
+      --gold: #ac7b00;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+    .shell { max-width: 1260px; padding: 25px 24px 48px; margin: auto; }
+    header { margin: 0 0 19px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; }
+    .brand { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: #28649a; }
+    .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: #52718e; }
+    h1 { font-size: clamp(28px,4vw,41px); line-height: 1.12; margin: 9px 0; letter-spacing: -.03em; }
+    h2 { font-size: 18px; line-height: 1.2; letter-spacing: -.01em; margin: 0 0 9px; }
+    h3 { font-size: 14px; font-weight: 750; margin: 0 0 7px; }
+    .intro { color: var(--muted); max-width: 850px; font-size: 15px; margin: 0 0 21px; }
+    .tiny { font-size: 12px; color: var(--muted); }
+    .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 2px 6px rgba(16,38,64,.025); }
+    .setup { padding: 20px 22px; margin-bottom: 17px; }
+    .setup-grid { display: grid; grid-template-columns: minmax(280px,1fr) minmax(220px,1fr) minmax(220px,1fr); gap: 22px; align-items: start; }
+    .source-choice { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 9px; }
+    button, .upload-label { font-family: inherit; cursor: pointer; touch-action: manipulation; }
+    .softbtn { padding: 8px 12px; border: 1px solid #cfdaea; color: #29445f; background: #fff; border-radius: 9px; font-weight: 650; font-size: 13px; }
+    .softbtn:hover { border-color: #87b1dd; background: #f6faff; }
+    .softbtn.active { background: #eaf2fd; border-color: #6e9fd6; color: #154c8b; }
+    .fileinput { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .upload-label { display: inline-block; }
+    .status { font-size: 12px; color: var(--muted); margin-top: 10px; overflow-wrap: anywhere; }
+    .controls { padding: 20px 22px 18px; margin-bottom: 17px; }
+    .control-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 26px; }
+    .control-head { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+    output { font-variant-numeric: tabular-nums; color: #174f8f; white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: #708096; font-size: 11px; }
+    .control-head label { min-width: 0; }
+    .angular-readout { white-space: normal; text-align: right; font-size: 12px; line-height: 1.35; }
+    .phase-meter { margin-top: 8px; border-top: 1px solid #e5ebf3; padding-top: 7px; }
+    .phase-meter-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; gap: 7px; color: #617388; }
+    .phase-meter-row output { font-size: 13px; font-weight: 800; color: #174f8f; }
+    .phase-meter progress { width: 100%; display: block; height: 7px; margin-top: 5px; border: 0; border-radius: 999px; overflow: hidden; appearance: none; -webkit-appearance: none; }
+    .phase-meter progress::-webkit-progress-bar { background: #e4ebf3; border-radius: 999px; }
+    .phase-meter progress::-webkit-progress-value { background: #2365b5; border-radius: 999px; }
+    .phase-meter progress::-moz-progress-bar { background: #2365b5; border-radius: 999px; }
+    .reset { background: white; color: #385c7a; border: 1px solid var(--line); border-radius: 9px; padding: 6px 11px; font-weight: 700; font-size: 12px; }
+    .reset:hover { background: #f5f8fb; }
+    .chain { display: flex; align-items: center; justify-content: center; gap: 7px; flex-wrap: wrap; padding: 14px; margin-bottom: 17px; }
+    .try-panel { padding: 15px 21px 13px; margin-bottom: 17px; }
+    .try-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+    .try-heading h2 { margin-bottom: 4px; }
+    .try-heading p { margin: 0; font-size: 12px; color: var(--muted); }
+    .try-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 23px; padding: 0; margin: 8px 0 0; list-style: none; }
+    .try-list li { position: relative; padding-left: 14px; font-size: 13px; line-height: 1.45; color: #415973; }
+    .try-list li::before { content: '•'; position: absolute; left: 0; color: #2365b5; font-weight: 700; }
+    .try-list strong { color: #1c3e60; }
+    .node { padding: 7px 11px; border-radius: 8px; border: 1px solid var(--line); background: white; white-space: nowrap; text-align: center; font-weight: 700; font-size: 12px; }
+    .node span { display: block; font-weight: 450; font-size: 11px; color: var(--muted); }
+    .arrow { font-size: 18px; color: #718397; }
+    .main-panel { padding: 18px 21px 20px; }
+    .chart-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .stage-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+    .stage-tab { border-radius: 9px; background: #fff; border: 1px solid var(--line); color: #455972; padding: 10px 13px; font-size: 13px; font-weight: 700; }
+    .stage-tab:hover { background: #f6faff; }
+    .stage-tab[aria-pressed="true"] { color: white; background: #1f568e; border-color: #1f568e; }
+    .plottools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px; color: var(--muted); }
+    .plottools label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+    .plottools select { border: 1px solid var(--line); border-radius: 7px; padding: 5px 6px; background: white; color: var(--ink); font-size: 13px; }
+    .plot-grid { display: grid; grid-template-columns: minmax(0,1.28fr) minmax(0,.72fr); gap: 24px; }
+    .plotbox { min-width: 0; border: 1px solid #e4eaf2; border-radius: 11px; padding: 11px 12px 7px; background: white; }
+    .plot-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 0 4px 3px; }
+    .plot-title { font-size: 14px; font-weight: 750; }
+    .plot-subtitle { font-size: 11px; color: #697b91; }
+    canvas { width: 100%; height: 290px; display: block; }
+    .line-legend { display: flex; gap: 18px; margin-top: 6px; flex-wrap: wrap; padding-left: 5px; color: #627387; font-size: 12px; }
+    .legend-key { display: inline-flex; gap: 7px; align-items: center; }
+    .swatch { display: inline-block; width: 21px; height: 0; border-top: 3px solid; }
+    .readout { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; margin-top: 17px; }
+    .info { padding: 14px 17px; background: #f7faff; border: 1px solid #dfe8f4; border-radius: 11px; }
+    .formula { font-family: Georgia, "Times New Roman", serif; font-size: 17px; color: #234d79; line-height: 1.5; }
+    .info p { margin: 3px 0 0; color: #4d6278; font-size: 13px; }
+    .listen { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
+    .transport { display: flex; align-items: center; gap: 13px; margin-top: 16px; padding: 12px 14px; background: #f5f9fd; border: 1px solid #e0e9f3; border-radius: 10px; }
+    .transport input[type="range"] { flex: 1; min-width: 70px; }
+    .timecode { font-size: 12px; color: #48617c; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sources-detail { margin-top: 9px; font-size: 12px; color: #5b6e83; }
+    .sources-detail a { color: #1d5b94; }
+    .source-choice button { white-space: nowrap; }
+    .empty-note { font-size: 12px; color: #6b7f95; }
+    .play { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; background: #1d5c95; border: 1px solid #1d5c95; color: #fff; border-radius: 10px; font-weight: 700; font-size: 13px; }
+    .play:hover { background: #174776; }
+    .play.alt { background: white; color: #204f7b; border-color: #bad1e5; }
+    .play.alt:hover { background: #f3f9ff; }
+    .foot { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 19px; color: #65778c; font-size: 12px; }
+    .foot a { color: #1d5b94; }
+    .hidden { display: none!important; }
+    @media (max-width: 1000px) { .control-grid { grid-template-columns: 1fr 1fr; } .setup-grid { grid-template-columns: 1fr 1fr; } .plot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) { .try-list { grid-template-columns: 1fr; } }
+    @media (max-width: 660px) { .shell { padding: 16px 12px 40px; } .setup-grid,.readout,.control-grid { grid-template-columns: 1fr; } .setup,.controls,.main-panel,.try-panel { padding: 15px; } .node { flex: 1; } canvas { height: 230px; } }
+  
+    /* Two-channel extensions: preserve visual identity of the DSB-SC AM demo. */
+    .source-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+    .channel-card { background:#f8fbff; border:1px solid #dce7f3; padding:15px 16px; border-radius:12px; min-width:0; }
+    .channel-card[data-channel="2"] { background:#fffaf5; border-color:#f0e0cf; }
+    .channel-card h3 { color:#205c9b; font-size:15px; }
+    .channel-card[data-channel="2"] h3 { color:#a95617; }
+    .channel-card .source-choice { margin-top:10px; }
+    .source-meta { display:flex; gap:9px; align-items:center; flex-wrap:wrap; color:#56677b; font-size:12px; }
+    .preset-row { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:center; margin-bottom:13px; }
+    .preset-row h2 { margin:0; }
+    .compact-explain { margin:11px 0 0; color:#576c82; font-size:13px; }
+    .flow-box { padding:13px 16px; margin-bottom:17px; }
+    .flow-grid { display:grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap:8px; align-items:center; }
+    .flow-stack { display:grid; gap:7px; }
+    .node-blue { border-color:#9fc1e6; color:#1b5b9b; background:#f2f7fd; }
+    .node-orange { border-color:#edc99f; color:#a45416; background:#fff9f0; }
+    .node-purple { border-color:#c4a8df; color:#71379b; background:#f7f2fc; }
+    .flow-arrow { color:#8794a6; font-size:19px; text-align:center; }
+    .flow-arrow small { display:block; font-size:9px; }
+    .flow-summary { font-size:12px; margin:9px 0 0; color:#526881; }
+    .mix-coeffs { margin-top:12px; padding-top:10px; border-top:1px solid #e5ebf3; }
+    .mix-group { margin-bottom:8px; }
+    .mix-head { display:flex; justify-content:space-between; color:#52677e; font-size:11px; align-items:center; margin-bottom:4px; gap:8px; }
+    .mix-bar { display:flex; height:9px; border-radius:999px; overflow:hidden; background:#e6edf5; }
+    .mix-bar .desired { background:#2365b5; width:100%; transition:width .12s; }
+    .mix-bar .leak { background:#d16b26; flex:1; }
+    .mix-meaning { font-size:11px; color:#65788e; line-height:1.4; margin-top:6px; }
+    .mathmix { font-family: Georgia,"Times New Roman",serif; font-size:19px; color:#24517d; line-height:1.65; }
+    .formula-sm { font-size:16px; }
+    .source-status { min-height:18px; }
+    .transport-note { color:#5a6c83; font-size:11px; line-height:1.5; margin-top:7px; }
+    .options-inline { display:flex; gap:5px; align-items:center; }
+    .options-inline select { max-width:175px; }
+    .readout--2 { grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); }
+    .line-legend .swatch.comparison { border-top-style:dashed; }
+    .source-choice .softbtn[data-channel="2"].active { background:#fff1e1; border-color:#e4a76c; color:#9b4b0f; }
+    .listen .play[data-selected="true"] { box-shadow:0 0 0 3px rgba(35,101,181,.18); }
+    @media (max-width:1050px) { .flow-grid{grid-template-columns: 1fr auto 1fr auto 1fr; } .flow-grid > :nth-last-child(-n+2){display:none;} }
+    @media (max-width:800px) { .source-grid { grid-template-columns:1fr; } .flow-grid{display:flex; flex-wrap:wrap; justify-content:center;}.flow-grid > :nth-last-child(-n+2){display:flex;} }
+    @media (max-width:660px) { .channel-card { padding:13px; } .readout--2 { grid-template-columns:1fr; } .mix-coeffs { margin-top:5px; } .flow-grid .node { min-width:100px; } .flow-arrow { font-size:15px; } }
+  
+/* SSB-specific refinements. */
+.setup-flex { display:grid;grid-template-columns:1.4fr 1fr;gap:23px;align-items:start; }
+.scheme-choice { display:flex;gap:8px;flex-wrap:wrap;margin:10px 0; }
+.scheme-choice .softbtn { min-width:94px; }
+.explain-card {background:#f8fbff;border:1px solid #e0e9f3;border-radius:10px;padding:12px 14px;margin-top:10px;}
+.explain-card h3 { margin-bottom:5px; }
+.explain-card p {font-size:12px;color:#51677e;margin:3px 0;}
+.power-panel {padding:17px 20px; margin-bottom:17px;}
+.power-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;}
+.power-item {background:#f8fbff;border:1px solid #e4eaf2;border-radius:11px;padding:11px 13px;}
+.power-item .number {font-size:24px;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums;}
+.power-item .label {font-size:12px;color:#5c6f86;min-height:35px;}
+.power-item .bar {height:8px;background:#e3eaf3;border-radius:10px;overflow:hidden;margin-top:7px;}
+.power-item .fill {display:block;height:100%;background:#2365b5;transition:width .12s;}
+.power-item.orange .fill{background:#d16b26;}
+.power-item.green .fill{background:#138461;}
+.power-note {font-size:12px;color:#64768b;margin:10px 0 0;}
+.compare-panel {padding:17px 21px 20px;margin-top:17px;border:1px solid #e1e7f0;border-radius:13px;background:#fbfcff;}
+.compare-panel canvas {height:300px;}
+.compare-head {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.compare-head h3 {font-size:16px;margin:0;}
+.compare-head .tiny {max-width:540px;}
+.comparison-caption{font-size:12px;color:#617389;margin:8px 0 0;}
+.radio-highlight {border:1px solid #aec7e2;background:#eff5fc;border-radius:9px;padding:8px 10px;font-size:12px;color:#375b7d;}
+.pill {display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid #d6e2ef;background:#f5faff;font-size:11px;color:#31679d;font-weight:700;}
+.check-row {display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:5px;}
+.stage-subtitle {font-size:12px;color:#62768c;margin-top:7px;}
+.compare-panel canvas {width:100%;}
+@media(max-width:850px){.setup-flex{grid-template-columns:1fr;}.power-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:600px){.power-grid{grid-template-columns:1fr;}.power-item .label{min-height:0}.power-item{padding:9px 12px}.compare-panel{padding:13px;}}
+</style></head><body><div class="shell">
+<header><div class="brand">University of Michigan · EECS 216</div></header>
+<h1>Single-Sideband Amplitude Modulation Demo</h1>
+<p class="intro">Start from suppressed-carrier AM, <strong>remove one sideband</strong>, and compare coherent reception. SSB uses <strong>half the RF bandwidth</strong>, but a receiver phase error can both reduce the component matching the original signal and <strong>distort its waveform</strong>.</p>
+
+<section class="panel setup" aria-label="Audio selection and modulation scheme">
+<h2>1. Choose your audio and transmission scheme</h2><div class="setup-flex">
+<div>
+ <div class="source-choice" role="group" aria-label="Choose audio source">
+ <button class="softbtn active" type="button" data-source="beethoven" aria-pressed="true">Beethoven · Symphony No. 5</button>
+ <button class="softbtn" type="button" data-source="joplin" aria-pressed="false">Joplin · The Entertainer</button>
+ <button class="softbtn" type="button" data-source="tone" aria-pressed="false">Two tones</button>
+ <button class="softbtn" type="button" data-source="pulse" aria-pressed="false">Pulse test</button>
+ <label class="softbtn upload-label" for="audioFile">Upload audio…</label><input id="audioFile" class="fileinput" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac">
+ </div>
+ <div class="status" id="fileStatus" role="status">Beethoven selected by default · 8:20 · press a Play button to stream.</div>
+ <div class="sources-detail" id="sourceCredit">Beethoven's Symphony No. 5, Skidmore College Orchestra. Public-domain recording via Wikimedia Commons.</div>
+</div>
+<div>
+ <h3>Transmission scheme</h3><div class="scheme-choice" role="group" aria-label="Select transmission scheme">
+ <button type="button" class="softbtn" data-scheme="dsb" aria-pressed="false">DSB-SC</button>
+ <button type="button" class="softbtn active" data-scheme="usb" aria-pressed="true">Upper SSB</button>
+ <button type="button" class="softbtn" data-scheme="lsb" aria-pressed="false">Lower SSB</button>
+ </div>
+ <div class="radio-highlight" id="bandwidthMessage">With 5 kHz baseband audio, USB occupies approximately 50–55 kHz rather than 45–55 kHz.</div>
+ <div class="tiny" style="margin-top:7px">SSB is formed by retaining one sideband of the DSB-SC signal; the missing sideband is not sent.</div>
+</div></div></section>
+
+<section class="panel controls" aria-label="Processing controls">
+<div class="chart-top"><h2>2. Change the signal-processing parameters</h2><button class="reset" type="button" id="resetBtn">Reset controls</button></div>
+<div class="control-grid">
+<div><div class="control-head"><label for="carrier">Carrier angular frequency ω<sub>c</sub></label><output id="carrierVal" class="angular-readout">2π × 50,000 rad/s</output></div><input id="carrier" type="range" min="12000" max="55000" step="1000" value="50000"><div class="range-ends"><span>12 kHz</span><span>55 kHz</span></div></div>
+<div><div class="control-head"><label for="noise">RF channel noise</label><output id="noiseVal">5%</output></div><input id="noise" type="range" min="0" max="100" step="1" value="5"><div class="range-ends"><span>None</span><span>1 × source RMS</span></div></div>
+<div><div class="control-head"><label for="phase">Receiver phase error φ</label><output id="phaseVal">10°</output></div><input id="phase" type="range" min="0" max="90" step="1" value="10"><div class="range-ends"><span>0° (synchronized)</span><span>90°</span></div><div class="phase-meter"><div class="phase-meter-row"><span>Desired amplitude coefficient · cos φ</span><output id="phaseGainVal">1.000</output></div><progress id="phaseGainMeter" value="1" max="1"></progress></div></div>
+<div><div class="control-head"><label for="cutoff">LPF cutoff ω<sub>LPF</sub></label><output id="cutoffVal" class="angular-readout">2π × 5,500 rad/s</output></div><input id="cutoff" type="range" min="500" max="8000" step="100" value="5500"><div class="range-ends"><span>0.5 kHz</span><span>8 kHz</span></div></div>
+</div></section>
+
+<section class="chain" aria-label="Processing diagram">
+<div class="node">x(t)<span>audio · |ω| ≤ ω<sub>B</sub></span></div><div class="arrow">→</div>
+<div class="node">× cos(ω<sub>c</sub>t)<span>DSB-SC</span></div><div class="arrow">→</div>
+<div class="node">Sideband filter<span>USB / LSB</span></div><div class="arrow">→</div>
+<div class="node">+ RF noise<span>channel</span></div><div class="arrow">→</div>
+<div class="node">× local cosine<span>phase error φ</span></div><div class="arrow">→</div>
+<div class="node">LPF<span>recovered audio</span></div>
+</section>
+
+<section class="panel try-panel" aria-labelledby="tryTitle"><div class="try-heading"><h2 id="tryTitle">Things to try and observe</h2><p>Begin with <strong>Two tones</strong> or <strong>Pulse test</strong>.</p></div>
+<ul class="try-list">
+<li><strong>Save bandwidth:</strong> Compare DSB-SC with Upper and Lower SSB. Observe which half of each RF band disappears.</li>
+<li><strong>Correct receiver:</strong> Set φ = 0° and noise = 0%. The recovered audio closely matches the original.</li>
+<li><strong>Phase-error experiment:</strong> Raise φ to 45°, then 90°. DSB-SC fades; SSB retains output power but changes the waveform.</li>
+<li><strong>Compare waveforms:</strong> Watch the three aligned plots and listen to DSB vs. SSB recovery. Turn on noise or change the LPF cutoff afterward.</li>
+</ul></section>
+
+<section class="panel power-panel" aria-label="Ideal phase-error effect"><div class="chart-top"><h2>3. Desired power versus distortion</h2><span class="pill">Ideal model · no noise</span></div>
+<div class="power-grid">
+<div class="power-item"><div class="label">Desired-signal power<br><span class="tiny">matches the original waveform</span></div><div class="number" id="wantedPower">100.0%</div><div class="bar"><span class="fill" id="wantedFill" style="width:100%"></span></div></div>
+<div class="power-item orange"><div class="label">Distortion power<br><span class="tiny">unwanted orthogonal component</span></div><div class="number" id="distortionPower">0.0%</div><div class="bar"><span class="fill" id="distortionFill" style="width:0%"></span></div></div>
+<div class="power-item green"><div class="label">Total recovered signal power<br><span class="tiny">relative to synchronized recovery</span></div><div class="number" id="totalPower">100.0%</div><div class="bar"><span class="fill" id="totalFill" style="width:100%"></span></div></div>
+</div><p class="power-note" id="powerExplanation">Ideal SSB: the desired component decreases as cos² φ while distortion increases as sin² φ. Their sum stays constant; this does not mean the waveform is unchanged.</p></section>
+
+<section class="panel main-panel" aria-label="Signal visualizations and playback">
+<div class="chart-top"><h2>4. Inspect each stage</h2><div class="plottools">
+<label><input type="checkbox" id="compare" checked> Overlay DSB/reference</label>
+<label for="zoom">Spectrum <select id="zoom"><option value="standard" selected>±60 kHz (fixed)</option><option value="extended">±120 kHz (mixer images)</option></select></label>
+<label for="timeWindow">Time view <select id="timeWindow"><option value="auto" selected>Automatic</option><option value="0.5">0.5 ms</option><option value="2">2 ms</option><option value="12">12 ms</option><option value="25">25 ms</option></select></label>
+</div></div>
+<div class="stage-tabs" role="group" aria-label="Select signal processing stage">
+<button class="stage-tab" type="button" data-stage="x" aria-pressed="false">1 · Original</button>
+<button class="stage-tab" type="button" data-stage="dsb" aria-pressed="false">2 · DSB-SC</button>
+<button class="stage-tab" type="button" data-stage="tx" aria-pressed="true">3 · SSB sideband</button>
+<button class="stage-tab" type="button" data-stage="r" aria-pressed="false">4 · With noise</button>
+<button class="stage-tab" type="button" data-stage="z" aria-pressed="false">5 · Receiver mixer</button>
+<button class="stage-tab" type="button" data-stage="hat" aria-pressed="false">6 · After LPF</button>
+</div>
+<div class="plot-grid">
+<div class="plotbox"><div class="plot-head"><span class="plot-title">Magnitude spectrum |S(jω)|</span><span class="plot-subtitle">256 kHz simulated RF · live FFT · fixed dBFS</span></div><canvas id="spectrum" role="img" aria-label="Live magnitude spectrum"></canvas><div class="line-legend" id="spectrumLegend"></div></div>
+<div class="plotbox"><div class="plot-head"><span class="plot-title">Time-domain signal</span><span class="plot-subtitle">Shared amplitude reference</span></div><canvas id="waveform" role="img" aria-label="Time-domain waveform"></canvas><div class="line-legend" id="waveLegend"></div></div>
+</div>
+<div class="readout"><div class="info" aria-live="polite"><h3 id="stageHeading">Sideband-selected signal</h3><div class="formula" id="stageFormula">Retain one sideband of the DSB-SC spectrum.</div><p id="stageInfo">The occupied bandwidth is half that of DSB-SC.</p></div><div class="info"><h3>Phase-error comparison</h3><div class="formula" id="phaseFormula">DSB: desired amplitude × cos φ</div><p id="phaseInfo">With phase mismatch, SSB also produces an unwanted waveform component.</p></div></div>
+<div class="compare-panel"><div class="compare-head"><div><h3>Compare DSB-SC versus SSB reception</h3><div class="tiny">Three synchronized waveforms · same vertical scale · ideal receiver (no noise)</div></div><label class="tiny"><input type="checkbox" id="showComparison" checked> Show comparison</label></div>
+<div id="comparisonArea"><canvas id="comparison" role="img" aria-label="Three synchronized waveforms: original, DSB-SC recovery, and SSB recovery"></canvas>
+<p class="comparison-caption">Same time interval and amplitude scale in all three rows. The comparison isolates phase mismatch; the live “After LPF” stage separately includes the adjustable LPF and channel noise.</p></div></div>
+<div class="transport" aria-label="Full-song playback timeline"><label class="timecode" for="seek">Position</label><input id="seek" type="range" min="0" max="500" step="0.1" value="0" aria-label="Seek within full audio recording"><span class="timecode" id="timeLabel">0:00 / 8:20</span></div>
+<div class="listen"><button type="button" id="playX" class="play">▶ Original</button><button type="button" id="playD" class="play alt">▶ DSB recovered</button><button type="button" id="playS" class="play">▶ SSB recovered</button><button type="button" id="playSelected" class="play alt">▶ Selected scheme</button><button type="button" id="pauseBtn" class="reset">Ⅱ Pause</button><button type="button" id="stopBtn" class="reset">■ Stop</button><span id="playStatus" class="tiny" role="status">RF is simulated for visualization, while audio playback uses an equivalent baseband receiver.</span></div>
+</section>
+<div class="foot"><span>Reference: EECS 216 Typed Lecture Notes by Prof. Achilleas Anastasopoulos · Chapter 7. SSB uses one RF sideband; coherent demodulation and LPF are simulated.</span><span>Static HTML · Uploaded files stay local</span></div>
+</div><script>
+'use strict';
+(() => {
+  /*
+    SSB teaching model. DSB y=x cos(wc t). Ideal USB and LSB are the
+    corresponding halves of its spectrum:
+      y_USB=(x cos(wc t)-Q[x] sin(wc t))/2;
+      y_LSB=(x cos(wc t)+Q[x] sin(wc t))/2,
+    where Q[x] is a 90-degree quadrature signal (computed internally).
+    A DSB receiver uses 2 cos(wc t+phi); SSB uses 4 cos(...) to
+    compensate for ideal sideband filtering. Ideal baseband results:
+       DSB: x cos phi
+       USB: x cos phi+Q[x] sin phi
+       LSB: x cos phi-Q[x] sin phi.
+    The normal-mode audio engine uses matched-delay FIR quadrature and
+    Web Audio biquad filters. 50-kHz RF is *not* played on the soundcard:
+    a 256-kHz numerical RF simulation is generated from live baseband.
+    The three-waveform comparison is intentionally noise free, whereas
+    the actual recovered audio contains the chosen filter and RF noise.
+  */
+  const RF_FS=256000, FFT_SIZE=8192, SOURCE_BW=5000, FIR_TAPS=1025;
+  const SOURCES={
+    beethoven:{name:'Beethoven — Symphony No. 5, movement I',duration:500,
+      local:'audio/beethoven_symphony5_movement1.ogg',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor%2C_op._67_-_i._allegro_con_brio.ogg',
+      credit:'Beethoven, Symphony No. 5 (I), Skidmore College Orchestra · public-domain recording.',
+      page:'https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor,_op._67_-_i._allegro_con_brio.ogg'},
+    joplin:{name:'Joplin — The Entertainer',duration:306,
+      local:'audio/joplin_the_entertainer.mp3',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/b/bd/%22The_Entertainer%22_%281902%29%2C_by_Scott_Joplin.mp3',
+      credit:'Scott Joplin, The Entertainer; James Brigham (2018) · CC0 recording.',
+      page:'https://commons.wikimedia.org/wiki/File:%22The_Entertainer%22_(1902),_by_Scott_Joplin.mp3'}
+  };
+  const byId=id=>document.getElementById(id);
+  const controls={carrier:byId('carrier'),noise:byId('noise'),phase:byId('phase'),cutoff:byId('cutoff')};
+  const audio=document.createElement('audio');audio.preload='metadata';audio.crossOrigin='anonymous';audio.playsInline=true;audio.loop=false;audio.style.display='none';document.body.append(audio);
+  const colors={x:'#2365b5',dsb:'#138461',usb:'#d16b26',lsb:'#d16b26',tx:'#8447a9',r:'#ad4269',z:'#8447a9',hat:'#d16b26',d:'#138461',s:'#d16b26'};
+  const labels={x:'Original',dsb:'DSB-SC',usb:'Upper sideband',lsb:'Lower sideband',tx:'Selected transmitted',r:'Received + noise',z:'Receiver mixer',hat:'Recovered audio',d:'DSB recovered',s:'SSB recovered'};
+  let choice='beethoven',scheme='usb',stage='tx',blob=null,usingLocal=false,triedRemote=false;
+  let context=null,graph=null,playing=false,heard='s',listenRequest='s',expectedDuration=500,pausedPosition=0,clockEpoch=0,dragSeek=false;
+  let tick=null,ready=false,inputRMS=.20,noiseScale=0,selectedAudio='s';
+  const traces={};
+  const fmtTime=seconds=>{if(!Number.isFinite(seconds)||seconds<0)seconds=0;return Math.floor(seconds/60)+':'+String(Math.floor(seconds%60)).padStart(2,'0');};
+  const round3=n=>Math.abs(n)<.0005?'0.000':n.toFixed(3);
+  const safeDuration=()=>Number.isFinite(audio.duration)&&audio.duration>0?audio.duration:expectedDuration;
+  const nowPosition=()=>playing&&context?Math.min(safeDuration(),pausedPosition+Math.max(0,context.currentTime-clockEpoch)):pausedPosition;
+  const playbackStatus=s=>{byId('playStatus').textContent=s;};
+  function updateTimeline(){const d=safeDuration(),p=Math.min(nowPosition(),d);byId('seek').max=String(d);if(!dragSeek)byId('seek').value=String(p);byId('timeLabel').textContent=fmtTime(p)+' / '+fmtTime(d);}
+  function seekMedia(t){try{if(audio.readyState>=1)audio.currentTime=Math.max(0,Math.min(t,Math.max(0,safeDuration()-.04)));}catch(_){} }
+  function setCredit(){const el=byId('sourceCredit');el.textContent='';const s=SOURCES[choice];if(s){el.append(document.createTextNode(s.credit+' '));const a=document.createElement('a');a.href=s.page;a.textContent='Recording/license.';a.target='_blank';a.rel='noopener noreferrer';el.append(a);}else{el.textContent=choice==='upload'?'Uploaded audio remains in your browser; it is not sent to a server.':'Synthetic audio generated locally in the browser.';}}
+  function waveBlob(samples,fs){const b=new ArrayBuffer(44+samples.length*2),v=new DataView(b);const str=(off,s)=>{for(let k=0;k<s.length;k++)v.setUint8(off+k,s.charCodeAt(k));};str(0,'RIFF');v.setUint32(4,36+samples.length*2,true);str(8,'WAVE');str(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,fs,true);v.setUint32(28,fs*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);str(36,'data');v.setUint32(40,samples.length*2,true);for(let k=0;k<samples.length;k++)v.setInt16(44+k*2,Math.round(Math.max(-1,Math.min(1,samples[k]))*32767),true);return new Blob([b],{type:'audio/wav'});}
+  function synthetic(kind){const fs=48000,dur=8,arr=new Float32Array(fs*dur);for(let i=0;i<arr.length;i++){const t=i/fs;if(kind==='tone'){arr[i]=.43*Math.cos(2*Math.PI*440*t)+.28*Math.cos(2*Math.PI*1170*t+.3)+.12*Math.cos(2*Math.PI*1850*t-.8);}else{const f0=55,cycles=2*Math.PI*f0*t,v=Math.cos(cycles)+.54*Math.cos(2*cycles+.15)+.3*Math.cos(3*cycles-.4)+.16*Math.cos(5*cycles+.7)+.09*Math.cos(7*cycles-1.1);arr[i]=.42*v/2.09;}}return arr;}
+  function pause(){if(playing){pausedPosition=nowPosition();playing=false;}audio.pause();if(graph)graph.noiseGate.gain.setTargetAtTime(0,context.currentTime,.012);updateTimeline();}
+  function stop(){pause();pausedPosition=0;seekMedia(0);updateTimeline();playbackStatus('Stopped. Play the original, DSB, or SSB output to compare.');}
+  function selectSource(next,file=null){pause();pausedPosition=0;ready=false;blankCharts();if(blob){URL.revokeObjectURL(blob);blob=null;}choice=next;triedRemote=false;expectedDuration=SOURCES[next]?.duration||8;document.querySelectorAll('button[data-source]').forEach(b=>{const on=b.dataset.source===next;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});setCredit();
+    if(SOURCES[next]){usingLocal=location.protocol==='https:'||location.protocol==='http:';audio.src=usingLocal?SOURCES[next].local:SOURCES[next].remote;byId('fileStatus').textContent=SOURCES[next].name+' · '+fmtTime(expectedDuration)+' · ready to stream.';}
+    else {usingLocal=false;const sound=next==='upload'&&file?null:synthetic(next);blob=URL.createObjectURL(sound?waveBlob(sound,48000):file);audio.src=blob;byId('fileStatus').textContent=(next==='upload'?file.name:(next==='tone'?'Two tones':'Pulse test'))+' · loading audio.';}
+    audio.load();updateTimeline();
+  }
+  function chooseScheme(val){scheme=val;document.querySelectorAll('button[data-scheme]').forEach(b=>{const on=b.dataset.scheme===scheme;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});applyControls();if(listenRequest==='selected')chooseListening('selected');if(playing)refreshAnalyzers();else{drawSpectrum();drawWaveform();drawComparison();}}
+  function gainFrom(from,to,value=0){const g=context.createGain();g.gain.value=value;from.connect(g).connect(to);return g;}
+  function mkLP(q,cut){const f=context.createBiquadFilter();f.type='lowpass';f.Q.value=q;f.frequency.value=cut;return f;}
+  function lpPair(cut){return [mkLP(.541196100146,cut),mkLP(1.306562964876,cut)];}
+  function analyser(){const a=context.createAnalyser();a.fftSize=FFT_SIZE;a.smoothingTimeConstant=0;return a;}
+  function whiteNoise(){const fs=context.sampleRate,b=context.createBuffer(1,Math.ceil(fs*4),fs),d=b.getChannelData(0);for(let k=0;k<d.length;k+=2){const a=Math.max(1e-12,Math.random()),q=Math.random(),r=Math.sqrt(-2*Math.log(a));d[k]=r*Math.cos(2*Math.PI*q);if(k+1<d.length)d[k+1]=r*Math.sin(2*Math.PI*q);}const src=context.createBufferSource();src.buffer=b;src.loop=true;return src;}
+  function quadratureImpulse(){const buf=context.createBuffer(1,FIR_TAPS,context.sampleRate),d=buf.getChannelData(0),m=(FIR_TAPS-1)/2;for(let i=0;i<FIR_TAPS;i++){const v=i-m;if(v===0||v%2===0){d[i]=0;continue;}const win=.42-.5*Math.cos(2*Math.PI*i/(FIR_TAPS-1))+.08*Math.cos(4*Math.PI*i/(FIR_TAPS-1));d[i]=win*2/(Math.PI*v);}return buf;}
+  function createGraph(){if(graph)return graph;context=new (window.AudioContext||window.webkitAudioContext)();const [in1,in2]=lpPair(SOURCE_BW),[rd1,rd2]=lpPair(+controls.cutoff.value),[rs1,rs2]=lpPair(+controls.cutoff.value);
+    const aX=analyser(),aQ=analyser(),aNI=analyser(),aNQ=analyser(),aD=analyser(),aS=analyser();
+    const src=context.createMediaElementSource(audio);src.connect(in1).connect(in2);
+    const delay=context.createDelay(1),cv=context.createConvolver();delay.delayTime.value=(FIR_TAPS-1)/2/context.sampleRate;cv.normalize=false;cv.buffer=quadratureImpulse();
+    in2.connect(delay).connect(aX);in2.connect(cv).connect(aQ);
+    const dX=gainFrom(aX,rd1),sX=gainFrom(aX,rs1),sQ=gainFrom(aQ,rs1);
+    const ni=whiteNoise(),nq=whiteNoise(),gate=context.createGain();gate.gain.value=0;
+    const [n11,n12]=lpPair(SOURCE_BW),[n21,n22]=lpPair(SOURCE_BW);
+    ni.connect(gate).connect(n11).connect(n12).connect(aNI);nq.connect(gate).connect(n21).connect(n22).connect(aNQ);
+    const dNI=gainFrom(aNI,rd1),dNQ=gainFrom(aNQ,rd1),sNI=gainFrom(aNI,rs1),sNQ=gainFrom(aNQ,rs1);
+    rd1.connect(rd2).connect(aD);rs1.connect(rs2).connect(aS);
+    const silent=context.createGain();silent.gain.value=0;silent.connect(context.destination);for(const a of [aX,aQ,aNI,aNQ,aD,aS])a.connect(silent);
+    const master=context.createGain();master.gain.value=.62;master.connect(context.destination);
+    ni.start();nq.start();graph={aX,aQ,aNI,aNQ,aD,aS,dX,sX,sQ,dNI,dNQ,sNI,sNQ,rd1,rd2,rs1,rs2,noiseGate:gate,master,heard:null,fs:context.sampleRate,analyzers:{x:aX,q:aQ,ni:aNI,nq:aNQ,d:aD,s:aS}};
+    applyControls();chooseListening(listenRequest||'s');return graph;
+  }
+  function chooseListening(which){listenRequest=which;heard=which==='selected'?(scheme==='dsb'?'d':'s'):which;
+    document.querySelectorAll('.listen .play').forEach(b=>b.dataset.selected=String((b.id==='playSelected'&&which==='selected')||(b.id==='playX'&&which==='x')||(b.id==='playD'&&which==='d')||(b.id==='playS'&&which==='s')));
+    if(!graph)return;const n=({x:graph.aX,d:graph.aD,s:graph.aS})[heard];if(graph.heard&&graph.heard!==n)graph.heard.disconnect(graph.master);if(n&&graph.heard!==n){n.connect(graph.master);graph.heard=n;}
+  }
+  function updatePower(){const degrees=+controls.phase.value,ph=degrees*Math.PI/180,c=Math.cos(ph),s=Math.sin(ph),d=100*c*c,isSSB=scheme!=='dsb';const other=isSSB?100*s*s:0;const total=d+other;
+    for(const [id,val] of [['wantedPower',d],['distortionPower',other],['totalPower',total]])byId(id).textContent=val.toFixed(1)+'%';
+    byId('wantedFill').style.width=d+'%';byId('distortionFill').style.width=other+'%';byId('totalFill').style.width=total+'%';
+    byId('phaseGainVal').textContent=round3(c);byId('phaseGainMeter').value=c;
+    byId('powerExplanation').textContent=isSSB?'Ideal SSB: cos²φ of the recovered power matches the original, and sin²φ is unwanted waveform distortion. Total recovered signal power stays constant (without noise or filtering effects).':'Ideal DSB-SC: recovered signal power decreases as cos²φ. There is no extra waveform component; at 90° the recovered signal vanishes (without noise).';
+    byId('phaseFormula').textContent='Desired: cos²φ = '+(c*c).toFixed(3)+' · '+(isSSB?'distortion: sin²φ = '+(s*s).toFixed(3):'no additional waveform distortion');
+    byId('phaseInfo').textContent=isSSB?'SSB keeps a full-power output but modifies its waveform when φ differs from zero. Magnitude alone can conceal this effect.':'DSB-SC keeps the original waveform shape while reducing its amplitude. At 90°, the ideal output is zero.';
+  }
+  function updateStageDescription(){const fc=(+controls.carrier.value/1000).toFixed(0),isSSB=scheme!=='dsb',sign=scheme==='usb'?'+':'−',mode=scheme==='usb'?'upper':'lower';
+    const items={
+      x:['Original baseband audio','x(t)  ·  |ω| ≤ ω<sub>B</sub>','Most original audio energy lies below approximately 5 kHz after preprocessing.'],
+      dsb:['Double-sideband suppressed-carrier signal','y<sub>DSB</sub>(t) = x(t) cos(ω<sub>c</sub>t)','Two RF sidebands occupy about '+(fc-5)+'–'+(fc+5)+' kHz on the positive-frequency axis.'],
+      tx:[isSSB?'One sideband retained':'DSB-SC selected',isSSB?'y<sub>SSB</sub>(t) = BPF{y<sub>DSB</sub>(t)}':'y(t) = x(t) cos(ω<sub>c</sub>t)',isSSB?'Only the '+mode+' half of the positive-frequency RF band remains (and its conjugate at negative frequencies).':'Both sidebands remain, occupying twice the baseband bandwidth.'],
+      r:['Received RF signal','r(t) = y(t) + n<sub>RF</sub>(t)','RF-band Gaussian noise is added. The receiver cannot filter away noise overlapping the desired band.'],
+      z:['Coherent receiver mixer','z(t) = '+(isSSB?'4':'2')+'r(t) cos(ω<sub>c</sub>t + φ)','Mixing moves a copy back to baseband and creates an image around ±'+(2*fc)+' kHz. The factor '+(isSSB?'4 restores the amplitude lost by retaining one sideband.':'2 restores DSB mixer gain.')],
+      hat:['Audio recovered after low-pass filtering','x̂(t) = LPF{z(t)}','The LPF removes the high-frequency images. Phase mismatch attenuates the desired component and, for SSB, introduces waveform distortion.']
+    };
+    const [h,f,t]=items[stage];byId('stageHeading').textContent=h;byId('stageFormula').innerHTML=f;byId('stageInfo').textContent=t;
+    document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.stage===stage)));
+    const btn=byId('playSelected');btn.textContent='▶ Selected ('+(scheme==='dsb'?'DSB':scheme==='usb'?'USB':'LSB')+')';document.querySelector('[data-stage=tx]').textContent=scheme==='dsb'?'3 · Transmitted DSB':scheme==='usb'?'3 · Upper SSB':'3 · Lower SSB';
+    byId('bandwidthMessage').textContent=scheme==='dsb'?`DSB-SC at ${fc} kHz: RF band is approximately ${fc-5}–${+fc+5} kHz (10 kHz wide).`:`${scheme==='usb'?'Upper':'Lower'} SSB at ${fc} kHz: RF band is approximately ${scheme==='usb'?fc:+fc-5}–${scheme==='usb'?+fc+5:fc} kHz (5 kHz wide).`;
+  }
+  function adjustNoiseGain(){if(!graph)return;const enbw=Math.sqrt(Math.min(.99,2*1.026*SOURCE_BW/context.sampleRate));noiseScale=(+controls.noise.value/100)*inputRMS/Math.max(enbw,.08);
+    const phi=+controls.phase.value*Math.PI/180,c=Math.cos(phi),s=Math.sin(phi),now=context.currentTime;
+    // A fixed RF-band noise amplitude is represented as filtered independent I/Q noise.
+    // Sideband recovery uses twice the DSB receiver gain, so its noise terms double.
+    [[graph.dNI,noiseScale*c],[graph.dNQ,-noiseScale*s],[graph.sNI,2*noiseScale*c],[graph.sNQ,-2*noiseScale*s]].forEach(([g,v])=>g.gain.setTargetAtTime(v,now,.018));
+  }
+  function applyControls(){const ph=+controls.phase.value*Math.PI/180,c=Math.cos(ph),s=Math.sin(ph),now=context?.currentTime||0;byId('carrierVal').textContent='2π × '+(+controls.carrier.value).toLocaleString('en-US')+' rad/s';byId('noiseVal').textContent=controls.noise.value+'%';byId('phaseVal').textContent=controls.phase.value+'°';byId('cutoffVal').textContent='2π × '+(+controls.cutoff.value).toLocaleString('en-US')+' rad/s';updatePower();updateStageDescription();
+    if(graph){[[graph.dX,c],[graph.sX,c],[graph.sQ,(scheme==='lsb'?-1:1)*s]].forEach(([g,v])=>g.gain.setTargetAtTime(v,now,.015));for(const f of [graph.rd1,graph.rd2,graph.rs1,graph.rs2])f.frequency.setTargetAtTime(+controls.cutoff.value,now,.02);adjustNoiseGain();}
+  }
+  function setupCanvas(id){const canvas=byId(id),rect=canvas.getBoundingClientRect(),scale=Math.min(window.devicePixelRatio||1,2),width=Math.max(270,rect.width),height=Math.max(160,rect.height);if(canvas.width!==Math.round(width*scale)||canvas.height!==Math.round(height*scale)){canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);}const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);return {ctx,width,height};}
+  function drawAxes(ctx,dims,view,xLabel,yLabel,xTicks,yTicks,xFormatter,yFormatter){const {width,height}=dims,pad={left:55,right:14,top:18,bottom:35},plot={x:pad.left,y:pad.top,w:width-pad.left-pad.right,h:height-pad.top-pad.bottom};ctx.clearRect(0,0,width,height);ctx.fillStyle='white';ctx.fillRect(0,0,width,height);ctx.font='11px -apple-system, BlinkMacSystemFont, "Segoe UI",sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';for(const yt of yTicks){const yy=plot.y+(view.ymax-yt)/(view.ymax-view.ymin)*plot.h;if(yy<plot.y-1||yy>plot.y+plot.h+1)continue;ctx.strokeStyle='#e8edf4';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(plot.x,yy);ctx.lineTo(plot.x+plot.w,yy);ctx.stroke();ctx.fillStyle='#66798f';ctx.fillText(yFormatter(yt),plot.x-8,yy);}ctx.textAlign='center';ctx.textBaseline='top';for(const xt of xTicks){const xx=plot.x+(xt-view.xmin)/(view.xmax-view.xmin)*plot.w;if(xx<plot.x-1||xx>plot.x+plot.w+1)continue;ctx.strokeStyle=xt===0?'#cbd7e4':'#edf1f6';ctx.beginPath();ctx.moveTo(xx,plot.y);ctx.lineTo(xx,plot.y+plot.h);ctx.stroke();ctx.fillStyle='#6c7c8d';ctx.fillText(xFormatter(xt),xx,plot.y+plot.h+7);}ctx.strokeStyle='#9cadbe';ctx.lineWidth=1;ctx.strokeRect(plot.x,plot.y,plot.w,plot.h);ctx.fillStyle='#52677f';ctx.textAlign='center';ctx.fillText(xLabel,plot.x+plot.w/2,height-15);ctx.save();ctx.translate(13,plot.y+plot.h/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLabel,0,0);ctx.restore();return plot;}
+  function spectrumKeys(){const cmp=byId('compare').checked;if(stage==='x')return ['x'];if(stage==='dsb')return ['dsb'];if(stage==='tx')return cmp&&scheme!=='dsb'?['dsb','tx']:['tx'];if(stage==='r')return cmp?['tx','r']:['r'];if(stage==='z')return ['z'];return cmp?['x','hat']:['hat'];}
+  function legend(keys){return keys.map((k,i)=>`<span class="legend-key"><span class="swatch ${i<keys.length-1?'comparison':''}" style="border-color:${colors[k]}"></span>${labels[k]}</span>`).join('');}
+  function drawTrace(ctx,plot,key,range,main){const db=traces[key]?.frequency;if(!db)return;const maxima=new Float32Array(Math.ceil(plot.w)+1);maxima.fill(-110);for(let k=0;k<db.length;k++){const freq=k*RF_FS/FFT_SIZE;if(freq>range)break;const val=Number.isFinite(db[k])?db[k]:-110;for(const sign of [1,-1]){const xi=Math.round((sign*freq+range)/(2*range)*plot.w);if(xi>=0&&xi<maxima.length)maxima[xi]=Math.max(maxima[xi],val);}}ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();ctx.strokeStyle=colors[key];ctx.lineWidth=main?1.9:1.3;ctx.globalAlpha=main?1:.6;if(!main)ctx.setLineDash([5,4]);ctx.beginPath();for(let k=0;k<maxima.length;k++){const val=Math.max(-105,Math.min(5,maxima[k])),yy=plot.y+(5-val)/110*plot.h,xx=plot.x+k;if(k===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);}ctx.stroke();ctx.restore();}
+  function drawSpectrum(){const dims=setupCanvas('spectrum'),{ctx}=dims,range=byId('zoom').value==='extended'?120:60,view={xmin:-range,xmax:range,ymin:-105,ymax:5},ticks=range===60?[-60,-40,-20,0,20,40,60]:[-120,-80,-40,0,40,80,120];const plot=drawAxes(ctx,dims,view,'ω / (2π) (kHz)','Magnitude (dBFS)',ticks,[-100,-80,-60,-40,-20,0],String,String);
+    if(stage==='z'||stage==='hat'){const c=+controls.cutoff.value/1000,a=plot.x+(range-c)/(2*range)*plot.w,b=plot.x+(range+c)/(2*range)*plot.w;ctx.fillStyle='rgba(19,132,97,.06)';ctx.fillRect(a,plot.y,b-a,plot.h);ctx.save();ctx.setLineDash([3,4]);for(const v of [a,b]){ctx.strokeStyle='rgba(19,132,97,.4)';ctx.beginPath();ctx.moveTo(v,plot.y);ctx.lineTo(v,plot.y+plot.h);ctx.stroke();}ctx.restore();}
+    const keys=spectrumKeys();if(ready)keys.forEach((k,i)=>drawTrace(ctx,plot,k,range*1000,i===keys.length-1));else{ctx.font='13px system-ui';ctx.fillStyle='#74869a';ctx.textAlign='center';ctx.fillText('Press Play to inspect live spectra',plot.x+plot.w/2,plot.y+plot.h/2);}byId('spectrumLegend').innerHTML=legend(keys);
+  }
+  function timeSpanMs(){const v=byId('timeWindow').value;return v==='auto'?(stage==='x'||stage==='hat'?12:.5):+v;}
+  function waveformTrace(ctx,plot,key,spanMs,amp,main,offset=0){const samples=traces[key]?.time;if(!samples)return;const count=Math.min(samples.length,Math.floor(RF_FS*spanMs/1000));ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();ctx.strokeStyle=colors[key];ctx.lineWidth=main?1.7:1.3;ctx.globalAlpha=main?1:.65;if(!main)ctx.setLineDash([5,4]);ctx.beginPath();for(let k=0;k<count;k++){const xx=plot.x+k/Math.max(1,count-1)*plot.w,yy=plot.y+(amp-samples[samples.length-count+k+offset])/(2*amp)*plot.h;if(k===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);}ctx.stroke();ctx.restore();}
+  function drawWaveform(){const dims=setupCanvas('waveform'),{ctx}=dims,span=timeSpanMs(),count=Math.floor(RF_FS*span/1000),keys=spectrumKeys();let amp=.5;
+    if(ready){const baseline=stage==='hat'?['x','hat']:['x',...keys];for(const k of baseline){const a=traces[k]?.time;if(!a)continue;for(let i=Math.max(0,a.length-count);i<a.length;i+=5)amp=Math.max(amp,Math.abs(a[i]));}}
+    amp=Math.min(4,Math.ceil(amp*2)/2);const plot=drawAxes(ctx,dims,{xmin:0,xmax:span,ymin:-amp,ymax:amp},'Time (ms)','Amplitude',[0,span/4,span/2,span*3/4,span],[-amp,0,amp],x=>String(Number(x.toFixed(2))),String);
+    if(ready)keys.forEach((k,i)=>waveformTrace(ctx,plot,k,span,amp,i===keys.length-1));else{ctx.fillStyle='#74869a';ctx.textAlign='center';ctx.font='12px system-ui';ctx.fillText('Live waveform',plot.x+plot.w/2,plot.y+plot.h/2);}byId('waveLegend').innerHTML=legend(keys);
+  }
+  function drawComparison(){if(!byId('showComparison').checked)return;const dims=setupCanvas('comparison'),{ctx,width,height}=dims,pad={left:129,right:15,top:13,bottom:30},plotw=width-pad.left-pad.right,plotH=height-pad.top-pad.bottom,rowh=plotH/3;ctx.fillStyle='white';ctx.fillRect(0,0,width,height);ctx.font='11px system-ui';ctx.textAlign='left';ctx.textBaseline='middle';
+    const ph=+controls.phase.value*Math.PI/180,c=Math.cos(ph),s=Math.sin(ph),sgn=scheme==='lsb'?-1:1,spanMs=25,n=Math.floor(RF_FS*spanMs/1000);const x=traces.x?.time,q=traces.q?.time;let amp=.45;if(ready&&x){for(let k=x.length-n;k<x.length;k+=7)amp=Math.max(amp,Math.abs(x[k]));}amp=Math.min(3,Math.ceil(amp*2)/2);
+    const modes=[['Original','#2365b5',0],['DSB-SC recovered','#138461',1],[(scheme==='lsb'?'LSB':'USB')+' recovered','#d16b26',2]];
+    for(let row=0;row<3;row++){const top=pad.top+row*rowh,center=top+rowh/2;ctx.fillStyle=row===1?'#fafdfa':row===2?'#fffaf5':'#f8fbff';ctx.fillRect(pad.left,top,plotw,rowh);ctx.strokeStyle='#dce5ef';ctx.strokeRect(pad.left,top,plotw,rowh);ctx.strokeStyle='#d6dfeb';ctx.beginPath();ctx.moveTo(pad.left,center);ctx.lineTo(pad.left+plotw,center);ctx.stroke();ctx.fillStyle=modes[row][1];ctx.font='bold 11px system-ui';ctx.textAlign='left';ctx.fillText(modes[row][0],8,center-8);ctx.fillStyle='#6a7d92';ctx.font='10px system-ui';ctx.fillText(row===0?'reference':row===1?'amplitude × cos φ':'waveform changes',8,center+8);
+      if(!ready||!x||!q)continue;ctx.save();ctx.beginPath();ctx.rect(pad.left,top,plotw,rowh);ctx.clip();ctx.strokeStyle=modes[row][1];ctx.lineWidth=1.5;ctx.beginPath();const points=Math.max(2,Math.min(1000,n));for(let k=0;k<points;k++){const idx=x.length-n+Math.floor(k/(points-1)*(n-1)),v=modes[row][2]===0?x[idx]:modes[row][2]===1?c*x[idx]:c*x[idx]+sgn*s*q[idx],xx=pad.left+plotw*k/(points-1),yy=center-v/amp*(rowh*.43);if(k===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);}ctx.stroke();ctx.restore();}
+    ctx.fillStyle='#5e7288';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText('Shared time interval: 25 ms  ·  identical amplitude scales',pad.left+plotw/2,height-13);
+    if(!ready){ctx.fillStyle='#657c92';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Press Play to see the waveform comparison',pad.left+plotw/2,height/2);}
+  }
+  function blankCharts(){for(const k of Object.keys(traces))delete traces[k];ready=false;drawSpectrum();drawWaveform();drawComparison();}
+  // Interpolate the latest soundcard samples into a short 256-kHz RF window.
+  const INTERP_PHASES=512,INTERP_TAPS=16;
+  const interpKernels=(()=>{const all=[],sinc=x=>Math.abs(x)<1e-9?1:Math.sin(Math.PI*x)/(Math.PI*x);for(let p=0;p<INTERP_PHASES;p++){const frac=p/INTERP_PHASES,kernel=new Float32Array(INTERP_TAPS);let sum=0;for(let j=0;j<INTERP_TAPS;j++){const d=frac-(j-7);kernel[j]=Math.abs(d)<8?sinc(d)*sinc(d/8):0;sum+=kernel[j];}for(let j=0;j<INTERP_TAPS;j++)kernel[j]/=sum;all.push(kernel);}return all;})();
+  function interpolate(src,fs,out){const ratio=fs/RF_FS,n=out.length,headroom=10;for(let k=0;k<n;k++){const pos=src.length-1-headroom-(n-1-k)*ratio,i=Math.floor(pos),frac=pos-i,kernel=interpKernels[Math.min(INTERP_PHASES-1,Math.round(frac*(INTERP_PHASES-1)))];let v=0;for(let j=0;j<INTERP_TAPS;j++)v+=src[i+j-7]*kernel[j];out[k]=v;}}
+  const fftTable=(()=>{const n=FFT_SIZE,br=new Uint16Array(n),tr=new Float64Array(n/2),ti=new Float64Array(n/2),window=new Float64Array(n),bits=Math.round(Math.log2(n));for(let i=0;i<n;i++){let v=i,z=0;for(let k=0;k<bits;k++){z=(z<<1)|(v&1);v>>=1;}br[i]=z;window[i]=.5-.5*Math.cos(2*Math.PI*i/(n-1));}for(let i=0;i<n/2;i++){tr[i]=Math.cos(-2*Math.PI*i/n);ti[i]=Math.sin(-2*Math.PI*i/n);}return {br,tr,ti,window};})();
+  function spectrumDb(samples){const n=FFT_SIZE,re=new Float64Array(n),im=new Float64Array(n),T=fftTable;for(let k=0;k<n;k++)re[T.br[k]]=samples[k]*T.window[k];for(let size=2;size<=n;size*=2){const half=size/2,step=n/size;for(let base=0;base<n;base+=size)for(let j=0;j<half;j++){const p=base+j,q=p+half,idx=j*step,c=T.tr[idx],s=T.ti[idx],rr=re[q]*c-im[q]*s,ii=re[q]*s+im[q]*c;re[q]=re[p]-rr;im[q]=im[p]-ii;re[p]+=rr;im[p]+=ii;}}const out=new Float32Array(n/2),scale=4/(n-1);for(let k=0;k<n/2;k++)out[k]=Math.max(-110,20*Math.log10(Math.max(1e-8,Math.hypot(re[k],im[k])*scale)));return out;}
+  function refreshAnalyzers(){if(!graph||!playing||audio.readyState<2)return;const raw={};for(const [k,a] of Object.entries(graph.analyzers)){const b=new Float32Array(FFT_SIZE);a.getFloatTimeDomainData(b);raw[k]=b;}let energy=0;for(let k=0;k<FFT_SIZE;k++)energy+=raw.x[k]**2;const rms=Math.sqrt(energy/FFT_SIZE);if(rms>1e-4)inputRMS=.985*inputRMS+.015*rms;adjustNoiseGain();
+    const sampled={};for(const key of ['x','q','ni','nq','d','s']){const out=new Float32Array(FFT_SIZE);interpolate(raw[key],graph.fs,out);sampled[key]=out;}
+    const {x,q,ni,nq,d,s}=sampled,dsb=new Float32Array(FFT_SIZE),usb=new Float32Array(FFT_SIZE),lsb=new Float32Array(FFT_SIZE),tx=new Float32Array(FFT_SIZE),r=new Float32Array(FFT_SIZE),z=new Float32Array(FFT_SIZE),hat=scheme==='dsb'?d:s;
+    const fc=+controls.carrier.value,w=2*Math.PI*fc/RF_FS,phi=+controls.phase.value*Math.PI/180,rxGain=scheme==='dsb'?2:4;
+    let theta=2*Math.PI*fc*(nowPosition()-(FFT_SIZE-1)/RF_FS);for(let k=0;k<FFT_SIZE;k++,theta+=w){const cc=Math.cos(theta),ss=Math.sin(theta),rc=Math.cos(theta+phi);dsb[k]=x[k]*cc;usb[k]=.5*(x[k]*cc-q[k]*ss);lsb[k]=.5*(x[k]*cc+q[k]*ss);tx[k]=scheme==='dsb'?dsb[k]:scheme==='usb'?usb[k]:lsb[k];r[k]=tx[k]+noiseScale*(ni[k]*cc+nq[k]*ss);z[k]=rxGain*r[k]*rc;}
+    for(const [key,data] of Object.entries({x,q,ni,nq,dsb,usb,lsb,tx,r,z,hat,d,s}))traces[key]={time:data,frequency:spectrumDb(data)};
+    ready=true;drawSpectrum();drawWaveform();drawComparison();updateTimeline();
+  }
+  function ticker(){if(tick)return;tick=window.setInterval(()=>{if(!playing)return;if(nowPosition()>=safeDuration()-.02){pause();playbackStatus('End of recording. Press Play to restart.');return;}refreshAnalyzers();updateTimeline();},180);}
+  async function startPlayback(which){chooseListening(which);if(playing){playbackStatus('Now listening to '+(heard==='x'?'original':heard==='d'?'DSB recovery':'SSB recovery')+'.');return;}
+    try{if(!(window.AudioContext||window.webkitAudioContext))throw new Error('Web Audio is not supported');createGraph();await context.resume();if(pausedPosition>=safeDuration()-.05)pausedPosition=0;seekMedia(pausedPosition);await audio.play();clockEpoch=context.currentTime;playing=true;graph.noiseGate.gain.setTargetAtTime(1,context.currentTime,.015);ticker();playbackStatus('Playing '+(heard==='x'?'original':heard==='d'?'DSB':'SSB')+' audio · simulated RF: 256 kHz · soundcard: '+Math.round(context.sampleRate/1000)+' kHz.');}
+    catch(err){pause();playbackStatus('Audio unavailable: '+err.message+'. Try the Two tones or Pulse test preset, or upload a local file.');}
+  }
+  audio.addEventListener('loadedmetadata',()=>{byId('fileStatus').textContent=(SOURCES[choice]?.name||choice)+' · '+fmtTime(safeDuration())+' available.';updateTimeline();});
+  audio.addEventListener('error',()=>{if(SOURCES[choice]&&usingLocal&&!triedRemote){usingLocal=false;triedRemote=true;audio.src=SOURCES[choice].remote;audio.load();byId('fileStatus').textContent='Local file not found; loading Wikimedia recording…';return;}byId('fileStatus').textContent='Could not load this recording. Use the test tones or upload a local file.';});
+  audio.addEventListener('durationchange',updateTimeline);
+  audio.addEventListener('ended',()=>{pause();playbackStatus('End of recording.');});
+  document.querySelectorAll('button[data-source]').forEach(b=>b.addEventListener('click',()=>selectSource(b.dataset.source)));
+  document.querySelectorAll('button[data-scheme]').forEach(b=>b.addEventListener('click',()=>chooseScheme(b.dataset.scheme)));
+  byId('audioFile').addEventListener('change',evt=>{const file=evt.target.files?.[0];if(file)selectSource('upload',file);evt.target.value='';});
+  for(const el of Object.values(controls))el.addEventListener('input',()=>{applyControls();if(playing)refreshAnalyzers();else{drawSpectrum();drawWaveform();drawComparison();}});
+  byId('resetBtn').addEventListener('click',()=>{controls.carrier.value=50000;controls.noise.value=5;controls.phase.value=10;controls.cutoff.value=5500;chooseScheme('usb');applyControls();});
+  document.querySelectorAll('button[data-stage]').forEach(b=>b.addEventListener('click',()=>{stage=b.dataset.stage;updateStageDescription();drawSpectrum();drawWaveform();}));
+  byId('zoom').addEventListener('change',drawSpectrum);byId('compare').addEventListener('change',()=>{drawSpectrum();drawWaveform();});byId('timeWindow').addEventListener('change',drawWaveform);
+  byId('showComparison').addEventListener('change',()=>{byId('comparisonArea').classList.toggle('hidden',!byId('showComparison').checked);if(byId('showComparison').checked)drawComparison();});
+  byId('playX').addEventListener('click',()=>startPlayback('x'));byId('playD').addEventListener('click',()=>startPlayback('d'));byId('playS').addEventListener('click',()=>startPlayback('s'));byId('playSelected').addEventListener('click',()=>startPlayback('selected'));
+  byId('pauseBtn').addEventListener('click',()=>{pause();playbackStatus('Paused at '+fmtTime(nowPosition())+'.');});byId('stopBtn').addEventListener('click',stop);
+  byId('seek').addEventListener('input',e=>{dragSeek=true;pausedPosition=+e.target.value;if(playing&&context)clockEpoch=context.currentTime;seekMedia(pausedPosition);byId('timeLabel').textContent=fmtTime(pausedPosition)+' / '+fmtTime(safeDuration());});byId('seek').addEventListener('change',()=>{dragSeek=false;updateTimeline();});
+  window.addEventListener('resize',()=>{drawSpectrum();drawWaveform();drawComparison();});window.addEventListener('pagehide',()=>{pause();if(blob)URL.revokeObjectURL(blob);});
+  if(location.search.includes('test=1'))window.__EECS216_SSB_DIAGNOSTICS__=()=>({traces,playing,position:nowPosition(),scheme,stage,phase:+controls.phase.value,noise:+controls.noise.value,noiseScale,fs:graph?.fs,inputRMS,heard});
+  setCredit();updatePower();updateStageDescription();selectSource('beethoven');chooseScheme('usb');blankCharts();
+})();
+
+</script></body></html>
