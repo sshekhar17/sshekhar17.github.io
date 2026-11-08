@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive quadrature amplitude modulation laboratory for EECS 216, Signals and Systems.">
+  <title>Quadrature Amplitude Modulation Demo | EECS 216</title>
+  <style>
+
+    :root {
+      color-scheme: light;
+      --ink: #14253b;
+      --muted: #53657b;
+      --line: #dbe3ee;
+      --panel: #fff;
+      --page: #f4f7fb;
+      --blue: #2365b5;
+      --orange: #d16b26;
+      --purple: #8447a9;
+      --magenta: #ad4269;
+      --green: #138461;
+      --gold: #ac7b00;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; }
+    .shell { max-width: 1260px; padding: 25px 24px 48px; margin: auto; }
+    header { margin: 0 0 19px; display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; }
+    .brand { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; color: #28649a; }
+    .eyebrow { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: #52718e; }
+    h1 { font-size: clamp(28px,4vw,41px); line-height: 1.12; margin: 9px 0; letter-spacing: -.03em; }
+    h2 { font-size: 18px; line-height: 1.2; letter-spacing: -.01em; margin: 0 0 9px; }
+    h3 { font-size: 14px; font-weight: 750; margin: 0 0 7px; }
+    .intro { color: var(--muted); max-width: 850px; font-size: 15px; margin: 0 0 21px; }
+    .tiny { font-size: 12px; color: var(--muted); }
+    .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); box-shadow: 0 2px 6px rgba(16,38,64,.025); }
+    .setup { padding: 20px 22px; margin-bottom: 17px; }
+    .setup-grid { display: grid; grid-template-columns: minmax(280px,1fr) minmax(220px,1fr) minmax(220px,1fr); gap: 22px; align-items: start; }
+    .source-choice { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 9px; }
+    button, .upload-label { font-family: inherit; cursor: pointer; touch-action: manipulation; }
+    .softbtn { padding: 8px 12px; border: 1px solid #cfdaea; color: #29445f; background: #fff; border-radius: 9px; font-weight: 650; font-size: 13px; }
+    .softbtn:hover { border-color: #87b1dd; background: #f6faff; }
+    .softbtn.active { background: #eaf2fd; border-color: #6e9fd6; color: #154c8b; }
+    .fileinput { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .upload-label { display: inline-block; }
+    .status { font-size: 12px; color: var(--muted); margin-top: 10px; overflow-wrap: anywhere; }
+    .controls { padding: 20px 22px 18px; margin-bottom: 17px; }
+    .control-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 26px; }
+    .control-head { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; font-size: 13px; font-weight: 700; margin-bottom: 7px; }
+    output { font-variant-numeric: tabular-nums; color: #174f8f; white-space: nowrap; }
+    input[type="range"] { width: 100%; accent-color: var(--blue); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: #708096; font-size: 11px; }
+    .control-head label { min-width: 0; }
+    .angular-readout { white-space: normal; text-align: right; font-size: 12px; line-height: 1.35; }
+    .phase-meter { margin-top: 8px; border-top: 1px solid #e5ebf3; padding-top: 7px; }
+    .phase-meter-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; gap: 7px; color: #617388; }
+    .phase-meter-row output { font-size: 13px; font-weight: 800; color: #174f8f; }
+    .phase-meter progress { width: 100%; display: block; height: 7px; margin-top: 5px; border: 0; border-radius: 999px; overflow: hidden; appearance: none; -webkit-appearance: none; }
+    .phase-meter progress::-webkit-progress-bar { background: #e4ebf3; border-radius: 999px; }
+    .phase-meter progress::-webkit-progress-value { background: #2365b5; border-radius: 999px; }
+    .phase-meter progress::-moz-progress-bar { background: #2365b5; border-radius: 999px; }
+    .reset { background: white; color: #385c7a; border: 1px solid var(--line); border-radius: 9px; padding: 6px 11px; font-weight: 700; font-size: 12px; }
+    .reset:hover { background: #f5f8fb; }
+    .chain { display: flex; align-items: center; justify-content: center; gap: 7px; flex-wrap: wrap; padding: 14px; margin-bottom: 17px; }
+    .try-panel { padding: 15px 21px 13px; margin-bottom: 17px; }
+    .try-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
+    .try-heading h2 { margin-bottom: 4px; }
+    .try-heading p { margin: 0; font-size: 12px; color: var(--muted); }
+    .try-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 23px; padding: 0; margin: 8px 0 0; list-style: none; }
+    .try-list li { position: relative; padding-left: 14px; font-size: 13px; line-height: 1.45; color: #415973; }
+    .try-list li::before { content: '•'; position: absolute; left: 0; color: #2365b5; font-weight: 700; }
+    .try-list strong { color: #1c3e60; }
+    .node { padding: 7px 11px; border-radius: 8px; border: 1px solid var(--line); background: white; white-space: nowrap; text-align: center; font-weight: 700; font-size: 12px; }
+    .node span { display: block; font-weight: 450; font-size: 11px; color: var(--muted); }
+    .arrow { font-size: 18px; color: #718397; }
+    .main-panel { padding: 18px 21px 20px; }
+    .chart-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+    .stage-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+    .stage-tab { border-radius: 9px; background: #fff; border: 1px solid var(--line); color: #455972; padding: 10px 13px; font-size: 13px; font-weight: 700; }
+    .stage-tab:hover { background: #f6faff; }
+    .stage-tab[aria-pressed="true"] { color: white; background: #1f568e; border-color: #1f568e; }
+    .plottools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; font-size: 13px; color: var(--muted); }
+    .plottools label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+    .plottools select { border: 1px solid var(--line); border-radius: 7px; padding: 5px 6px; background: white; color: var(--ink); font-size: 13px; }
+    .plot-grid { display: grid; grid-template-columns: minmax(0,1.28fr) minmax(0,.72fr); gap: 24px; }
+    .plotbox { min-width: 0; border: 1px solid #e4eaf2; border-radius: 11px; padding: 11px 12px 7px; background: white; }
+    .plot-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 0 4px 3px; }
+    .plot-title { font-size: 14px; font-weight: 750; }
+    .plot-subtitle { font-size: 11px; color: #697b91; }
+    canvas { width: 100%; height: 290px; display: block; }
+    .line-legend { display: flex; gap: 18px; margin-top: 6px; flex-wrap: wrap; padding-left: 5px; color: #627387; font-size: 12px; }
+    .legend-key { display: inline-flex; gap: 7px; align-items: center; }
+    .swatch { display: inline-block; width: 21px; height: 0; border-top: 3px solid; }
+    .readout { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; margin-top: 17px; }
+    .info { padding: 14px 17px; background: #f7faff; border: 1px solid #dfe8f4; border-radius: 11px; }
+    .formula { font-family: Georgia, "Times New Roman", serif; font-size: 17px; color: #234d79; line-height: 1.5; }
+    .info p { margin: 3px 0 0; color: #4d6278; font-size: 13px; }
+    .listen { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
+    .transport { display: flex; align-items: center; gap: 13px; margin-top: 16px; padding: 12px 14px; background: #f5f9fd; border: 1px solid #e0e9f3; border-radius: 10px; }
+    .transport input[type="range"] { flex: 1; min-width: 70px; }
+    .timecode { font-size: 12px; color: #48617c; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sources-detail { margin-top: 9px; font-size: 12px; color: #5b6e83; }
+    .sources-detail a { color: #1d5b94; }
+    .source-choice button { white-space: nowrap; }
+    .empty-note { font-size: 12px; color: #6b7f95; }
+    .play { display: inline-flex; align-items: center; gap: 7px; padding: 9px 13px; background: #1d5c95; border: 1px solid #1d5c95; color: #fff; border-radius: 10px; font-weight: 700; font-size: 13px; }
+    .play:hover { background: #174776; }
+    .play.alt { background: white; color: #204f7b; border-color: #bad1e5; }
+    .play.alt:hover { background: #f3f9ff; }
+    .foot { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 19px; color: #65778c; font-size: 12px; }
+    .foot a { color: #1d5b94; }
+    .hidden { display: none!important; }
+    @media (max-width: 1000px) { .control-grid { grid-template-columns: 1fr 1fr; } .setup-grid { grid-template-columns: 1fr 1fr; } .plot-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) { .try-list { grid-template-columns: 1fr; } }
+    @media (max-width: 660px) { .shell { padding: 16px 12px 40px; } .setup-grid,.readout,.control-grid { grid-template-columns: 1fr; } .setup,.controls,.main-panel,.try-panel { padding: 15px; } .node { flex: 1; } canvas { height: 230px; } }
+  
+    /* Two-channel extensions: preserve visual identity of the DSB-SC AM demo. */
+    .source-grid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+    .channel-card { background:#f8fbff; border:1px solid #dce7f3; padding:15px 16px; border-radius:12px; min-width:0; }
+    .channel-card[data-channel="2"] { background:#fffaf5; border-color:#f0e0cf; }
+    .channel-card h3 { color:#205c9b; font-size:15px; }
+    .channel-card[data-channel="2"] h3 { color:#a95617; }
+    .channel-card .source-choice { margin-top:10px; }
+    .source-meta { display:flex; gap:9px; align-items:center; flex-wrap:wrap; color:#56677b; font-size:12px; }
+    .preset-row { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; align-items:center; margin-bottom:13px; }
+    .preset-row h2 { margin:0; }
+    .compact-explain { margin:11px 0 0; color:#576c82; font-size:13px; }
+    .flow-box { padding:13px 16px; margin-bottom:17px; }
+    .flow-grid { display:grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap:8px; align-items:center; }
+    .flow-stack { display:grid; gap:7px; }
+    .node-blue { border-color:#9fc1e6; color:#1b5b9b; background:#f2f7fd; }
+    .node-orange { border-color:#edc99f; color:#a45416; background:#fff9f0; }
+    .node-purple { border-color:#c4a8df; color:#71379b; background:#f7f2fc; }
+    .flow-arrow { color:#8794a6; font-size:19px; text-align:center; }
+    .flow-arrow small { display:block; font-size:9px; }
+    .flow-summary { font-size:12px; margin:9px 0 0; color:#526881; }
+    .mix-coeffs { margin-top:12px; padding-top:10px; border-top:1px solid #e5ebf3; }
+    .mix-group { margin-bottom:8px; }
+    .mix-head { display:flex; justify-content:space-between; color:#52677e; font-size:11px; align-items:center; margin-bottom:4px; gap:8px; }
+    .mix-bar { display:flex; height:9px; border-radius:999px; overflow:hidden; background:#e6edf5; }
+    .mix-bar .desired { background:#2365b5; width:100%; transition:width .12s; }
+    .mix-bar .leak { background:#d16b26; flex:1; }
+    .mix-meaning { font-size:11px; color:#65788e; line-height:1.4; margin-top:6px; }
+    .mathmix { font-family: Georgia,"Times New Roman",serif; font-size:19px; color:#24517d; line-height:1.65; }
+    .formula-sm { font-size:16px; }
+    .source-status { min-height:18px; }
+    .transport-note { color:#5a6c83; font-size:11px; line-height:1.5; margin-top:7px; }
+    .options-inline { display:flex; gap:5px; align-items:center; }
+    .options-inline select { max-width:175px; }
+    .readout--2 { grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); }
+    .line-legend .swatch.comparison { border-top-style:dashed; }
+    .source-choice .softbtn[data-channel="2"].active { background:#fff1e1; border-color:#e4a76c; color:#9b4b0f; }
+    .listen .play[data-selected="true"] { box-shadow:0 0 0 3px rgba(35,101,181,.18); }
+    @media (max-width:1050px) { .flow-grid{grid-template-columns: 1fr auto 1fr auto 1fr; } .flow-grid > :nth-last-child(-n+2){display:none;} }
+    @media (max-width:800px) { .source-grid { grid-template-columns:1fr; } .flow-grid{display:flex; flex-wrap:wrap; justify-content:center;}.flow-grid > :nth-last-child(-n+2){display:flex;} }
+    @media (max-width:660px) { .channel-card { padding:13px; } .readout--2 { grid-template-columns:1fr; } .mix-coeffs { margin-top:5px; } .flow-grid .node { min-width:100px; } .flow-arrow { font-size:15px; } }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header><div class="brand">University of Michigan · EECS 216</div></header>
+  <h1>Quadrature Amplitude Modulation Demo</h1>
+  <p class="intro">Transmit <strong>two audio signals in the same frequency band</strong> using cosine and sine carriers. Explore how a synchronized receiver separates them—and how a phase mismatch causes <strong>cross-talk</strong> between the two recovered channels.</p>
+
+  <section class="panel setup" aria-label="Audio sources">
+    <div class="preset-row"><h2>1. Choose two audio signals</h2><button type="button" class="softbtn" id="tonePreset">Try two-tone experiment</button></div>
+    <div class="source-grid">
+      <div class="channel-card" data-channel="1">
+        <h3>Channel 1 · x₁(t) <span class="tiny">— cosine carrier</span></h3>
+        <div class="source-choice" role="group" aria-label="Channel 1 audio source">
+          <button type="button" class="softbtn active" data-channel="1" data-source="beethoven" aria-pressed="true">Beethoven</button>
+          <button type="button" class="softbtn" data-channel="1" data-source="joplin" aria-pressed="false">Joplin</button>
+          <button type="button" class="softbtn" data-channel="1" data-source="tone" aria-pressed="false">Two tones</button>
+          <button type="button" class="softbtn" data-channel="1" data-source="melody" aria-pressed="false">Melody</button>
+          <label class="softbtn upload-label" for="upload1">Upload…</label>
+          <input type="file" class="fileinput" id="upload1" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac">
+        </div>
+        <div class="status source-status" id="status1" role="status">Beethoven · Symphony No. 5, first movement</div>
+        <div class="sources-detail" id="credit1">Public-domain recording via Wikimedia Commons.</div>
+      </div>
+      <div class="channel-card" data-channel="2">
+        <h3>Channel 2 · x₂(t) <span class="tiny">— sine carrier</span></h3>
+        <div class="source-choice" role="group" aria-label="Channel 2 audio source">
+          <button type="button" class="softbtn" data-channel="2" data-source="beethoven" aria-pressed="false">Beethoven</button>
+          <button type="button" class="softbtn active" data-channel="2" data-source="joplin" aria-pressed="true">Joplin</button>
+          <button type="button" class="softbtn" data-channel="2" data-source="tone" aria-pressed="false">Two tones</button>
+          <button type="button" class="softbtn" data-channel="2" data-source="melody" aria-pressed="false">Melody</button>
+          <label class="softbtn upload-label" for="upload2">Upload…</label>
+          <input type="file" class="fileinput" id="upload2" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac">
+        </div>
+        <div class="status source-status" id="status2" role="status">Joplin · The Entertainer</div>
+        <div class="sources-detail" id="credit2">CC0 recording via Wikimedia Commons.</div>
+      </div>
+    </div>
+    <p class="compact-explain"><span class="formula">y(t) = x₁(t) cos(ω<sub>c</sub>t) + x₂(t) sin(ω<sub>c</sub>t)</span> &nbsp; Both audio signals occupy the same RF band; their carriers differ in phase by 90°.</p>
+  </section>
+
+  <section class="panel controls" aria-label="Signal processing controls">
+    <div class="chart-top"><h2>2. Change the signal-processing parameters</h2><button class="reset" type="button" id="resetBtn">Reset controls</button></div>
+    <div class="control-grid">
+      <div>
+        <div class="control-head"><label for="carrier">Carrier angular frequency ω<sub>c</sub></label><output class="angular-readout" id="carrierVal">2π × 50,000 rad/s</output></div>
+        <input id="carrier" type="range" min="12000" max="55000" step="1000" value="50000">
+        <div class="range-ends"><span>12 kHz</span><span>55 kHz</span></div>
+      </div>
+      <div>
+        <div class="control-head"><label for="noise">RF channel noise</label><output id="noiseVal">5%</output></div>
+        <input id="noise" type="range" min="0" max="100" step="1" value="5">
+        <div class="range-ends"><span>None</span><span>1 × combined RMS</span></div>
+      </div>
+      <div>
+        <div class="control-head"><label for="phase">Receiver phase error φ</label><output id="phaseVal">10°</output></div>
+        <input id="phase" type="range" min="0" max="90" step="1" value="10">
+        <div class="range-ends"><span>0° (synchronized)</span><span>90°</span></div>
+        <div class="mix-coeffs">
+          <div class="mix-group"><div class="mix-head"><span>Desired · cos φ <strong id="cosCoeff">1.000</strong></span><span>Cross-talk · sin φ <strong id="sinCoeff">0.000</strong></span></div>
+          <div class="mix-bar"><span class="desired" id="desiredBar"></span><span class="leak"></span></div></div>
+          <div class="mix-meaning">Mixing coefficients, not measured audio power.</div>
+        </div>
+      </div>
+      <div>
+        <div class="control-head"><label for="cutoff">LPF cutoff ω<sub>LPF</sub></label><output class="angular-readout" id="cutoffVal">2π × 5,500 rad/s</output></div>
+        <input id="cutoff" type="range" min="500" max="8000" step="100" value="5500">
+        <div class="range-ends"><span>0.5 kHz</span><span>8 kHz</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel flow-box" aria-label="Transmitter and receiver diagram">
+    <div class="flow-grid">
+      <div class="flow-stack"><div class="node node-blue">x₁(t)<span>Audio 1</span></div><div class="node node-orange">x₂(t)<span>Audio 2</span></div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-stack"><div class="node node-blue">× cos(ω<sub>c</sub>t)<span>I branch</span></div><div class="node node-orange">× sin(ω<sub>c</sub>t)<span>Q branch</span></div></div>
+      <div class="flow-arrow">→</div>
+      <div class="node node-purple">Sum + noise<span>one shared RF band</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-stack"><div class="node node-blue">× 2cos(ω<sub>c</sub>t+φ) → LPF<span>Recover x̂₁(t)</span></div><div class="node node-orange">× 2sin(ω<sub>c</sub>t+φ) → LPF<span>Recover x̂₂(t)</span></div></div>
+    </div>
+    <p class="flow-summary">The transmitter combines the channels; the synchronized receiver separates them using two orthogonal local oscillators.</p>
+  </section>
+
+  <section class="panel try-panel" aria-labelledby="tryTitle">
+    <div class="try-heading"><h2 id="tryTitle">Things to try and observe</h2><p>Start with <strong>Try two-tone experiment</strong> for clear spectral peaks.</p></div>
+    <ul class="try-list">
+      <li><strong>Two signals, one band:</strong> Observe that both modulated contributions lie around ±ω<sub>c</sub>, even though their original spectra differ.</li>
+      <li><strong>Perfect synchronization:</strong> Set φ = 0° and noise = 0%. Listen to each recovered channel; each contains its own audio.</li>
+      <li><strong>Cross-talk:</strong> Increase φ to 45°, then 90°. Each receiver starts hearing the other channel; at 90° the outputs exchange (one is negated).</li>
+      <li><strong>Noise and filtering:</strong> Raise the RF noise level and vary the LPF cutoff. Listen for distortion and noise that survives the filter.</li>
+    </ul>
+  </section>
+
+  <section class="panel main-panel" aria-label="Signal visualization and playback">
+    <div class="chart-top"><h2>3. Inspect each stage</h2><div class="plottools">
+      <label><input id="components" type="checkbox" checked> Overlay components</label>
+      <label for="zoom">Spectrum window <select id="zoom"><option value="standard" selected>±60 kHz (fixed)</option><option value="extended">±120 kHz (mixer images)</option></select></label>
+      <label for="mixerView">Receiver mixer <select id="mixerView"><option value="z1" selected>Channel 1</option><option value="z2">Channel 2</option><option value="both">Both</option></select></label>
+      <label for="timeWindow">Time view <select id="timeWindow"><option value="auto" selected>Automatic</option><option value="0.5">0.5 ms</option><option value="2">2 ms</option><option value="12">12 ms</option></select></label>
+    </div></div>
+    <div class="stage-tabs" role="group" aria-label="Choose signal-processing stage">
+      <button class="stage-tab" type="button" data-stage="x" aria-pressed="false">1 · Original pair</button>
+      <button class="stage-tab" type="button" data-stage="y" aria-pressed="true">2 · Quadrature AM</button>
+      <button class="stage-tab" type="button" data-stage="r" aria-pressed="false">3 · With noise</button>
+      <button class="stage-tab" type="button" data-stage="z" aria-pressed="false">4 · Receiver mixers</button>
+      <button class="stage-tab" type="button" data-stage="hat" aria-pressed="false">5 · After LPF</button>
+    </div>
+    <div class="plot-grid">
+      <div class="plotbox">
+        <div class="plot-head"><span class="plot-title">Magnitude spectrum |S(jω)|</span><span class="plot-subtitle">256 kHz RF simulation · live FFT · fixed dBFS reference</span></div>
+        <canvas id="spectrum" role="img" aria-label="Live spectrum for both quadrature audio channels and selected processing stage"></canvas>
+        <div class="line-legend" id="spectrumLegend"></div>
+      </div>
+      <div class="plotbox">
+        <div class="plot-head"><span class="plot-title">Time-domain signal</span><span class="plot-subtitle">Rolling waveform · comparable amplitude reference</span></div>
+        <canvas id="waveform" role="img" aria-label="Time-domain waveform for selected processing stage"></canvas>
+        <div class="line-legend" id="waveLegend"></div>
+      </div>
+    </div>
+    <div class="readout readout--2">
+      <div class="info" aria-live="polite"><h3 id="stageHeading">Quadrature-modulated signal</h3><div class="formula" id="stageFormula">y(t) = x₁(t)cos(ω<sub>c</sub>t) + x₂(t)sin(ω<sub>c</sub>t)</div><p id="stageInfo">Both modulated contributions occupy the same band, around ±ω<sub>c</sub>.</p></div>
+      <div class="info" aria-live="polite"><h3>Receiver cross-talk</h3><div class="mathmix formula-sm" id="mixEquation1">x̂₁(t) ≈ 1.000x₁(t) − 0.000x₂(t)</div><div class="mathmix formula-sm" id="mixEquation2">x̂₂(t) ≈ 0.000x₁(t) + 1.000x₂(t)</div><p id="mixInfo">Ideal relations after low-pass filtering; noise and filter imperfections omitted.</p></div>
+    </div>
+    <div class="transport" aria-label="Synchronized playback timeline">
+      <label class="timecode" for="seek">Position</label><input type="range" id="seek" min="0" max="500" step="0.1" value="0" aria-label="Seek both songs together"><span class="timecode" id="timeLabel">0:00 / 8:20</span>
+    </div>
+    <p class="transport-note">Shared timeline: if one recording is shorter, it loops while the longer one finishes. Playback always keeps the two channels aligned to the selected timeline position.</p>
+    <div class="listen">
+      <button type="button" class="play" id="playX1">▶ Original 1</button>
+      <button type="button" class="play alt" id="playX2">▶ Original 2</button>
+      <button type="button" class="play" id="playHat1">▶ Recovered 1</button>
+      <button type="button" class="play alt" id="playHat2">▶ Recovered 2</button>
+      <button type="button" class="reset" id="pauseBtn">Ⅱ Pause</button>
+      <button type="button" class="reset" id="stopBtn">■ Stop</button>
+      <span id="playStatus" class="tiny" role="status">RF waveforms are visualized at 256 kHz; only the original or recovered baseband audio is played.</span>
+    </div>
+  </section>
+  <div class="foot"><span>Teaching model: DSB quadrature AM · 256 kHz simulated RF · ~5 kHz audio baseband · coherent two-branch recovery · fourth-order Butterworth LPFs. Audio input and output run at the browser audio rate.</span><span>EECS 216 · Static HTML · uploaded files stay local</span></div>
+</div>
+<script>
+'use strict';
+(() => {
+  /*
+   * Companion to the EECS 216 suppressed-carrier AM demonstration.
+   *
+   * REAL-TIME AUDIO (soundcard sample rate):
+   *   x_1 and x_2 are 5-kHz-lowpass audio streams.
+   *   y = x_1 cos(wct)+x_2 sin(wct) is represented by its
+   *   narrowband complex envelope. The two ideal coherent receiver outputs:
+   *     LPF[2 y cos(wct+phi)] = x_1 cos(phi)-x_2 sin(phi),
+   *     LPF[2 y sin(wct+phi)] = x_1 sin(phi)+x_2 cos(phi).
+   *   Noise is independent bandlimited Gaussian I/Q noise, rotated by phi
+   *   before identical fourth-order Butterworth low-pass output filters.
+   *
+   * RF VISUALIZATION (256 kHz numerical sampling):
+   *   For each 32-ms rolling block, interpolate real baseband audio and
+   *   numerically generate both RF contributions, composite channel, and
+   *   *pre-filter* receiver mixer outputs, including the ±2wc images.
+   *   Do not send 50-kHz RF directly to the browser sound output.
+   *
+   * Audio media elements share a virtual timeline; shorter recordings loop.
+   */
+  const RF_FS=256000, FFT_SIZE=8192, SOURCE_BW=5000;
+  const SOURCES={
+    beethoven:{name:'Beethoven — Symphony No. 5, movement I',duration:500,
+      local:'audio/beethoven_symphony5_movement1.ogg',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/e/e6/Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor%2C_op._67_-_i._allegro_con_brio.ogg',
+      credit:'Beethoven, Symphony No. 5 (I), Skidmore College Orchestra · public-domain recording.',
+      page:'https://commons.wikimedia.org/wiki/File:Ludwig_van_Beethoven_-_symphony_no._5_in_c_minor,_op._67_-_i._allegro_con_brio.ogg'},
+    joplin:{name:'Joplin — The Entertainer',duration:306,
+      local:'audio/joplin_the_entertainer.mp3',
+      remote:'https://upload.wikimedia.org/wikipedia/commons/b/bd/%22The_Entertainer%22_%281902%29%2C_by_Scott_Joplin.mp3',
+      credit:'Scott Joplin, The Entertainer; James Brigham (2018) · CC0 recording.',
+      page:'https://commons.wikimedia.org/wiki/File:%22The_Entertainer%22_(1902),_by_Scott_Joplin.mp3'}
+  };
+  const colors={x1:'#2365b5',x2:'#d16b26',y1:'#2365b5',y2:'#d16b26',y:'#8447a9',r:'#ad4269',z1:'#2365b5',z2:'#d16b26',hat1:'#2365b5',hat2:'#d16b26'};
+  const labels={x1:'Original 1',x2:'Original 2',y1:'Cosine contribution',y2:'Sine contribution',y:'Combined QAM',r:'Received + RF noise',z1:'Mixer 1 (cosine)',z2:'Mixer 2 (sine)',hat1:'Recovered 1',hat2:'Recovered 2'};
+  const byId=id=>document.getElementById(id);
+  const controls={carrier:byId('carrier'),noise:byId('noise'),phase:byId('phase'),cutoff:byId('cutoff')};
+  const tracks=[1,2].map(i=>{
+    const audio=document.createElement('audio');audio.preload='metadata';audio.crossOrigin='anonymous';audio.playsInline=true;audio.loop=true;
+    audio.setAttribute('aria-hidden','true');audio.style.display='none';document.body.append(audio);
+    return {i,audio,choice:null,blob:null,usingLocal:false,triedRemote:false,expectedDuration:6,ready:false};
+  });
+  let context=null,graph=null,stage='y',listening='hat1',isPlaying=false,clockEpoch=0,pausedPosition=0;
+  let draggingSeek=false,readyForVisualization=false,inputRMS=.18,animationTimer=null;
+  const traces={};
+  const status=(i,msg)=>{byId('status'+i).textContent=msg;};
+  const playbackStatus=msg=>{byId('playStatus').textContent=msg;};
+  const fmtTime=seconds=>{if(!Number.isFinite(seconds)||seconds<0)seconds=0;return Math.floor(seconds/60)+':'+String(Math.floor(seconds%60)).padStart(2,'0');};
+  const round3=x=>Math.abs(x)<.0005?'0.000':x.toFixed(3);
+  function trackDuration(track){const n=track.audio.duration;return Number.isFinite(n)&&n>0?n:track.expectedDuration;}
+  function duration(){return Math.max(...tracks.map(trackDuration));}
+  function nowPosition(){return isPlaying&&context?Math.min(duration(),pausedPosition+Math.max(0,context.currentTime-clockEpoch)):pausedPosition;}
+  function assignMediaPosition(time){
+    for(const track of tracks){
+      const d=trackDuration(track);if(!Number.isFinite(d)||d<=0)continue;
+      try{track.audio.currentTime=Math.min((time % d + d)%d,Math.max(0,d-.003));}catch(_){/* metadata still loading */}
+    }
+  }
+  function updateTimeline(){
+    const d=duration(),p=Math.min(nowPosition(),d);
+    byId('seek').max=String(d);
+    if(!draggingSeek)byId('seek').value=String(p);
+    byId('timeLabel').textContent=fmtTime(p)+' / '+fmtTime(d);
+  }
+  function setCredits(track,choice){
+    const parent=byId('credit'+track.i);parent.textContent='';
+    if(SOURCES[choice]){
+      const entry=SOURCES[choice];parent.append(document.createTextNode(entry.credit+' '));
+      const a=document.createElement('a');a.href=entry.page;a.textContent='Recording/license.';a.target='_blank';a.rel='noopener noreferrer';parent.append(a);
+    }else parent.textContent=choice==='upload'?'Uploaded audio remains local to your browser session.':'Synthesized in your browser; no outside audio required.';
+  }
+  function setSelectedButton(track,choice){
+    document.querySelectorAll(`button[data-channel="${track.i}"][data-source]`).forEach(el=>{
+      const active=el.dataset.source===choice;el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active));
+    });
+  }
+  function pause(resetGates=true){
+    if(isPlaying){pausedPosition=nowPosition();isPlaying=false;}
+    for(const t of tracks)t.audio.pause();
+    if(graph&&resetGates)for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(0,context.currentTime,.015);
+    updateTimeline();
+  }
+  function stop(){pause();pausedPosition=0;assignMediaPosition(0);updateTimeline();playbackStatus('Stopped. Select one of the four audio outputs to listen.');}
+  function resetForNewSource(){pause();pausedPosition=0;inputRMS=.18;assignMediaPosition(0);blankCharts();updateTimeline();}
+  function selectSource(i,choice,file=null){
+    resetForNewSource();
+    const t=tracks[i-1];if(t.blob){URL.revokeObjectURL(t.blob);t.blob=null;}
+    t.choice=choice;t.triedRemote=false;t.ready=false;t.expectedDuration=SOURCES[choice]?.duration||8;
+    setSelectedButton(t,choice);setCredits(t,choice);
+    if(SOURCES[choice]){
+      const entry=SOURCES[choice];t.usingLocal=location.protocol==='http:'||location.protocol==='https:';
+      t.audio.src=t.usingLocal?entry.local:entry.remote;
+      status(i,entry.name+' · '+fmtTime(entry.duration)+'.');
+    }else{
+      t.usingLocal=false;
+      if(choice==='upload'&&file){t.blob=URL.createObjectURL(file);t.audio.src=t.blob;t.expectedDuration=8;status(i,'Uploaded '+file.name+' · loading metadata.');}
+      else{const synth=choice==='tone'?makeTones(i):makeMelody(i);t.blob=URL.createObjectURL(waveBlob(synth,48000));t.audio.src=t.blob;t.expectedDuration=synth.length/48000;status(i,(choice==='tone'?'Two-tone test':'Melody')+' · '+fmtTime(t.expectedDuration)+' · generated in browser.');}
+    }
+    t.audio.load();updateTimeline();
+  }
+  function makeTones(i){
+    const fs=48000,n=fs*8,a=new Float32Array(n),f1=i===1?440:700,f2=i===1?1100:1700;
+    for(let k=0;k<n;k++){const tt=k/fs;a[k]=.47*Math.sin(2*Math.PI*f1*tt)+.28*Math.sin(2*Math.PI*f2*tt);}
+    return a;
+  }
+  function makeMelody(i){
+    const fs=48000,n=fs*8,buf=new Float32Array(n),notes=i===1?[330,392,494,440,392,330,294,392,440,523]:[262,330,392,330,440,349,392,523,494,392];
+    for(let k=0;k<n;k++){
+      const tt=k/fs,idx=Math.min(notes.length-1,Math.floor(tt/.8)),local=tt-idx*.8,f=notes[idx];
+      const env=Math.max(0,Math.min(1,local/.035,(.8-local)/.08));
+      buf[k]=env*(.52*Math.sin(2*Math.PI*f*local)+.17*Math.sin(2*Math.PI*2*f*local)+.07*Math.sin(2*Math.PI*3*f*local));
+    }
+    return buf;
+  }
+  function waveBlob(data,fs){
+    const b=new ArrayBuffer(44+data.length*2),view=new DataView(b);
+    const str=(off,s)=>{for(let k=0;k<s.length;k++)view.setUint8(off+k,s.charCodeAt(k));};
+    str(0,'RIFF');view.setUint32(4,36+data.length*2,true);str(8,'WAVE');str(12,'fmt ');
+    view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,1,true);
+    view.setUint32(24,fs,true);view.setUint32(28,fs*2,true);view.setUint16(32,2,true);view.setUint16(34,16,true);
+    str(36,'data');view.setUint32(40,data.length*2,true);
+    for(let k=0;k<data.length;k++)view.setInt16(44+k*2,Math.round(Math.max(-1,Math.min(1,data[k]))*32767),true);
+    return new Blob([b],{type:'audio/wav'});
+  }
+  function mkLP(q,cutoff){const f=context.createBiquadFilter();f.type='lowpass';f.Q.value=q;f.frequency.value=cutoff;return f;}
+  function lpPair(cutoff){return [mkLP(.541196100146,cutoff),mkLP(1.306562964876,cutoff)];}
+  function analyzer(){const a=context.createAnalyser();a.fftSize=FFT_SIZE;a.smoothingTimeConstant=0;return a;}
+  function noiseSource(){
+    const fs=context.sampleRate,buf=context.createBuffer(1,fs*6,fs),d=buf.getChannelData(0);
+    for(let k=0;k<d.length;k+=2){const u=Math.max(1e-12,Math.random()),v=Math.random(),r=Math.sqrt(-2*Math.log(u));d[k]=r*Math.cos(2*Math.PI*v);if(k+1<d.length)d[k+1]=r*Math.sin(2*Math.PI*v);}
+    const src=context.createBufferSource();src.buffer=buf;src.loop=true;return src;
+  }
+  function gainFrom(input,to){const g=context.createGain();g.gain.value=0;input.connect(g).connect(to);return g;}
+  function createGraph(){
+    if(graph)return graph;
+    context=new (window.AudioContext||window.webkitAudioContext)();
+    const [f11,f12]=lpPair(SOURCE_BW),[f21,f22]=lpPair(SOURCE_BW);
+    const aX1=analyzer(),aX2=analyzer(),aNI=analyzer(),aNQ=analyzer(),aHat1=analyzer(),aHat2=analyzer();
+    context.createMediaElementSource(tracks[0].audio).connect(f11).connect(f12).connect(aX1);
+    context.createMediaElementSource(tracks[1].audio).connect(f21).connect(f22).connect(aX2);
+    const [rx11,rx12]=lpPair(+controls.cutoff.value),[rx21,rx22]=lpPair(+controls.cutoff.value);
+    // Four coefficients of the two-by-two rotation matrix.
+    const mix11=gainFrom(aX1,rx11),mix12=gainFrom(aX2,rx11);
+    const mix21=gainFrom(aX1,rx21),mix22=gainFrom(aX2,rx21);
+    const nI=noiseSource(),nQ=noiseSource(),gateI=context.createGain(),gateQ=context.createGain();
+    gateI.gain.value=0;gateQ.gain.value=0;
+    const [ni1,ni2]=lpPair(SOURCE_BW),[nq1,nq2]=lpPair(SOURCE_BW);
+    const levelI=context.createGain(),levelQ=context.createGain();
+    nI.connect(gateI).connect(ni1).connect(ni2).connect(levelI).connect(aNI);
+    nQ.connect(gateQ).connect(nq1).connect(nq2).connect(levelQ).connect(aNQ);
+    const ni11=gainFrom(aNI,rx11),nq12=gainFrom(aNQ,rx11),ni21=gainFrom(aNI,rx21),nq22=gainFrom(aNQ,rx21);
+    rx11.connect(rx12).connect(aHat1);rx21.connect(rx22).connect(aHat2);
+    const silent=context.createGain();silent.gain.value=0;silent.connect(context.destination);
+    for(const node of [aX1,aX2,aNI,aNQ,aHat1,aHat2])node.connect(silent);
+    const master=context.createGain();master.gain.value=.52;master.connect(context.destination);
+    nI.start();nQ.start();
+    graph={fs:context.sampleRate,aX1,aX2,aNI,aNQ,aHat1,aHat2,
+      gateI,gateQ,levelI,levelQ,mix11,mix12,mix21,mix22,ni11,nq12,ni21,nq22,
+      rxFilters:[rx11,rx12,rx21,rx22],master,heard:null,
+      analyzers:{x1:aX1,x2:aX2,ni:aNI,nq:aNQ,hat1:aHat1,hat2:aHat2}};
+    applyControls();chooseListening(listening);return graph;
+  }
+  function chooseListening(which){
+    listening=which;
+    for(const btn of document.querySelectorAll('.listen .play'))btn.dataset.selected=String(btn.id.toLowerCase()===('play'+which).toLowerCase());
+    if(!graph)return;
+    const node=({x1:graph.aX1,x2:graph.aX2,hat1:graph.aHat1,hat2:graph.aHat2})[which];
+    if(graph.heard&&graph.heard!==node)graph.heard.disconnect(graph.master);
+    if(node&&graph.heard!==node){node.connect(graph.master);graph.heard=node;}
+  }
+  function refreshLabels(){
+    const phi=+controls.phase.value,co=Math.cos(phi*Math.PI/180),si=Math.sin(phi*Math.PI/180);
+    byId('carrierVal').textContent='2π × '+(+controls.carrier.value).toLocaleString('en-US')+' rad/s';
+    byId('noiseVal').textContent=controls.noise.value+'%';byId('phaseVal').textContent=phi+'°';
+    byId('cutoffVal').textContent='2π × '+(+controls.cutoff.value).toLocaleString('en-US')+' rad/s';
+    byId('cosCoeff').textContent=round3(co);byId('sinCoeff').textContent=round3(si);
+    byId('desiredBar').style.width=(co+si?100*co/(co+si):100)+'%';
+    byId('mixEquation1').textContent='x̂₁(t) ≈ '+round3(co)+'x₁(t) − '+round3(si)+'x₂(t)';
+    byId('mixEquation2').textContent='x̂₂(t) ≈ '+round3(si)+'x₁(t) + '+round3(co)+'x₂(t)';
+    byId('mixInfo').textContent=phi===0?'At φ=0°, the receiver separates the channels (aside from filtering).':
+      phi===90?'At φ=90°, x̂₁ ≈ −x₂ and x̂₂ ≈ x₁: the channels exchange, with a sign reversal.':
+      'At φ='+phi+'°, the other audio leaks into each output. Noise and filter imperfections are omitted from these ideal equations.';
+    updateStageDescription();
+  }
+  function updateStageDescription(){
+    const fc=(+controls.carrier.value/1000).toFixed(0),which=byId('mixerView').value;
+    const items={
+      x:['Original baseband signals','x₁(t),  x₂(t)','Two independently selected recordings are low-pass filtered to approximately 5 kHz.'],
+      y:['Quadrature-modulated signal','y(t) = x₁(t)cos(ω<sub>c</sub>t) + x₂(t)sin(ω<sub>c</sub>t)','Both contributions occupy the same carrier bands around ±'+fc+' kHz, despite carrying different information.'],
+      r:['Received signal with RF noise','r(t) = y(t) + n<sub>RF</sub>(t)','In-phase and quadrature Gaussian noise overlap the transmitted RF band.'],
+      z:['Outputs of coherent receiver mixers','z₁(t)=2r(t)cos(ω<sub>c</sub>t+φ)<br>z₂(t)=2r(t)sin(ω<sub>c</sub>t+φ)','Choose mixer '+(which==='both'?'pair':which==='z1'?'1':'2')+'. Baseband copies appear near zero; images appear near ±'+(2*fc)+' kHz (extended view).'],
+      hat:['Recovered audio pair after LPF','x̂₁(t)=LPF{z₁(t)}<br>x̂₂(t)=LPF{z₂(t)}','The LPFs remove the images. Phase error introduces cross-talk, while in-band noise remains.']
+    };
+    const [heading,formula,desc]=items[stage];byId('stageHeading').textContent=heading;byId('stageFormula').innerHTML=formula;byId('stageInfo').textContent=desc;
+    document.querySelectorAll('[data-stage]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.stage===stage)));
+  }
+  function applyControls(){
+    refreshLabels();if(!graph)return;
+    const phi=(+controls.phase.value)*Math.PI/180,c=Math.cos(phi),s=Math.sin(phi),g=graph,now=context.currentTime;
+    [[g.mix11,c],[g.mix12,-s],[g.mix21,s],[g.mix22,c],
+     [g.ni11,c],[g.nq12,-s],[g.ni21,s],[g.nq22,c]].forEach(([node,value])=>node.gain.setTargetAtTime(value,now,.01));
+    g.rxFilters.forEach(node=>node.frequency.setTargetAtTime(+controls.cutoff.value,now,.015));
+    adjustNoiseGain();
+  }
+  function adjustNoiseGain(){
+    if(!graph)return;
+    // Four-pole Butterworth lowpass approximates 1.026 times cutoff as one-sided ENBW.
+    const filterRMS=Math.sqrt(Math.min(.99,2*1.026*SOURCE_BW/graph.fs));
+    const level=(+controls.noise.value/100)*inputRMS/(Math.SQRT2*filterRMS);
+    graph.levelI.gain.setTargetAtTime(level,context.currentTime,.06);
+    graph.levelQ.gain.setTargetAtTime(level,context.currentTime,.06);
+  }
+  function setupCanvas(id){
+    const canvas=byId(id),rect=canvas.getBoundingClientRect(),scale=Math.min(window.devicePixelRatio||1,2);
+    const width=Math.max(250,rect.width),height=Math.max(150,rect.height);
+    if(canvas.width!==Math.round(width*scale)||canvas.height!==Math.round(height*scale)){
+      canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);
+    }
+    const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);
+    return {ctx,width,height};
+  }
+  function drawAxes(ctx,dims,view,xLabel,yLabel,xTicks,yTicks,xFormatter,yFormatter){
+    const {width,height}=dims,pad={left:55,right:15,top:18,bottom:35};
+    const plot={x:pad.left,y:pad.top,w:width-pad.left-pad.right,h:height-pad.top-pad.bottom};
+    ctx.clearRect(0,0,width,height);ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);
+    ctx.font='11px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    ctx.textAlign='right';ctx.textBaseline='middle';
+    for(const yt of yTicks){
+      const yy=plot.y+(view.ymax-yt)/(view.ymax-view.ymin)*plot.h;
+      if(yy<plot.y-1||yy>plot.y+plot.h+1)continue;
+      ctx.strokeStyle='#e8edf4';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(plot.x,yy);ctx.lineTo(plot.x+plot.w,yy);ctx.stroke();
+      ctx.fillStyle='#6c7c8d';ctx.fillText(yFormatter(yt),plot.x-8,yy);
+    }
+    ctx.textAlign='center';ctx.textBaseline='top';
+    for(const xt of xTicks){
+      const xx=plot.x+(xt-view.xmin)/(view.xmax-view.xmin)*plot.w;
+      if(xx<plot.x-1||xx>plot.x+plot.w+1)continue;
+      ctx.strokeStyle=xt===0?'#cbd7e4':'#edf1f6';ctx.lineWidth=xt===0?1.2:1;
+      ctx.beginPath();ctx.moveTo(xx,plot.y);ctx.lineTo(xx,plot.y+plot.h);ctx.stroke();
+      ctx.fillStyle='#6c7c8d';ctx.fillText(xFormatter(xt),xx,plot.y+plot.h+7);
+    }
+    ctx.strokeStyle='#9cadbe';ctx.lineWidth=1;ctx.strokeRect(plot.x,plot.y,plot.w,plot.h);
+    ctx.fillStyle='#52677f';ctx.textAlign='center';ctx.fillText(xLabel,plot.x+plot.w/2,height-15);
+    ctx.save();ctx.translate(13,plot.y+plot.h/2);ctx.rotate(-Math.PI/2);ctx.fillText(yLabel,0,0);ctx.restore();
+    return plot;
+  }
+  function freqRange(){return byId('zoom').value==='extended'?120000:60000;}
+  function displayKeys(){
+    const components=byId('components').checked;
+    if(stage==='x')return ['x1','x2'];
+    if(stage==='y')return components?['y1','y2','y']:['y'];
+    if(stage==='r')return components?['y1','y2','r']:['r'];
+    if(stage==='z')return byId('mixerView').value==='both'?['z1','z2']:[byId('mixerView').value];
+    return ['hat1','hat2'];
+  }
+  function drawTrace(ctx,plot,which,range,main){
+    const db=traces[which]?.frequency;if(!db)return;
+    const maxima=new Float32Array(Math.ceil(plot.w)+1);maxima.fill(-110);
+    for(let k=0;k<db.length;k++){
+      const f=k*RF_FS/FFT_SIZE;if(f>range)break;
+      const val=Number.isFinite(db[k])?db[k]:-110;
+      for(const sign of [1,-1]){
+        const ix=Math.round((sign*f+range)/(2*range)*plot.w);
+        if(ix>=0&&ix<maxima.length)maxima[ix]=Math.max(maxima[ix],val);
+      }
+    }
+    ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();
+    ctx.strokeStyle=colors[which];ctx.lineWidth=main?1.9:1.35;ctx.globalAlpha=main?1:.67;
+    if(!main)ctx.setLineDash([5,4]);ctx.beginPath();
+    for(let i=0;i<maxima.length;i++){
+      const val=Math.max(-100,Math.min(0,maxima[i]));
+      const yy=plot.y+(0-val)/100*plot.h,xx=plot.x+i;
+      if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+    }
+    ctx.stroke();ctx.restore();
+  }
+  function plotColors(keys){return keys.map((k,i)=>'<span class="legend-key"><span class="swatch '+(i<keys.length-1&&['y','r'].includes(stage)?'comparison':'')+'" style="border-color:'+colors[k]+'"></span>'+labels[k]+'</span>').join('');}
+  function drawSpectrum(){
+    const dims=setupCanvas('spectrum'),{ctx}=dims,range=freqRange()/1000;
+    const xTicks=range===60?[-60,-40,-20,0,20,40,60]:[-120,-80,-40,0,40,80,120];
+    const plot=drawAxes(ctx,dims,{xmin:-range,xmax:range,ymin:-100,ymax:0},'ω / (2π) (kHz)','Magnitude (dBFS)',xTicks,[-100,-80,-60,-40,-20,0],String,String);
+    if(stage==='hat'||stage==='z'){
+      const c=+controls.cutoff.value/1000,p0=plot.x+(-c+range)/(2*range)*plot.w,p1=plot.x+(c+range)/(2*range)*plot.w;
+      ctx.fillStyle='rgba(19,132,97,.05)';ctx.fillRect(p0,plot.y,p1-p0,plot.h);
+      for(const xx of [p0,p1]){ctx.strokeStyle='rgba(19,132,97,.5)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xx,plot.y);ctx.lineTo(xx,plot.y+plot.h);ctx.stroke();ctx.setLineDash([]);}
+    }
+    const keys=displayKeys();
+    if(readyForVisualization){keys.forEach((k,i)=>drawTrace(ctx,plot,k,range*1000,i===keys.length-1||['x','hat','z'].includes(stage)));}
+    else {ctx.fillStyle='#73859a';ctx.font='13px system-ui';ctx.textAlign='center';ctx.fillText('Press Play to see both live spectra',plot.x+plot.w/2,plot.y+plot.h/2);}
+    byId('spectrumLegend').innerHTML=plotColors(keys);
+  }
+  function timeSpanMs(){return byId('timeWindow').value==='auto'?(stage==='x'||stage==='hat'?12:.5):+byId('timeWindow').value;}
+  function drawWaveTrace(ctx,plot,key,spanMs,amp,main){
+    const samples=traces[key]?.time;if(!samples)return;
+    const count=Math.min(samples.length,Math.floor(RF_FS*spanMs/1000));
+    ctx.save();ctx.beginPath();ctx.rect(plot.x,plot.y,plot.w,plot.h);ctx.clip();
+    ctx.strokeStyle=colors[key];ctx.lineWidth=main?1.6:1.2;ctx.globalAlpha=main?1:.7;
+    if(!main)ctx.setLineDash([5,4]);ctx.beginPath();
+    for(let i=0;i<count;i++){
+      const xx=plot.x+i/Math.max(1,count-1)*plot.w,yy=plot.y+(amp-samples[samples.length-count+i])/(2*amp)*plot.h;
+      if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
+    }ctx.stroke();ctx.restore();
+  }
+  function drawWaveform(){
+    const dims=setupCanvas('waveform'),{ctx}=dims,spanMs=timeSpanMs(),count=Math.floor(RF_FS*spanMs/1000);
+    const keys=displayKeys();let amp=.25;
+    if(readyForVisualization){
+      // One waveform amplitude reference is used for all compared channels.
+      for(const key of ['x1','x2',...keys]){
+        const a=traces[key]?.time;if(!a)continue;
+        for(let i=Math.max(0,a.length-count);i<a.length;i+=3)amp=Math.max(amp,Math.abs(a[i]));
+      }
+    }
+    amp=Math.min(4,Math.ceil(amp*2)/2);
+    const plot=drawAxes(ctx,dims,{xmin:0,xmax:spanMs,ymin:-amp,ymax:amp},'Time (ms)','Amplitude',
+      [0,spanMs/4,spanMs/2,spanMs*3/4,spanMs],[-amp,-amp/2,0,amp/2,amp],x=>String(Number(x.toFixed(2))),x=>String(Number(x.toFixed(1))));
+    if(readyForVisualization)keys.forEach((k,i)=>drawWaveTrace(ctx,plot,k,spanMs,amp,i===keys.length-1||['x','hat','z'].includes(stage)));
+    else{ctx.fillStyle='#73859a';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Live waveform',plot.x+plot.w/2,plot.y+plot.h/2);}
+    byId('waveLegend').innerHTML=plotColors(keys);
+  }
+  function blankCharts(){for(const k of Object.keys(traces))delete traces[k];readyForVisualization=false;drawSpectrum();drawWaveform();}
+  const INTERP_PHASES=512,INTERP_TAPS=16;
+  const interpKernels=(()=>{
+    const all=[],sinc=x=>Math.abs(x)<1e-9?1:Math.sin(Math.PI*x)/(Math.PI*x);
+    for(let p=0;p<INTERP_PHASES;p++){
+      const frac=p/INTERP_PHASES,kernel=new Float32Array(INTERP_TAPS);let sum=0;
+      for(let j=0;j<INTERP_TAPS;j++){const d=frac-(j-7);kernel[j]=Math.abs(d)<8?sinc(d)*sinc(d/8):0;sum+=kernel[j];}
+      for(let j=0;j<INTERP_TAPS;j++)kernel[j]/=sum;all.push(kernel);
+    }return all;
+  })();
+  function interpolate(src,fs,out){
+    const ratio=fs/RF_FS,n=out.length,headroom=10;
+    for(let i=0;i<n;i++){
+      const pos=src.length-1-headroom-(n-1-i)*ratio,k=Math.floor(pos),frac=pos-k;
+      const kernel=interpKernels[Math.min(INTERP_PHASES-1,Math.round(frac*(INTERP_PHASES-1)))];
+      let v=0;for(let j=0;j<INTERP_TAPS;j++)v+=src[k+j-7]*kernel[j];out[i]=v;
+    }
+  }
+  const fftTable=(()=>{
+    const n=FFT_SIZE,br=new Uint16Array(n),tr=new Float64Array(n/2),ti=new Float64Array(n/2),window=new Float64Array(n);
+    const bits=Math.round(Math.log2(n));
+    for(let i=0;i<n;i++){let v=i,z=0;for(let k=0;k<bits;k++){z=(z<<1)|(v&1);v>>=1;}br[i]=z;window[i]=.5-.5*Math.cos(2*Math.PI*i/(n-1));}
+    for(let i=0;i<n/2;i++){tr[i]=Math.cos(-2*Math.PI*i/n);ti[i]=Math.sin(-2*Math.PI*i/n);}
+    return {br,tr,ti,window};
+  })();
+  function spectrumDb(samples){
+    const n=FFT_SIZE,re=new Float64Array(n),im=new Float64Array(n),T=fftTable;
+    for(let i=0;i<n;i++)re[T.br[i]]=samples[i]*T.window[i];
+    for(let size=2;size<=n;size*=2){
+      const half=size/2,step=n/size;
+      for(let base=0;base<n;base+=size){
+        for(let j=0;j<half;j++){
+          const p=base+j,q=p+half,idx=j*step,c=T.tr[idx],s=T.ti[idx];
+          const tr=re[q]*c-im[q]*s,ti=re[q]*s+im[q]*c;
+          re[q]=re[p]-tr;im[q]=im[p]-ti;re[p]+=tr;im[p]+=ti;
+        }
+      }
+    }
+    const out=new Float32Array(n/2),scale=4/(n-1);
+    for(let i=0;i<n/2;i++)out[i]=Math.max(-110,20*Math.log10(Math.max(1e-8,Math.hypot(re[i],im[i])*scale)));
+    return out;
+  }
+  function refreshAnalyzers(){
+    if(!graph||!isPlaying||tracks.some(t=>t.audio.readyState<2))return;
+    const raw={};for(const [key,a] of Object.entries(graph.analyzers)){
+      const buf=new Float32Array(FFT_SIZE);a.getFloatTimeDomainData(buf);raw[key]=buf;
+    }
+    let p1=0,p2=0;for(let i=0;i<FFT_SIZE;i++){p1+=raw.x1[i]**2;p2+=raw.x2[i]**2;}
+    const rms=Math.sqrt((p1+p2)/FFT_SIZE);if(rms>1e-4)inputRMS=.99*inputRMS+.01*rms;
+    adjustNoiseGain();
+    const resampled={};for(const key of ['x1','x2','ni','nq','hat1','hat2']){
+      const out=new Float32Array(FFT_SIZE);interpolate(raw[key],graph.fs,out);resampled[key]=out;
+    }
+    const {x1,x2,ni,nq,hat1,hat2}=resampled;
+    const y1=new Float32Array(FFT_SIZE),y2=new Float32Array(FFT_SIZE),y=new Float32Array(FFT_SIZE),r=new Float32Array(FFT_SIZE),z1=new Float32Array(FFT_SIZE),z2=new Float32Array(FFT_SIZE);
+    const freq=+controls.carrier.value,w=2*Math.PI*freq/RF_FS,ph=(+controls.phase.value)*Math.PI/180;
+    // Use one time origin for the two RF carrier contributions and both demodulators.
+    let theta=2*Math.PI*freq*(nowPosition()-(FFT_SIZE-1)/RF_FS);
+    for(let k=0;k<FFT_SIZE;k++,theta+=w){
+      const c=Math.cos(theta),s=Math.sin(theta),cp=Math.cos(theta+ph),sp=Math.sin(theta+ph);
+      y1[k]=x1[k]*c;y2[k]=x2[k]*s;y[k]=y1[k]+y2[k];
+      r[k]=y[k]+ni[k]*c+nq[k]*s;
+      z1[k]=2*r[k]*cp;z2[k]=2*r[k]*sp;
+    }
+    const waves={x1,x2,y1,y2,y,r,z1,z2,hat1,hat2};
+    for(const [key,data] of Object.entries(waves))traces[key]={time:data,frequency:spectrumDb(data)};
+    readyForVisualization=true;drawSpectrum();drawWaveform();updateTimeline();
+  }
+  function ensureTicker(){
+    if(animationTimer!==null)return;
+    let prevSync=0;
+    animationTimer=window.setInterval(()=>{
+      if(!isPlaying)return;
+      const playhead=nowPosition();if(playhead>=duration()-.02){pause();playbackStatus('End of the shared timeline. Press Play to restart.');return;}
+      if(context&&context.currentTime-prevSync>1.5){
+        prevSync=context.currentTime;
+        for(const t of tracks){
+          const d=trackDuration(t),target=(playhead%d+d)%d,actual=t.audio.currentTime;
+          const drift=Math.abs((target-actual+d/2)%d-d/2);
+          if(Number.isFinite(drift)&&drift>.24&&t.audio.readyState>=2){try{t.audio.currentTime=target;}catch(_){}}
+        }
+      }
+      refreshAnalyzers();updateTimeline();
+    },180);
+  }
+  async function startPlayback(which){
+    chooseListening(which);
+    if(isPlaying){playbackStatus('Now listening to '+labels[which]+'. Spectrum and both channels continue in sync.');return;}
+    try{
+      if(!(window.AudioContext||window.webkitAudioContext))throw new Error('Web Audio API unavailable');
+      createGraph();await context.resume();
+      if(pausedPosition>=duration()-.03)pausedPosition=0;
+      assignMediaPosition(pausedPosition);
+      await Promise.all(tracks.map(t=>t.audio.play()));
+      // Re-align media after both browser audio streams have started.
+      assignMediaPosition(pausedPosition);clockEpoch=context.currentTime;isPlaying=true;
+      for(const gate of [graph.gateI,graph.gateQ])gate.gain.setTargetAtTime(1,context.currentTime,.015);
+      ensureTicker();
+      playbackStatus('Playing '+labels[which]+' · shared timeline · RF simulated at 256 kHz; audio output at '+Math.round(context.sampleRate/1000)+' kHz.');
+    }catch(err){
+      pause();playbackStatus('Could not play both sources: '+err.message+'. Try the two-tone preset, or upload a local audio file.');
+    }
+  }
+  // Track events and fallback from unbundled local paths to Wikimedia Commons.
+  for(const t of tracks){
+    t.audio.addEventListener('loadedmetadata',()=>{
+      t.ready=true;status(t.i,(SOURCES[t.choice]?.name||t.choice||'Audio')+' · '+fmtTime(trackDuration(t))+' available.');updateTimeline();
+    });
+    t.audio.addEventListener('error',()=>{
+      const entry=SOURCES[t.choice];
+      if(entry&&t.usingLocal&&!t.triedRemote){t.usingLocal=false;t.triedRemote=true;status(t.i,'Local copy unavailable; loading Wikimedia Commons…');t.audio.src=entry.remote;t.audio.load();return;}
+      if(entry)status(t.i,'Could not stream this recording. Try a local file or the two-tone preset.');
+      else status(t.i,'Audio failed to load; choose a different source.');
+    });
+    t.audio.addEventListener('durationchange',updateTimeline);
+  }
+  document.querySelectorAll('button[data-channel][data-source]').forEach(b=>b.addEventListener('click',()=>selectSource(+b.dataset.channel,b.dataset.source)));
+  byId('tonePreset').addEventListener('click',()=>{selectSource(1,'tone');selectSource(2,'tone');stage='y';updateStageDescription();drawSpectrum();drawWaveform();});
+  for(const i of [1,2]){
+    byId('upload'+i).addEventListener('change',evt=>{
+      const file=evt.target.files?.[0];if(file)selectSource(i,'upload',file);evt.target.value='';
+    });
+  }
+  for(const el of Object.values(controls))el.addEventListener('input',()=>{applyControls();if(readyForVisualization&&isPlaying)refreshAnalyzers();});
+  byId('resetBtn').addEventListener('click',()=>{
+    controls.carrier.value=50000;controls.noise.value=5;controls.phase.value=10;controls.cutoff.value=5500;applyControls();
+    if(isPlaying)refreshAnalyzers();
+  });
+  byId('components').addEventListener('change',()=>{drawSpectrum();drawWaveform();});
+  byId('zoom').addEventListener('change',drawSpectrum);
+  byId('mixerView').addEventListener('change',()=>{updateStageDescription();drawSpectrum();drawWaveform();});
+  byId('timeWindow').addEventListener('change',drawWaveform);
+  document.querySelectorAll('[data-stage]').forEach(b=>b.addEventListener('click',()=>{
+    stage=b.dataset.stage;updateStageDescription();drawSpectrum();drawWaveform();
+  }));
+  for(const choice of ['X1','X2','Hat1','Hat2'])byId('play'+choice).addEventListener('click',()=>startPlayback(choice[0].toLowerCase()+choice.slice(1)));
+  byId('pauseBtn').addEventListener('click',()=>{pause();playbackStatus('Paused at '+fmtTime(nowPosition())+'. Press an audio button to resume.');});
+  byId('stopBtn').addEventListener('click',stop);
+  byId('seek').addEventListener('input',e=>{
+    draggingSeek=true;const p=+e.target.value;pausedPosition=p;if(isPlaying&&context)clockEpoch=context.currentTime;
+    assignMediaPosition(p);byId('timeLabel').textContent=fmtTime(p)+' / '+fmtTime(duration());
+  });
+  byId('seek').addEventListener('change',()=>{draggingSeek=false;updateTimeline();});
+  window.addEventListener('resize',()=>{drawSpectrum();drawWaveform();});
+  window.addEventListener('pagehide',()=>{pause();for(const t of tracks)if(t.blob)URL.revokeObjectURL(t.blob);});
+  if(window.__EECS216_QAM_TEST__){
+    window.__EECS216_QAM_DIAGNOSTICS__=()=>({traces,contextRate:context?.sampleRate,playing:isPlaying,position:nowPosition(),phase:+controls.phase.value,carrier:+controls.carrier.value,noise:+controls.noise.value,inputRMS,listening});
+  }
+  refreshLabels();selectSource(1,'beethoven');selectSource(2,'joplin');chooseListening('hat1');blankCharts();
+})();
+
+</script>
+</body>
+</html>
