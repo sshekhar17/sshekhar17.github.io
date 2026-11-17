@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="EECS 216 non-ideal sampling demo: flat-top and natural sampling, their spectra, and reconstruction with an equalizer.">
+<title>Non-Ideal Sampling Demo | EECS 216</title>
+<style>
+:root{color-scheme:light;--ink:#14263d;--muted:#5a7089;--line:#dbe5ef;--page:#f4f7fb;--blue:#2467b9;--orange:#d0772d;--green:#138366;--red:#bd4b48;--purple:#8a60bd;--gray:#8a9daf}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--page);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}button,input{font:inherit}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #94bfe9;outline-offset:2px}
+.shell{max-width:1190px;margin:auto;padding:25px 24px 38px}header{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}.brand,.eyebrow{color:#28649a;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.085em}.eyebrow{color:#6c8095}h1{font-size:clamp(28px,3.5vw,38px);letter-spacing:-.035em;line-height:1.18;margin:5px 0 11px}h2{font-size:19px;letter-spacing:-.02em;margin:0 0 8px}h3{font-size:14px;margin:0 0 4px}.intro{font-size:14px;color:#516981;margin:0 0 20px;max-width:950px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.step{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;text-align:left;cursor:pointer;color:var(--ink)}.step[aria-current="step"]{background:#eaf4ff;border-color:#82b5e8;box-shadow:inset 0 0 0 1px #9dc6ed}.step .k{display:block;color:#3574ad;text-transform:uppercase;font-size:10px;letter-spacing:.06em;font-weight:800;margin-bottom:3px}.step strong{display:block;font-size:14px}.step .hint{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 2px 7px #14263d09}.panel+.panel{margin-top:14px}.lesson{padding:20px 21px}.lesson[hidden]{display:none!important}.lessonhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.badge{font-size:11px;color:#225f96;background:#e9f3fd;border-radius:100px;padding:5px 10px;font-weight:750}.lead{max-width:960px;color:#526981;margin:3px 0 13px}.lead strong{color:var(--ink)}.task{font-size:13px;font-weight:800;color:#205d96;margin:12px 0 13px}.controlpanel{padding:16px 17px;margin-bottom:14px;background:#f6f9fe;border:1px solid #dce7f4;border-radius:12px}.controls2{display:grid;grid-template-columns:1fr 1fr;gap:22px}.ctrl{min-width:0}.ctrl .topline{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:8px}.ctrl label{font-size:13px;font-weight:750}.num{color:#195e9c;font-weight:850;font-size:19px;font-variant-numeric:tabular-nums}.range{width:100%;accent-color:#286aba;cursor:pointer}.ends{display:flex;justify-content:space-between;color:#8194a9;font-size:11px;gap:9px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}.metric{background:#f3f8fd;border:1px solid #dce7f3;border-radius:10px;padding:9px 11px}.metric .key{color:#69819b;font-size:11px}.metric .val{font-weight:850;font-size:19px;line-height:1.4;font-variant-numeric:tabular-nums}.buttonbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}.button{cursor:pointer;background:#fff;color:#245d90;border:1px solid #c1d6e9;border-radius:9px;font-size:12px;padding:8px 11px;font-weight:750}.button:hover{background:#f1f8fe}.primary{background:#205e9a;color:white;border-color:#205e9a}.primary:hover{background:#174c7f}.button[disabled]{opacity:.5;cursor:not-allowed}.switch{display:flex;gap:8px;align-items:center;font-weight:750;font-size:13px;cursor:pointer}.switch input{width:16px;height:16px;accent-color:#2368ad}
+.plot{border:1px solid #e0e9f3;border-radius:12px;padding:12px 12px 10px;background:#fff;min-width:0}.plot .sub{color:#71869a;font-size:12px;margin:2px 0 6px}.plot canvas{width:100%;height:225px;display:block}.plot.compact canvas{height:144px}.plot.wide canvas{height:260px}.plots{display:grid;grid-template-columns:1fr 1fr;gap:13px}.stack{display:grid;grid-template-columns:1fr;gap:10px}.plotfoot{color:#70869b;font-size:11px;margin:2px 3px 0}.legend{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-top:10px;color:#61778d;font-size:12px}.legend .keybox{width:13px;height:3px;margin-right:5px;display:inline-block;vertical-align:middle}.legend .dash{border-top:2px dashed #a477c0;background:transparent;height:1px}.lessonend{margin-top:16px;padding-top:15px;border-top:1px solid #e2eaf3;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.lessonend p{font-size:12px;color:#60788e;margin:0;max-width:730px}.status{margin:13px 0 0;padding:10px 12px;border:1px solid #cbddeb;border-radius:10px;background:#f4f9fe;color:#345974;font-size:13px}.status.good{background:#eef8f3;border-color:#b9e2cb;color:#1e674b}.status.warn{background:#fff7ed;border-color:#ead4b9;color:#8b5a2d}.minibox{margin-top:14px;border:1px solid #e2e9f1;border-radius:11px;padding:12px 13px;background:#fbfdff}.minibox .blockrow{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center}.minibox .node{font-size:12px;border:1px solid #d6e2ee;background:#f4f8fc;border-radius:8px;padding:8px 10px;font-weight:700}.minibox .arr{color:#8ca3b8}.minor{font-size:12px;color:#637d95}details{border:1px solid #e0e9f3;border-radius:11px;padding:10px 13px;margin-top:12px}summary{cursor:pointer;color:#245d90;font-size:13px;font-weight:750}.math{font-family:Georgia,"Times New Roman",serif;font-size:17px;color:#254f77;text-align:center;margin:10px 0}.math.small{font-size:15px}.footer{margin-top:16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#71869a;font-size:12px}.footer a{color:#205e9a}.eqhint{font-size:12px;color:#60778d;text-align:center}
+.viewbar{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin:1px 0 10px}.seg{display:inline-flex;gap:0;overflow:hidden;border-radius:9px;border:1px solid #c7dcec;background:#fff}.seg button{padding:7px 11px;border:0;border-right:1px solid #c7dcec;background:#fff;color:#385b77;cursor:pointer;font-weight:750;font-size:12px}.seg button:last-child{border-right:0}.seg button[aria-pressed="true"]{background:#e5f2fe;color:#16568e}
+@media(max-width:850px){.plots,.controls2{grid-template-columns:1fr}.plot canvas{height:230px}}@media(max-width:650px){.shell{padding:16px 10px 32px}.lesson{padding:14px}.steps{grid-template-columns:1fr;gap:7px}.step{padding:9px 11px}.step .hint{display:none}.metrics{grid-template-columns:1fr 1fr}.plot{padding:10px 8px}.plot canvas{height:205px}.plot.compact canvas{height:127px}.plot.wide canvas{height:225px}h1{font-size:29px}}
+</style>
+</head>
+<body><div class="shell">
+<header><span class="brand">University of Michigan · EECS 216</span><span class="eyebrow">Chapter 8 · Signals and Systems</span></header>
+<h1>Non-Ideal Sampling Demo</h1>
+<p class="intro">In this demo we compare flat-top and natural sampling, examine their spectra, and reconstruct the original bandlimited signal.</p>
+<nav class="steps" aria-label="Experiments">
+<button type="button" class="step" data-step="1" aria-current="step"><span class="k">Experiment 1</span><strong>Make finite-width samples</strong><span class="hint">Hold a value or follow the signal</span></button>
+<button type="button" class="step" data-step="2"><span class="k">Experiment 2</span><strong>Compare the spectra</strong><span class="hint">Envelope versus replica scaling</span></button>
+<button type="button" class="step" data-step="3"><span class="k">Experiment 3</span><strong>Reconstruct the signal</strong><span class="hint">LPF, gain, and equalization</span></button>
+</nav>
+<div class="panel" style="padding:16px 20px;margin-bottom:14px">
+<div class="controls2">
+ <div class="ctrl"><div class="topline"><label for="ts">Sampling period <i>T</i><sub>s</sub></label><output id="tsOut" class="num">20 ms</output></div><input id="ts" class="range" type="range" min="10" max="24" step="1" value="20"><div class="ends"><span>10 ms</span><span>24 ms</span></div></div>
+ <div class="ctrl"><div class="topline"><label for="tau">Rectangular pulse width τ</label><output id="tauOut" class="num">12 ms</output></div><input id="tau" class="range" type="range" min="1" max="20" step="1" value="12"><div class="ends"><span>1 ms</span><span id="tauEnd">T<sub>s</sub> = 20 ms</span></div></div>
+</div>
+<div class="metrics">
+ <div class="metric"><div class="key">Sampling frequency · ω<sub>s</sub>/(2π)</div><div class="val" id="fsOut">50.0 Hz</div></div>
+ <div class="metric"><div class="key">Duty cycle · D = τ/T<sub>s</sub></div><div class="val" id="dutyOut">60%</div></div>
+ <div class="metric"><div class="key">Original bandwidth · ω<sub>B</sub>/(2π)</div><div class="val">20 Hz</div></div>
+</div>
+<div class="buttonbar"><button class="button" id="fullWidth" type="button">Set τ = T<sub>s</sub></button><button class="button" id="resetValues" type="button">Reset parameters</button><span class="minor">Throughout this demo, the sampling frequency exceeds 2×20 Hz.</span></div>
+</div>
+<section class="panel lesson" id="lesson1">
+<div class="lessonhead"><h2>1. Two ways to form finite-width samples</h2><span class="badge">Time domain</span></div>
+<p class="lead">A practical sampler produces pulses with nonzero duration. In <strong>flat-top sampling</strong>, each pulse holds the value measured at its starting time. In <strong>natural sampling</strong>, the output follows the original signal whenever the rectangular gate is open.</p>
+<p class="task">YOUR TASK · Change the pulse width τ. Compare the two signals inside the shaded windows. What happens when τ = T<sub>s</sub>?</p>
+<div class="stack">
+ <div class="plot compact"><h3>Original signal x(t)</h3><p class="sub">Blue curve; sample instants marked by dots; shaded windows indicate where the gate is open</p><canvas id="timeOriginal" role="img" aria-label="Original waveform with sampling points and open gates"></canvas></div>
+ <div class="plot compact"><h3>Flat-top / sample-and-hold output</h3><p class="sub">Orange pulses hold x(nT<sub>s</sub>) constant during each width-τ interval</p><canvas id="timeFlat" role="img" aria-label="Flat-top sampled waveform, with held rectangular pulses"></canvas></div>
+ <div class="plot compact"><h3>Natural sampled output</h3><p class="sub">Green portions follow x(t) while the gate is open; zero between windows</p><canvas id="timeNatural" role="img" aria-label="Natural sampled waveform following original during open gates"></canvas></div>
+</div>
+<div class="status" id="status1"></div>
+<details><summary>Show the mathematical expressions</summary>
+ <div class="math small">p<sub>τ</sub>(t) = 1 for 0 ≤ t &lt; τ, and 0 otherwise</div>
+ <div class="math">x<sub>FT</sub>(t) = ∑<sub>n∈ℤ</sub> x(nT<sub>s</sub>)p<sub>τ</sub>(t − nT<sub>s</sub>)</div>
+ <div class="math">x<sub>N</sub>(t) = x(t) ∑<sub>n∈ℤ</sub> p<sub>τ</sub>(t − nT<sub>s</sub>)</div>
+ <p class="minor">Natural sampling is also called switching: it retains the behavior of x(t) throughout each open window, not just its values at isolated sample instants.</p>
+</details>
+<div class="lessonend"><p>Flat-top sampling holds a number; natural sampling opens a gate for the original waveform.</p><button class="button primary" type="button" data-next="2">Next: compare the spectra →</button></div>
+</section>
+<section class="panel lesson" id="lesson2" hidden>
+<div class="lessonhead"><h2>2. What happens to the spectral replicas?</h2><span class="badge">Frequency domain</span></div>
+<p class="lead">Both sampling methods produce frequency-shifted copies of the original spectrum. However, <strong>flat-top sampling multiplies the entire spectrum by a sinc-shaped envelope</strong>, whereas <strong>natural sampling scales each replica by a constant</strong>.</p>
+<p class="task">YOUR TASK · Change τ, then compare the two spectra. In the full-spectrum view, look at the shifted copies; in the baseband view, compare their shapes.</p>
+<div class="viewbar"><span class="minor">Spectra are normalized by the duty cycle D so their shapes can be compared on a common scale.</span><div class="seg" role="group" aria-label="Frequency view"><button type="button" data-view="full" aria-pressed="true">Full replicas</button><button type="button" data-view="base" aria-pressed="false">Baseband zoom</button></div></div>
+<div class="plots">
+ <div class="plot"><h3>Flat-top sampling · |X<sub>FT</sub>(jω)|/D</h3><p class="sub">Orange spectrum; dashed curve is the magnitude of the sinc envelope</p><canvas id="specFlat" role="img" aria-label="Flat-top sampled magnitude spectrum and sinc envelope"></canvas></div>
+ <div class="plot"><h3>Natural sampling · |X<sub>N</sub>(jω)|/D</h3><p class="sub">Green spectrum; each replica has its own constant amplitude factor</p><canvas id="specNatural" role="img" aria-label="Natural sampled magnitude spectrum and replica scale factors"></canvas></div>
+</div>
+<div class="status" id="status2"></div>
+<details><summary>Show the frequency-domain derivation</summary>
+ <p class="minor">For the rectangular pulse p<sub>τ</sub>(t),</p>
+ <div class="math">P<sub>τ</sub>(jω) = τ sinc(ωτ/(2π)) e<sup>−jωτ/2</sup></div>
+ <div class="math small">X<sub>FT</sub>(jω) = [P<sub>τ</sub>(jω)/T<sub>s</sub>] ∑<sub>k∈ℤ</sub> X(j(ω − kω<sub>s</sub>))</div>
+ <div class="math small">X<sub>N</sub>(jω) = (1/T<sub>s</sub>) ∑<sub>k∈ℤ</sub> P<sub>τ</sub>(jkω<sub>s</sub>) X(j(ω − kω<sub>s</sub>))</div>
+ <p class="minor">We use sinc(u)=sin(πu)/(πu). In flat-top sampling the envelope varies with ω across each replica. In natural sampling, P<sub>τ</sub>(jkω<sub>s</sub>) depends only on the replica index k.</p>
+</details>
+<div class="lessonend"><p>The central copy of the natural-sampling spectrum is D·X(jω), but flat-top sampling also attenuates its higher baseband frequencies.</p><button class="button primary" type="button" data-next="3">Next: reconstruct the signal →</button></div>
+</section>
+<section class="panel lesson" id="lesson3" hidden>
+<div class="lessonhead"><h2>3. Can we recover the original signal?</h2><span class="badge">Reconstruction</span></div>
+<p class="lead">Pass each sampled signal through an ideal low-pass filter that retains only the original baseband, then compensate for the duty-cycle gain. Natural sampling recovers x(t) directly; flat-top sampling generally retains frequency-dependent attenuation.</p>
+<p class="task">YOUR TASK · Increase τ and compare the recovered signals. Then enable the equalizer for the flat-top path and see whether it recovers the original.</p>
+<div class="controlpanel"><label class="switch" for="eqOn"><input id="eqOn" type="checkbox"> Enable equalizer after the flat-top LPF</label><p class="minor" style="margin:7px 0 0">For a fair waveform comparison, the known flat-top hold delay τ/2 is removed from the display; this does not remove its magnitude distortion.</p></div>
+<div class="minibox"><div class="blockrow"><span class="node">Sampled signal</span><span class="arr">→</span><span class="node">Ideal LPF, |ω| ≤ ω<sub>B</sub></span><span class="arr">→</span><span class="node">Gain 1/D</span><span class="arr">→</span><span class="node" id="eqNode">Recovered waveform</span></div></div>
+<div class="plots" style="margin-top:14px">
+ <div class="plot"><h3>Flat-top recovery</h3><p class="sub">Blue: original · Orange: reconstructed (delay-aligned)</p><canvas id="reconFlat" role="img" aria-label="Original and flat-top reconstructed waveforms on a shared amplitude scale"></canvas><div class="metrics" style="grid-template-columns:1fr"><div class="metric"><div class="key">Normalized RMS reconstruction error</div><div class="val" id="errFlat">—</div></div></div></div>
+ <div class="plot"><h3>Natural-sampling recovery</h3><p class="sub">Blue: original · Green: recovered after LPF and gain</p><canvas id="reconNatural" role="img" aria-label="Original and natural-sampling reconstructed waveforms on a shared amplitude scale"></canvas><div class="metrics" style="grid-template-columns:1fr"><div class="metric"><div class="key">Normalized RMS reconstruction error</div><div class="val" id="errNatural">0.0%</div></div></div></div>
+</div>
+<div class="status" id="status3"></div>
+<details><summary>Show why the reconstruction methods differ</summary>
+ <p class="minor">Within |ω| ≤ ω<sub>B</sub>, after the ideal LPF the natural-sampling output equals D·X(jω). Dividing by D therefore restores X(jω).</p>
+ <div class="math small">Natural: X<sub>N,LPF</sub>(jω) = D X(jω)</div>
+ <p class="minor">For flat-top sampling, the LPF output contains an additional frequency-dependent factor:</p>
+ <div class="math small">Flat-top: X<sub>FT,LPF</sub>(jω) = D e<sup>−jωτ/2</sup> sinc(ωτ/(2π)) X(jω)</div>
+ <p class="minor">After gain correction and removal of the known delay τ/2, the remaining attenuation is sinc(ωτ/(2π)). The equalizer compensates for this factor wherever it is nonzero. In our chosen parameter range it has no zeros in the source passband.</p>
+</details>
+<div class="lessonend"><p>Natural sampling: LPF + gain. Flat-top sampling: LPF + gain, and generally an equalizer to correct the pulse-response distortion.</p><button class="button" type="button" data-next="1">Back to Experiment 1 ↺</button></div>
+</section>
+<footer class="footer"><span>Reference: EECS 216 Typed Lecture Notes by Prof. Achilleas Anastasopoulos · Chapter 8, §§8.3–8.4</span><span>Static HTML</span></footer>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),$$=q=>Array.from(document.querySelectorAll(q));
+const C={ink:'#14263d',muted:'#6c8196',blue:'#2467b9',orange:'#d0772d',green:'#138366',purple:'#8a60bd',gray:'#92a6b9'};
+const B=20,TMIN=-0.17,TMAX=0.17,FSPEC=160;
+let step=1,Ts=20,tau=12,eqOn=false,view='full';
+const sinc=u=>Math.abs(u)<1e-12?1:Math.sin(Math.PI*u)/(Math.PI*u);
+const terms=[{a:0.58,fc:0,shift:-0.09},{a:0.36,fc:8,shift:0.02},{a:-0.28,fc:16,shift:-0.04}];
+const scale=1/1.06;
+function source(t){let z=0;for(const v of terms)z+=v.a*sinc(8*(t-v.shift))*Math.cos(2*Math.PI*v.fc*(t-v.shift));return z*scale;}
+// Exact Fourier pair with source(t), using f in Hz and X(f)=integral x(t)e^(-j2πft)dt.
+function baseComplex(f){let re=0,im=0;for(const v of terms){let inside=v.fc===0?(Math.abs(f)<4?1:0):((Math.abs(f-v.fc)<4?1:0)+(Math.abs(f+v.fc)<4?1:0));if(!inside)continue;const amp=scale*v.a*inside/(v.fc===0?8:16),ph=-2*Math.PI*f*v.shift;re+=amp*Math.cos(ph);im+=amp*Math.sin(ph);}return[re,im];}
+const mag=(a,b)=>Math.hypot(a,b);const XMAX=Array.from({length:801},(_,i)=>mag(...baseComplex(-20+i*.05))).reduce((a,b)=>Math.max(a,b),0);
+const fs=()=>1000/Ts,D=()=>tau/Ts;
+function replicaComplex(f,period){let re=0,im=0;const kMin=Math.floor((f-B)/period)-1,kMax=Math.ceil((f+B)/period)+1;for(let k=kMin;k<=kMax;k++){const [r,q]=baseComplex(f-k*period);re+=r;im+=q;}return[re,im];}
+function naturalComplex(f,period){let re=0,im=0;const d=D(),kMin=Math.floor((f-B)/period)-1,kMax=Math.ceil((f+B)/period)+1;for(let k=kMin;k<=kMax;k++){const [r,q]=baseComplex(f-k*period);const coeff=sinc(k*d),ph=-Math.PI*k*d,c=coeff*Math.cos(ph),s=coeff*Math.sin(ph);re+=r*c-q*s;im+=r*s+q*c;}return[re,im];}
+function ftMagnitude(f){const [r,q]=replicaComplex(f,fs());return mag(r,q)*Math.abs(sinc(f*tau/1000))/XMAX;}
+function naturalMagnitude(f){return mag(...naturalComplex(f,fs()))/XMAX;}
+const integration=[];for(let j=0;j<640;j++){const f=-20+(j+.5)*40/640;const [re,im]=baseComplex(f);integration.push({f,re,im});}
+// Reconstruct after LPF, gain 1/D, and compensate known fixed delay tau/2.
+// The spectrum of the remaining flat-top distortion is sinc(f*tau); the equalizer removes it.
+function flatRecovered(t){if(eqOn)return source(t);let s=0;const dt=tau/1000;for(const v of integration){const th=2*Math.PI*v.f*t;s+=(v.re*Math.cos(th)-v.im*Math.sin(th))*sinc(v.f*dt);}return s*(40/640);}
+function normRMS(signal){let err=0,ref=0;for(let i=0;i<=160;i++){const t=TMIN+(TMAX-TMIN)*i/160,x=source(t),e=signal(t)-x;err+=e*e;ref+=x*x;}return Math.sqrt(err/Math.max(ref,1e-15));}
+function canv(id){const c=$(id);if(!c||c.closest('[hidden]'))return null;const rect=c.getBoundingClientRect(),w=Math.max(240,rect.width),h=Math.max(120,rect.height),dp=Math.min(2,window.devicePixelRatio||1);c.width=Math.round(w*dp);c.height=Math.round(h*dp);const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);return{g,w,h,l:47,r:w-14,t:13,b:h-34};}
+function xp(p,f,a,b){return p.l+(f-a)/(b-a)*(p.r-p.l);}function yp(p,y,a,b){return p.b-(y-a)/(b-a)*(p.b-p.t);}
+function axes(p,a,b,ymin,ymax,xTicks,unit,yLabel){const g=p.g;g.fillStyle='#fff';g.fillRect(0,0,p.w,p.h);g.strokeStyle='#eaf0f7';g.lineWidth=1;for(let j=0;j<5;j++){const y=p.t+j*(p.b-p.t)/4;g.beginPath();g.moveTo(p.l,y);g.lineTo(p.r,y);g.stroke();}g.font='11px system-ui';g.fillStyle='#7790a5';g.textAlign='center';for(const t of xTicks){const x=xp(p,t,a,b);if(x<p.l||x>p.r)continue;g.beginPath();g.moveTo(x,p.t);g.lineTo(x,p.b);g.stroke();g.fillText(String(t),x,p.b+16);}g.strokeStyle='#a6b8c9';g.beginPath();g.moveTo(p.l,p.t);g.lineTo(p.l,p.b);g.lineTo(p.r,p.b);g.stroke();g.fillStyle='#647a90';g.fillText(unit,(p.l+p.r)/2,p.h-5);g.save();g.translate(13,(p.t+p.b)/2);g.rotate(-Math.PI/2);g.fillText(yLabel,0,0);g.restore();}
+function line(p,fn,a,b,ymin,ymax,col,width=2,alpha=1,dash=[],n=260){const g=p.g;g.save();g.strokeStyle=col;g.globalAlpha=alpha;g.lineWidth=width;g.setLineDash(dash);g.beginPath();for(let i=0;i<=n;i++){const v=a+(b-a)*i/n,px=xp(p,v,a,b),py=yp(p,Math.max(ymin,Math.min(ymax,fn(v))),ymin,ymax);if(i===0)g.moveTo(px,py);else g.lineTo(px,py);}g.stroke();g.restore();}
+function windows(p,ymin,ymax){const g=p.g,d=Ts/1000,u=tau/1000;for(let k=Math.floor(TMIN/d)-1;k<=Math.ceil(TMAX/d)+1;k++){const st=k*d,en=st+u;if(en<=TMIN||st>=TMAX)continue;const left=xp(p,Math.max(st,TMIN),TMIN,TMAX),right=xp(p,Math.min(en,TMAX),TMIN,TMAX);g.fillStyle='rgba(111,148,189,.10)';g.fillRect(left,p.t,Math.max(0,right-left),p.b-p.t);}}
+function drawTime(id,type){const p=canv(id);if(!p)return;const rg=[-1.08,1.08],g=p.g,d=Ts/1000,u=tau/1000;axes(p,TMIN,TMAX,...rg,[-.15,-.1,-.05,0,.05,.1,.15],'t (seconds)','amplitude');windows(p,...rg);if(type!=='original')line(p,source,TMIN,TMAX,...rg,C.blue,1.15,.25,[],420);
+  const y0=yp(p,0,...rg);g.strokeStyle='#a3b5c6';g.lineWidth=.8;g.beginPath();g.moveTo(p.l,y0);g.lineTo(p.r,y0);g.stroke();
+  if(type==='original'){line(p,source,TMIN,TMAX,...rg,C.blue,2.1,1,[],520);for(let n=Math.floor(TMIN/d)-1;n<=Math.ceil(TMAX/d)+1;n++){const t=n*d;if(t<TMIN||t>TMAX)continue;g.beginPath();g.arc(xp(p,t,TMIN,TMAX),yp(p,source(t),...rg),2.8,0,2*Math.PI);g.fillStyle=C.orange;g.fill();}return;}
+  for(let n=Math.floor(TMIN/d)-1;n<=Math.ceil(TMAX/d)+1;n++){const st=n*d,en=st+u;if(en<=TMIN||st>=TMAX)continue;const left=Math.max(st,TMIN),right=Math.min(en,TMAX),x0=xp(p,left,TMIN,TMAX),x1=xp(p,right,TMIN,TMAX);const col=type==='flat'?C.orange:C.green;
+    g.save();g.strokeStyle=col;g.fillStyle=type==='flat'?'rgba(208,119,45,.11)':'rgba(19,131,102,.10)';g.lineWidth=1.75;g.beginPath();g.moveTo(x0,y0);
+    if(type==='flat'){const y=yp(p,source(st),...rg);g.lineTo(x0,y);g.lineTo(x1,y);g.lineTo(x1,y0);g.closePath();g.fill();g.stroke();}else{const N=12;g.lineTo(x0,yp(p,source(left),...rg));for(let j=1;j<=N;j++){const t=left+(right-left)*j/N;g.lineTo(xp(p,t,TMIN,TMAX),yp(p,source(t),...rg));}g.lineTo(x1,y0);g.closePath();g.fill();g.stroke();}g.restore();
+    if(type==='flat'&&st>=TMIN&&st<=TMAX){g.fillStyle=col;g.beginPath();g.arc(xp(p,st,TMIN,TMAX),yp(p,source(st),...rg),2.3,0,2*Math.PI);g.fill();}
+  }
+}
+function drawSpectra(id,kind){const p=canv(id);if(!p)return;const a=view==='base'?-23:-FSPEC,b=view==='base'?23:FSPEC,ys=[0,1.12],ticks=view==='base'?[-20,-10,0,10,20]:[-150,-100,-50,0,50,100,150],g=p.g;axes(p,a,b,ys[0],ys[1],ticks,'ω / (2π) (Hz)','normalized |spectrum|');
+  const xx=xp(p,-20,a,b),xx2=xp(p,20,a,b);g.fillStyle='rgba(36,103,185,.055)';g.fillRect(Math.max(p.l,xx),p.t,Math.min(p.r,xx2)-Math.max(p.l,xx),p.b-p.t);
+  // Reference: the original baseband magnitude on the same normalized vertical scale.
+  line(p,f=>mag(...baseComplex(f))/XMAX,a,b,...ys,C.blue,1.15,.45,[3,4],1200);
+  if(kind==='flat'){
+    line(p,ftMagnitude,a,b,...ys,C.orange,2.3,1,[],1700);
+    line(p,f=>Math.abs(sinc(f*tau/1000)),a,b,...ys,C.purple,1.75,.95,[6,4],1000);
+  }else{
+    line(p,naturalMagnitude,a,b,...ys,C.green,2.3,1,[],1700);
+    if(view==='full')for(let k=-4;k<=4;k++){const f=k*fs();if(f<a||f>b)continue;const xx=xp(p,f,a,b),yy=yp(p,Math.abs(sinc(k*D())),...ys);g.save();g.strokeStyle=C.green;g.lineWidth=1.5;g.globalAlpha=.6;g.setLineDash([3,3]);g.beginPath();g.moveTo(xx,yy);g.lineTo(xx,p.b);g.stroke();g.setLineDash([]);g.fillStyle=C.green;g.beginPath();g.arc(xx,yy,2.5,0,2*Math.PI);g.fill();g.restore();}
+  }
+}
+function drawRecovery(id,kind){const p=canv(id);if(!p)return;const rg=[-1.08,1.08],g=p.g;axes(p,TMIN,TMAX,...rg,[-.15,-.1,-.05,0,.05,.1,.15],'t (seconds)','amplitude');line(p,source,TMIN,TMAX,...rg,C.blue,1.95,.88,[6,3],450);if(kind==='flat'){const y=flatRecovered;line(p,y,TMIN,TMAX,...rg,C.orange,2.1,1,[],235);}else{line(p,source,TMIN,TMAX,...rg,C.green,2.25,.85,[],450);}}
+function classStatus(id,msg,good){const el=$(id);el.className='status '+(good?'good':'warn');el.textContent=msg;}
+function render(){const fsVal=fs(),duty=D();$('ts').value=Ts;$('tau').max=Ts;$('tau').value=tau;$('tsOut').textContent=Ts+' ms';$('tauOut').textContent=tau+' ms';$('tauEnd').innerHTML='T<sub>s</sub> = '+Ts+' ms';$('fsOut').textContent=fsVal.toFixed(1)+' Hz';$('dutyOut').textContent=(100*duty).toFixed(0)+'%';$('eqOn').checked=eqOn;
+  $$('[data-step]').forEach(b=>b.setAttribute('aria-current',Number(b.dataset.step)===step?'step':'false'));
+  for(let i=1;i<=3;i++)$('lesson'+i).hidden=step!==i;
+  if(step===1){drawTime('timeOriginal','original');drawTime('timeFlat','flat');drawTime('timeNatural','natural');classStatus('status1',tau===Ts?'At τ = Ts, the natural-sampling gate is continuously open, so its output is exactly x(t). The flat-top output remains a staircase of held sample values.':'Increase τ: flat-top pulses remain horizontal while natural-sampling pulses follow the waveform within each open window.',tau===Ts);}
+  if(step===2){$$('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===view?'true':'false'));drawSpectra('specFlat','flat');drawSpectra('specNatural','natural');classStatus('status2',view==='base'?'Within the baseband, natural sampling has the original spectral shape after gain normalization. The flat-top spectrum is attenuated according to frequency.':'The flat-top response is shaped by one frequency-dependent sinc envelope. Natural sampling scales each replica by its own constant; at τ = Ts, all noncentral natural replicas disappear.',view==='base');}
+  if(step===3){$('eqNode').innerHTML=eqOn?'Equalizer → output':'Recovered waveform';drawRecovery('reconFlat','flat');drawRecovery('reconNatural','natural');const e=normRMS(flatRecovered);$('errFlat').textContent=(100*e).toFixed(2)+'% RMS';$('errNatural').textContent='0.00% RMS';classStatus('status3',eqOn?'After ideal LPF, gain compensation, and equalization, both sampling methods recover the original waveform.':`Natural sampling reconstructs the original after LPF and gain. Flat-top sampling retains frequency-dependent attenuation (${(100*e).toFixed(1)}% normalized RMS error after delay alignment). Enable the equalizer to remove it.`,eqOn);}
+}
+$$('[data-step]').forEach(b=>b.addEventListener('click',()=>{step=Number(b.dataset.step);render();window.scrollTo({top:0,behavior:'smooth'});}));
+$$('[data-next]').forEach(b=>b.addEventListener('click',()=>{step=Number(b.dataset.next);render();window.scrollTo({top:0,behavior:'smooth'});}));
+$('ts').addEventListener('input',e=>{Ts=Number(e.target.value);tau=Math.min(tau,Ts);render();});
+$('tau').addEventListener('input',e=>{tau=Math.min(Ts,Number(e.target.value));render();});
+$('fullWidth').addEventListener('click',()=>{tau=Ts;render();});
+$('resetValues').addEventListener('click',()=>{Ts=20;tau=12;eqOn=false;view='full';render();});
+$$('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;render();}));
+$('eqOn').addEventListener('change',e=>{eqOn=e.target.checked;render();});
+window.addEventListener('resize',()=>{clearTimeout(window.__drawTimer);window.__drawTimer=setTimeout(render,120);});
+window.EECS216NonIdeal={getState:()=>({step,Ts,tau,fs:fs(),D:D(),view,eqOn,flatError:normRMS(flatRecovered),naturalError:0}),source,baseComplex,flatRecovered,ftMagnitude,naturalMagnitude,openStep:i=>{step=i;render();}};
+render();
+</script>
+</body></html>
