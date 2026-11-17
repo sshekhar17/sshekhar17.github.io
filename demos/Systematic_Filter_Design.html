@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="An interactive, discovery-based Butterworth filter design laboratory for EECS 216, based on Sections 6.4–6.4.2 of Achilleas Anastasopoulos's notes." />
+<title>Systematic Filter Design | EECS 216</title>
+<style>
+  :root { color-scheme:light; --ink:#15283e; --muted:#566b82; --accent:#2365b5; --blue2:#eaf3ff; --border:#dbe4ee; --surface:#ffffff; --page:#f4f7fb; --green:#17805c; --red:#b84951; --orange:#b87225; --shadow:0 2px 12px rgba(21,47,76,.035); }
+  * {box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--page);color:var(--ink);font:15px/1.52 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif} button,input,select{font:inherit} button{cursor:pointer} a{color:#1c60a2} button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #9ccafa;outline-offset:2px}
+  .shell{max-width:1260px;padding:26px 23px 56px;margin:auto} header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:15px} .brand{font-size:12px;font-weight:850;letter-spacing:.07em;text-transform:uppercase;color:#2e659a}
+  h1{font-size:clamp(27px,3.7vw,41px);line-height:1.12;margin:9px 0 10px;letter-spacing:-.033em} .subtitle{margin:0 0 20px;color:var(--muted);max-width:860px} h2{font-size:19px;line-height:1.24;margin:0 0 6px;letter-spacing:-.015em}h3{font-size:15px;line-height:1.3;margin:0 0 8px}.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}.eyebrow{color:#44719c;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}.panel{background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:var(--shadow);padding:21px 23px;margin-bottom:17px}.panel-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px 15px;flex-wrap:wrap;margin-bottom:15px}.panel-head p{margin:0;color:var(--muted);font-size:13px}.kicker{display:inline-block;border-radius:8px;background:#eaf3fe;padding:3px 9px;font-size:11px;color:#245b90;font-weight:800;margin-right:8px}
+  .math-equation{display:block;max-width:100%;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:8px 2px 12px;line-height:1.6}
+  .math-equation math{font-size:1.04em;white-space:nowrap;max-width:100%;math-style:normal}
+  .candidate-math math{font-size:1.02em}
+  @media(max-width:530px){.math-equation math{font-size:.90em}}
+  .formula{font-family:Cambria,"Times New Roman",Georgia,serif;font-size:20px;color:#204b78;line-height:1.58}.formula.large{font-size:23px}.formula.mini{font-size:17px}.mathnote{font-size:13px;color:#596e84;margin-top:5px}.division{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.12}.division span:first-child{border-bottom:1px solid;padding:0 4px 3px}.division span:last-child{padding:3px 4px 0}
+  .grid-two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:23px;align-items:start}.mini-card{border:1px solid #e5ecf4;border-radius:12px;background:#fbfdff;padding:16px}.proto-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}.quick{border:1px solid #cdddec;color:#345b7f;background:white;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:750}.quick:hover{background:#f0f7ff}.quick.sel{background:#dcecff;border-color:#7faee0;color:#154e83}.chart-frame{border:1px solid #e3eaf3;border-radius:11px;background:#fff;padding:10px;min-width:0}.chart-heading{display:flex;gap:6px 13px;align-items:baseline;flex-wrap:wrap;justify-content:space-between;margin:2px 6px 4px}.chart-heading strong{font-size:13px}.chart-heading span{font-size:11px;color:#708399}.chart{display:block;width:100%;height:255px}.chart.big{height:370px}.legend{display:flex;gap:12px 19px;align-items:center;flex-wrap:wrap;font-size:12px;color:#60748a;margin:6px 6px 0}.swatch{display:inline-block;width:22px;vertical-align:middle;transform:translateY(-3px);border-top:3px solid; margin-right:6px}.statrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}.statbox{border:1px solid #dfebf4;background:#f5faff;padding:10px 12px;border-radius:9px}.statbox b{display:block;font-size:19px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.statbox span{font-size:11px;color:#617890}
+  input[type=range]{width:100%;accent-color:var(--accent)}input[type=number]{width:100%;min-width:0;border:1px solid #cbd9e6;border-radius:8px;padding:9px 10px;font-variant-numeric:tabular-nums;background:#fff;color:var(--ink)}.control-label{display:block;font-size:12px;color:#436079;font-weight:800;margin-bottom:6px}.range-extents{display:flex;justify-content:space-between;gap:6px;color:#73879a;font-size:11px}
+  .type-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:15px}.type-button{display:flex;flex-direction:column;align-items:stretch;text-align:left;border:1px solid #dae4ee;border-radius:11px;background:white;padding:11px 13px 10px;color:var(--ink);gap:3px}.type-button:hover{background:#f5faff}.type-button[aria-pressed=true]{background:#eaf3ff;border:2px solid #4d88c4;padding:10px 12px 9px}.type-button strong{font-size:14px}.type-button .tiny{color:#6d7f90}.spark{width:100%;height:44px;display:block}.mapping-row{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:20px}.map-card{background:#f7faff;border:1px solid #e2ebf5;border-radius:10px;padding:15px}.mini-answer{font-size:12px;color:#6b8093;margin-top:8px}
+  .mask-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(275px,.8fr);gap:20px}.form-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.input-wrap{min-width:0}.input-wrap .hint{display:block;font-size:11px;color:#788b9f;margin-top:5px}.gain-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px}.controls-box{background:#f8fafd;border:1px solid #e1e8f1;border-radius:11px;padding:15px}.preface{font-size:12px;color:#61758b;margin:0 0 11px}.button-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-top:12px}.primary{background:#215d98;color:#fff;border:1px solid #215d98;border-radius:9px;padding:9px 13px;font-size:13px;font-weight:800}.primary:hover{background:#194d80}.secondary{background:#fff;color:#2c577e;border:1px solid #b9cede;border-radius:9px;padding:9px 13px;font-size:13px;font-weight:750}.secondary:hover{background:#f1f8ff}.ghost{background:transparent;border:0;color:#2a659e;font-weight:750;font-size:12px;padding:5px}.ghost:hover{text-decoration:underline}.error{color:#9e333d;font-size:13px;margin-top:9px}.hidden{display:none!important}
+  .work-grid{display:grid;grid-template-columns:minmax(0,1.48fr) minmax(315px,.78fr);gap:20px;align-items:start}.work-controls{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:12px 0 8px}.result-control{border:1px solid #e3eaf2;border-radius:11px;padding:13px;background:#f9fbfe}.center-control{grid-column:span 2}.result-control .value{font-size:18px;font-weight:850;color:#205c96; font-variant-numeric:tabular-nums}.check-list{display:grid;gap:8px;margin-top:13px}.check{border:1px solid #e3e9ef;border-radius:10px;padding:10px 13px;background:#fbfcfe;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px}.check strong{display:block;font-size:12px;color:#29465f}.check span{color:#5e7184}.status-pill{white-space:nowrap;font-size:11px;padding:3px 7px;border-radius:6px;font-weight:850}.status-pill.yes{color:#11674c;background:#e2f5ed}.status-pill.no{color:#a03440;background:#fae8eb}.design-tip{margin-top:10px;font-size:12px;color:#5b7188}
+  .challenge{background:#f7faff;border:1px solid #dae6f3;border-radius:12px;padding:16px;margin-top:14px}.challenge strong{font-size:14px}.guess-row{display:grid;grid-template-columns:minmax(80px,1fr) auto;gap:8px;align-items:end;margin-top:10px}.guess-row .secondary{white-space:nowrap}.feedback{margin-top:10px;min-height:23px;font-size:12px;color:#345d82}.reveal{border:1px solid #cfdfeb;background:#fff;border-radius:12px;padding:16px;margin-top:14px}.reveal h3{font-size:16px}.sol-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sol-item{background:#f5f9fc;border:1px solid #e1e9f1;border-radius:9px;padding:9px 10px;min-width:0}.sol-item b{display:block;color:#205987;font-size:17px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.sol-item span{font-size:11px;color:#667e94}.derivation{margin-top:12px;padding-top:11px;border-top:1px solid #e6edf5;font-size:13px;color:#3f5871}.derivation ol{padding-left:20px;margin:7px 0}.derivation li{margin:5px 0} .derivation code{font-family:Cambria,Georgia,serif;background:#eff5fa;padding:1px 4px;border-radius:3px;color:#245781}
+  .walkthrough{border:1px solid #e0e9f3;background:#fff;border-radius:13px;padding:17px 20px;margin-top:17px}.walkthrough h3{font-size:15px}.walkthrough ul{padding-left:20px;font-size:13px;color:#4b6075;margin:6px 0}.walkthrough li{margin:5px 0} .summary-text{font-size:13px;color:#546a7f;margin:7px 0 0}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px 28px;color:#657c92;font-size:12px;margin:20px 3px 0}
+  @media(max-width:1010px){.work-grid,.mask-grid{grid-template-columns:1fr}.grid-two{grid-template-columns:minmax(0,1fr) minmax(260px,.85fr)}}
+  @media(max-width:760px){.shell{padding:17px 13px 36px}.panel{padding:16px}.grid-two,.mapping-row{grid-template-columns:1fr}.type-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gain-grid{grid-template-columns:1fr 1fr 1fr}.chart.big{height:320px}}
+  @media(max-width:530px){.form-rows,.work-controls,.sol-grid{grid-template-columns:1fr}.center-control{grid-column:span 1}.statrow{grid-template-columns:1fr 1fr 1fr}.gain-grid{grid-template-columns:1fr}.chart{height:220px}.chart.big{height:290px}.guess-row{grid-template-columns:1fr}.type-button{min-height:95px}}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+  .free-params{margin-top:11px;padding:8px 10px;border-radius:8px;background:#eef5fd;border:1px solid #d9e6f4;font-size:12px;color:#355673}
+  .gain-lock{display:flex;gap:7px;align-items:center;margin-top:8px;color:#49657e;font-size:12px}
+  .gain-lock input{accent-color:var(--accent)}
+  .slider-with-number{display:grid;grid-template-columns:minmax(0,1fr) 86px;gap:9px;align-items:center}
+  .slider-with-number input[type=number]{padding:5px 7px;font-size:13px;text-align:right}
+  .derived-params{font-size:12px;border-left:3px solid #a6c2df;background:#f5faff;padding:7px 11px;margin:10px 0 0;color:#45627d}
+  .result-control .range-extents{margin-top:3px}.map-card .formula{overflow-wrap:anywhere}.mini-card .formula{font-size:18px}
+  @media(max-width:430px){.slider-with-number{grid-template-columns:1fr 76px}.map-card .formula{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div class="brand">University of Michigan · EECS 216</div></header>
+<h1>Systematic Filter Design</h1>
+<p class="subtitle">This page helps you design a filter according to a given spectral mask by transforming a low-pass Butterworth prototype.</p>
+
+<section class="panel" aria-labelledby="prototypeTitle">
+  <div class="panel-head"><div><span class="kicker">STEP 1</span><h2 id="prototypeTitle" style="display:inline">Explore the Butterworth prototype</h2></div><p>Change N (up to 20); all curves meet at the same −3 dB frequency.</p></div>
+  <div class="grid-two">
+    <div class="chart-frame">
+      <div class="chart-heading"><strong>Normalized low-pass magnitude</strong><span>ω = normalized, dimensionless frequency</span></div>
+      <canvas id="protoChart" class="chart" role="img" aria-label="Butterworth prototype curves for several filter orders"></canvas>
+      <div class="legend"><span><i class="swatch" style="border-color:#2365b5"></i>Selected order</span><span><i class="swatch" style="border-color:#b7c4d2"></i>Other orders</span><span><i class="swatch" style="border-color:#b76e36;border-top-style:dashed"></i>−3 dB level</span></div>
+    </div>
+    <div>
+      <div class="formula large math-equation" role="math" aria-label="Magnitude of H sub N at j omega equals 1 divided by the square root of 1 plus omega to the power 2 N">
+        <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
+          <mrow><mo>|</mo><msub><mi>H</mi><mi>N</mi></msub><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>|</mo></mrow>
+          <mo>=</mo>
+          <mfrac><mn>1</mn><msqrt><mn>1</mn><mo>+</mo><msup><mi>ω</mi><mrow><mn>2</mn><mi>N</mi></mrow></msup></msqrt></mfrac>
+        </math>
+      </div>
+      <p class="mathnote">Start with one prototype. Its shape depends on the positive integer N; its cutoff is normalized to ω = 1.</p>
+      <label class="control-label" for="protoN">Prototype order N <span id="protoNReadout" style="float:right;font-size:16px;color:#235e97">3</span></label>
+      <input type="range" id="protoN" min="1" max="20" step="1" value="3" />
+      <div class="range-extents"><span>N = 1</span><span>N = 20</span></div>
+      <div class="proto-tools" style="margin-top:12px"><span class="small muted">Try:</span><button class="quick" data-proto="1">N=1</button><button class="quick" data-proto="2">N=2</button><button class="quick sel" data-proto="3">N=3</button><button class="quick" data-proto="6">N=6</button><button class="quick" data-proto="10">N=10</button><button class="quick" data-proto="20">N=20</button></div>
+      <div class="statrow">
+        <div class="statbox"><b>1.000</b><span>ω = 0</span></div>
+        <div class="statbox"><b>0.707</b><span>ω = 1</span></div>
+        <div class="statbox"><b id="protoAtTwo">0.124</b><span>ω = 2</span></div>
+      </div>
+      <p class="summary-text" style="margin-top:11px">Why is a larger N useful? The passband becomes flatter and the transition near ω = 1 becomes sharper.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="familyTitle">
+  <div class="panel-head"><div><span class="kicker">STEP 2</span><h2 id="familyTitle" style="display:inline">Transform the prototype</h2></div><p>Choose Φ(ω); the normalized prototype and gain G do the rest.</p></div>
+  <div class="type-grid" role="group" aria-label="Filter type">
+    <button type="button" class="type-button" data-type="LPF" aria-pressed="true"><strong>Low-pass (LPF)</strong><span class="tiny">Pass low frequencies</span><canvas class="spark" id="sparkLPF" aria-hidden="true"></canvas></button>
+    <button type="button" class="type-button" data-type="HPF" aria-pressed="false"><strong>High-pass (HPF)</strong><span class="tiny">Pass high frequencies</span><canvas class="spark" id="sparkHPF" aria-hidden="true"></canvas></button>
+    <button type="button" class="type-button" data-type="BPF" aria-pressed="false"><strong>Band-pass (BPF)</strong><span class="tiny">Pass one band</span><canvas class="spark" id="sparkBPF" aria-hidden="true"></canvas></button>
+    <button type="button" class="type-button" data-type="BSF" aria-pressed="false"><strong>Band-stop (BSF)</strong><span class="tiny">Reject one band</span><canvas class="spark" id="sparkBSF" aria-hidden="true"></canvas></button>
+  </div>
+  <div class="mapping-row">
+    <div class="map-card">
+      <h3 id="mappingTitle">LPF · frequency scaling</h3>
+      <div class="formula" id="mappingFormula">Φ(ω) = ω/ω<sub>c</sub></div>
+      <div class="free-params" id="mappingFree">Free parameter: ω<sub>c</sub> &gt; 0.</div>
+      <div class="mathnote" id="mappingExplain">Move the normalized prototype cutoff from 1 to ω = ω<sub>c</sub>.</div>
+    </div>
+    <div class="map-card">
+      <h3>Candidate filter</h3>
+      <div class="formula math-equation candidate-math" role="math" aria-label="Magnitude of widehat H sub N at j omega equals G divided by the square root of 1 plus the absolute value of Phi of omega to the power 2 N">
+        <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
+          <mrow><mo>|</mo><mover accent="true"><msub><mi>H</mi><mi>N</mi></msub><mo stretchy="true">^</mo></mover><mo>(</mo><mi>j</mi><mi>ω</mi><mo>)</mo><mo>|</mo></mrow>
+          <mo>=</mo>
+          <mfrac>
+            <mi>G</mi>
+            <msqrt><mn>1</mn><mo>+</mo><msup><mrow><mo>|</mo><mi>Φ</mi><mo>(</mo><mi>ω</mi><mo>)</mo><mo>|</mo></mrow><mrow><mn>2</mn><mi>N</mi></mrow></msup></msqrt>
+          </mfrac>
+        </math>
+      </div>
+      <div class="mathnote">(i) Choose Φ; (ii) evaluate the Butterworth prototype H<sub>N</sub> at Φ(ω); (iii) multiply by G. G is the transformed peak-passband gain, not always its DC gain.</div>
+      <div class="free-params" id="candidateFree">Free parameters: G &gt; 0, integer N ≥ 1, ω<sub>c</sub> &gt; 0.</div>
+    </div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="maskTitle">
+  <div class="panel-head"><div><span class="kicker">STEP 3</span><h2 id="maskTitle" style="display:inline">Specify a spectral mask</h2></div><p>Values are shown as ω/(2π) in kHz.</p></div>
+  <div class="mask-grid">
+    <div class="controls-box">
+      <h3>Frequency boundaries</h3>
+      <p class="preface" id="maskGuidance">LPF: pass frequencies up to ωₚ; reject frequencies above ωₛ.</p>
+      <div id="edgeInputs" class="form-rows"></div>
+      <div class="button-row"><button type="button" id="resetMask" class="secondary">Restore example mask</button><button type="button" id="tightenStop" class="secondary">Demand 6 dB more stopband rejection</button></div>
+    </div>
+    <div class="controls-box">
+      <h3>Gain constraints in |H(jω)|</h3>
+      <p class="preface">[Same notation as the Lecture Notes]: G<sub>2</sub> is the upper passband gain, G<sub>1</sub> is the minimum permitted passband gain, and δ<sub>s</sub> is the maximum permitted stopband gain.</p>
+      <div class="gain-grid">
+        <div class="input-wrap"><label class="control-label" for="g2">G<sub>2</sub> · peak</label><input type="number" min="0.01" max="10" step="0.01" id="g2" value="1.10"/><span class="hint" id="g2db">0.0 dB</span></div>
+        <div class="input-wrap"><label class="control-label" for="g1">G<sub>1</sub> · pass min</label><input type="number" min="0.001" max="10" step="0.001" id="g1" value="0.90"/><span class="hint" id="g1db">−1.0 dB</span></div>
+        <div class="input-wrap"><label class="control-label" for="ds">δ<sub>s</sub> · stop max</label><input type="number" min="0.0001" max="10" step="0.001" id="ds" value="0.10"/><span class="hint" id="dsdb">−20.0 dB</span></div>
+      </div>
+      <div id="specError" role="alert" class="error hidden"></div>
+      <p class="summary-text">The green regions of the graph are allowed. The faint red regions violate the mask. Transition bands are unconstrained.</p>
+    </div>
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="designTitle">
+  <div class="panel-head"><div><span class="kicker">STEP 4</span><h2 id="designTitle" style="display:inline">Try to design the filter yourself</h2></div><p>Adjust G, N, and the physical cutoff parameters.</p></div>
+  <div class="work-grid">
+    <div>
+      <div class="chart-frame">
+        <div class="chart-heading"><strong id="workChartTitle">LPF candidate magnitude and mask</strong><label class="small muted" for="yScale">Vertical scale <select id="yScale" style="border:1px solid #d0deeb;padding:4px;border-radius:7px;background:white"><option value="linear">Linear |H|</option><option value="db">dB</option></select></label></div>
+        <canvas id="filterChart" class="chart big" role="img" aria-label="Current candidate Butterworth frequency-response magnitude superimposed on allowed passband and stopband constraints"></canvas>
+        <div class="legend"><span><i class="swatch" style="border-color:#2365b5"></i>Candidate |Ĥ_N|</span><span><i class="swatch" style="border-color:#17805c;border-top-style:dashed"></i>Mask boundaries</span><span><i class="swatch" style="border-color:#d9a4aa;border-top-style:solid"></i>Forbidden regions</span><span><i class="swatch" style="border-color:#b87735;border-top-style:dashed"></i>Candidate cutoff edge(s)</span></div>
+      </div>
+      <div class="work-controls">
+        <div class="result-control">
+          <div class="control-label"><label for="designN">Prototype order N</label><span class="value" id="designNValue" style="float:right">2</span></div>
+          <input id="designN" type="range" min="1" max="30" value="2" step="1" />
+          <div class="range-extents"><span>N = 1</span><span>N = 30</span></div>
+        </div>
+        <div class="result-control">
+          <div class="control-label"><label for="designGain">Candidate gain G</label><span class="value" id="designGainValue" style="float:right">1.100</span></div>
+          <input id="designGain" type="range" min="0.9" max="1.1" step="0.001" value="1.1" disabled />
+          <div class="range-extents" id="gainBounds"><span>G₁=0.9</span><span>G₂=1.1</span></div>
+          <label class="gain-lock"><input id="lockGain" type="checkbox" checked /> Use G = G₂ (recommended)</label>
+        </div>
+        <div class="result-control center-control" id="wcControl">
+          <div class="control-label"><label for="designWc">Cutoff ω<sub>c</sub>/(2π)</label><span class="value" id="wcValue" style="float:right">6.00 kHz</span></div>
+          <div class="slider-with-number"><input id="designWc" type="range" min="0.1" max="30" step="0.01" value="6" /><input type="number" id="wcNumber" min="0.01" step="0.01" value="6" aria-label="Cutoff omega c in kHz" /></div>
+          <div class="range-extents" id="wcBounds"><span>0.1 kHz</span><span>30 kHz</span></div>
+        </div>
+        <div class="result-control hidden" id="w1Control">
+          <div class="control-label"><label for="designW1">Lower cutoff ω<sub>1</sub>/(2π)</label><span class="value" id="w1Value" style="float:right">7.80 kHz</span></div>
+          <div class="slider-with-number"><input id="designW1" type="range" min="0.1" max="40" step="0.01" value="7.8" /><input type="number" id="w1Number" min="0.01" step="0.01" value="7.8" aria-label="Lower cutoff omega 1 in kHz" /></div>
+          <div class="range-extents" id="w1Bounds"><span>0.1 kHz</span><span>40 kHz</span></div>
+        </div>
+        <div class="result-control hidden" id="w2Control">
+          <div class="control-label"><label for="designW2">Upper cutoff ω<sub>2</sub>/(2π)</label><span class="value" id="w2Value" style="float:right">12.40 kHz</span></div>
+          <div class="slider-with-number"><input id="designW2" type="range" min="0.1" max="40" step="0.01" value="12.4" /><input type="number" id="w2Number" min="0.01" step="0.01" value="12.4" aria-label="Upper cutoff omega 2 in kHz" /></div>
+          <div class="range-extents" id="w2Bounds"><span>0.1 kHz</span><span>40 kHz</span></div>
+        </div>
+      </div>
+      <div class="derived-params hidden" id="derivedBand"></div>
+      <div class="check-list" id="checkList" aria-live="polite"></div>
+      <p class="design-tip" id="manualTip">Try making the transition sharper by increasing N. Does that always fix the mask?</p>
+    </div>
+    <div>
+      <div class="mini-card">
+        <h3>Design challenge</h3>
+        <p class="small muted" style="margin:0">Can you find the <strong>smallest possible integer N</strong> without looking at the answer? Try changing N, G, and the cutoff edge(s) directly.</p>
+        <div class="guess-row"><div><label class="control-label" for="guessN">My guess for smallest N</label><input id="guessN" type="number" min="1" max="100" step="1" placeholder="e.g. 5"/></div><button class="secondary" id="checkGuess" type="button">Test my guess</button></div>
+        <div class="feedback" id="guessFeedback" aria-live="polite">The mask is satisfied only when both conditions read PASS.</div>
+        <div class="button-row"><button id="revealBtn" type="button" class="primary">Reveal minimum-order design</button><button id="hideBtn" type="button" class="ghost hidden">Hide answer</button></div>
+      </div>
+      <div class="reveal hidden" id="revealPanel" aria-live="polite">
+        <h3>Minimum-order Butterworth design</h3>
+        <div id="solutionSummary" class="sol-grid"></div>
+        <div id="solutionDerivation" class="derivation"></div>
+        <div class="button-row"><button id="applyDesign" type="button" class="primary">Apply this design to the graph</button></div>
+      </div>
+      <div class="walkthrough">
+        <h3>What should you notice?</h3>
+        <ul>
+          <li><strong>Order:</strong> increasing N sharpens the transition but increases circuit complexity.</li>
+          <li><strong>Frequency parameters:</strong> moving ω<sub>c</sub> (or ω<sub>1</sub>, ω<sub>2</sub>) helps one mask boundary but can hurt another.</li><li><strong>Gain:</strong> the gain G is a free parameter. Try unlocking G and moving it away from G<sub>2</sub>.</li><li><strong>Band filters:</strong> for minimum order, the geometric center of the relevant mask edges is useful, but ω<sub>1</sub>, ω<sub>2</sub> are the actual free parameters.</li>
+          <li><strong>Minimum N:</strong> the first order with a nonempty feasible cutoff interval wins.</li>
+          <li><strong>Band filters:</strong> a prototype of order N transforms into a physical filter of order 2N.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="foot"><span>Reference: <em>EECS 216 Typed Lecture Notes</em> by Prof. Achilleas Anastasopoulos.</span><span>Static HTML</span></footer>
+</div>
+<script>
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const TYPES=['LPF','HPF','BPF','BSF'];
+ const EXAMPLES={
+  LPF:{edges:{p:5,s:8},g2:1.1,g1:0.9,ds:.1,N:2,wc:6},
+  HPF:{edges:{s:3.5,p:6},g2:1.1,g1:0.9,ds:.1,N:2,wc:4.8},
+  BPF:{edges:{s1:6,p1:8,p2:12,s2:15},g2:1.1,g1:0.9,ds:.1,N:2,w1:7.77,w2:12.37},
+  BSF:{edges:{p1:5,s1:9,s2:12,p2:20},g2:1.1,g1:0.9,ds:.1,N:1,w1:6.60,w2:16.40}
+ };
+ const FIELD_INFO={
+  LPF:[['p','Passband edge ωₚ/(2π)'],['s','Stopband edge ωₛ/(2π)']],
+  HPF:[['s','Stopband edge ωₛ/(2π)'],['p','Passband edge ωₚ/(2π)']],
+  BPF:[['s1','Lower stop ωₛ₁/(2π)'],['p1','Lower pass ωₚ₁/(2π)'],['p2','Upper pass ωₚ₂/(2π)'],['s2','Upper stop ωₛ₂/(2π)']],
+  BSF:[['p1','Lower pass ωₚ₁/(2π)'],['s1','Lower stop ωₛ₁/(2π)'],['s2','Upper stop ωₛ₂/(2π)'],['p2','Upper pass ωₚ₂/(2π)']]
+ };
+ const MESSAGE={
+  LPF:'LPF: pass frequencies up to ωₚ; reject frequencies above ωₛ. Require ωₚ < ωₛ.',
+  HPF:'HPF: reject frequencies below ωₛ; pass frequencies above ωₚ. Require ωₛ < ωₚ.',
+  BPF:'BPF: reject both outside bands and pass the middle band. Require ωₛ₁ < ωₚ₁ < ωₚ₂ < ωₛ₂.',
+  BSF:'BSF: pass the two outside bands and reject the middle band. Require ωₚ₁ < ωₛ₁ < ωₛ₂ < ωₚ₂.'
+ };
+ const state={type:'LPF',N:2,wc:6,w1:7.77,w2:12.37,G:1.1,lockGain:true,protoN:3,revealed:false,solution:null};
+ let latestValid=null;
+ const cap=(x,lo,hi)=>Math.max(lo,Math.min(hi,x));
+ const fmt=(x,d=2)=>Number.isFinite(x)?x.toFixed(d):'—';
+ const htmlEsc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const p2db=x=>20*Math.log10(x);
+ function readSpec(){let e={};for(const [key] of FIELD_INFO[state.type])e[key]=Number($('edge-'+key).value);return {type:state.type,edges:e,g1:Number($('g1').value),g2:Number($('g2').value),ds:Number($('ds').value)}}
+ function validate(s){if(!Object.values(s.edges).every(v=>Number.isFinite(v)&&v>0))return 'All frequency edges must be positive numbers.';
+  if(!(Number.isFinite(s.g1)&&Number.isFinite(s.g2)&&Number.isFinite(s.ds)&&s.g2>s.g1&&s.g1>s.ds&&s.ds>0))return 'Require G₂ > G₁ > δₛ > 0 for this minimum-order design.';
+  const v=Object.values(s.edges);if(!v.every((x,i)=>i===0||x>v[i-1]))return 'Frequency edges must increase from left to right: '+MESSAGE[s.type];
+  return null;
+ }
+ function transformed(s){const e=s.edges;
+  if(s.type==='LPF')return {ratio:e.s/e.p, pBase:e.p, sBase:e.s,center:null, kinds:'cutoff'};
+  if(s.type==='HPF')return {ratio:e.p/e.s,pBase:e.p,sBase:e.s,center:null,kinds:'cutoff'};
+  if(s.type==='BPF'){
+   const v=e.p1*e.p2, bp=e.p2-e.p1, ds1=v/e.s1-e.s1,ds2=e.s2-v/e.s2, ds=Math.min(ds1,ds2);
+   return {ratio:ds/bp,pBase:bp,sBase:ds,center:Math.sqrt(v),kinds:'bandwidth',limitStop:ds1<=ds2?'lower':'upper'};
+  }
+  const v=e.s1*e.s2, bs=e.s2-e.s1,dp1=v/e.p1-e.p1,dp2=e.p2-v/e.p2,dp=Math.min(dp1,dp2);
+  return {ratio:dp/bs,pBase:dp,sBase:bs,center:Math.sqrt(v),kinds:'bandwidth',limitPass:dp1<=dp2?'lower':'upper'};
+ }
+ function solve(s){const err=validate(s);if(err)return {error:err};
+  const m=transformed(s),Ap=(s.g2/s.g1)**2-1,As=(s.g2/s.ds)**2-1,R=m.ratio;
+  if(!(R>1&&Ap>0&&As>Ap))return {error:'The specified edges or gains do not define a feasible classical Butterworth transition.'};
+  const nReal=Math.log(As/Ap)/(2*Math.log(R)); const nMin=Math.max(1,Math.ceil(nReal-1e-11));
+  if(!Number.isFinite(nReal)||nMin>100)return {error:'The required order is too large for this visualization. Increase the transition width or relax the gain constraints.'};
+  const rr=rangeAt(s,nMin,Ap,As,m);
+  const chosen = s.type==='LPF' ? rr.lo : s.type==='HPF' ? rr.hi : s.type==='BPF'?rr.lo:rr.hi;
+  return {nReal,nMin,Ap,As,R,m,range:rr,chosen,G:s.g2,edges:s.edges,type:s.type,physicalOrder:nMin*(s.type==='BPF'||s.type==='BSF'?2:1)};
+ }
+ function rangeAt(s,N,ap,as,m){const a=Math.exp(Math.log(ap)/(2*N)),b=Math.exp(Math.log(as)/(2*N));
+  if(s.type==='LPF')return {lo:s.edges.p/a,hi:s.edges.s/b};
+  if(s.type==='HPF')return {lo:s.edges.s*b,hi:s.edges.p*a};
+  if(s.type==='BPF')return {lo:m.pBase/a,hi:m.sBase/b};
+  return {lo:m.sBase*b,hi:m.pBase*a};
+ }
+ function getCutoffPair(center,B){const root=Math.sqrt(B*B+4*center*center);return [(root-B)/2,(root+B)/2]}
+ function omega(s,frequency,p){
+  const x=Math.abs(frequency);
+  if(s.type==='LPF')return x/p.wc;
+  if(s.type==='HPF')return x===0?Infinity:-p.wc/x;
+  const b=p.w2-p.w1,q=p.w1*p.w2;
+  if(!(b>0&&q>0))return NaN;
+  if(s.type==='BPF')return x===0?Infinity:(x*x-q)/(b*x);
+  return x===0?0:(b*x)/(q-x*x);
+ }
+ function magnitude(s,N,p,f){
+  const r=Math.abs(omega(s,f,p));
+  if(!Number.isFinite(r))return r===Infinity?0:NaN;
+  if(r===0)return p.G;
+  const logPow=2*N*Math.log(r);
+  if(logPow>80)return p.G*Math.exp(-.5*logPow);
+  if(logPow< -40)return p.G;
+  return p.G/Math.sqrt(1+Math.exp(logPow));
+ }
+ function assess(s,N,p){
+  const e=s.edges;let pass,stop,locPass,locStop;
+  if(s.type==='LPF'||s.type==='HPF'){
+    pass=magnitude(s,N,p,e.p);stop=magnitude(s,N,p,e.s);
+    locPass=e.p;locStop=e.s;
+  } else {
+    const p1=magnitude(s,N,p,e.p1),p2=magnitude(s,N,p,e.p2),t1=magnitude(s,N,p,e.s1),t2=magnitude(s,N,p,e.s2);
+    pass=Math.min(p1,p2);stop=Math.max(t1,t2);
+    locPass=p1<=p2?e.p1:e.p2;locStop=t1>=t2?e.s1:e.s2;
+  }
+  return {pass,stop,locPass,locStop,passOK:pass+1e-9>=s.g1,stopOK:stop<=s.ds+1e-9,gainOK:p.G>=s.g1-1e-9&&p.G<=s.g2+1e-9};
+ }
+ function makeEdgeFields(s){
+  $('edgeInputs').innerHTML=FIELD_INFO[s.type].map(([key,label])=>`<div class="input-wrap"><label class="control-label" for="edge-${key}">${label}</label><input type="number" id="edge-${key}" min="0.001" step="0.25" value="${s.edges[key]}"><span class="hint">Value in kHz (ω/2π)</span></div>`).join('');
+  for(const [key] of FIELD_INFO[s.type])$('edge-'+key).addEventListener('input',updateAll);
+ }
+ function selectType(type){
+  if(!TYPES.includes(type))return;
+  state.type=type;const e=EXAMPLES[type];makeEdgeFields({type,edges:e.edges});
+  $('g1').value=e.g1;$('g2').value=e.g2;$('ds').value=e.ds;
+  state.N=e.N;state.wc=e.wc||state.wc;state.w1=e.w1||state.w1;state.w2=e.w2||state.w2;
+  state.lockGain=true;state.G=e.g2;$('lockGain').checked=true;
+  state.revealed=false;state.solution=null;$('designN').max=30;$('designN').value=state.N;
+  $('guessN').value='';$('guessFeedback').textContent='The mask is satisfied only when both conditions read PASS.';
+  document.querySelectorAll('[data-type]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.type===type));
+  const info={
+    LPF:['LPF · frequency scaling','Φ(ω) = ω/ω<sub>c</sub>','ω<sub>c</sub> &gt; 0','Move the normalized cutoff 1 to ω = ω<sub>c</sub>.'],
+    HPF:['HPF · frequency inversion','Φ(ω) = −ω<sub>c</sub>/ω','ω<sub>c</sub> &gt; 0','Large physical frequencies map toward the prototype passband at normalized frequency 0.'],
+    BPF:['BPF · frequency transformation','Φ(ω) = <span class="division"><span>ω² − ω<sub>1</sub>ω<sub>2</sub></span><span>ω(ω<sub>2</sub> − ω<sub>1</sub>)</span></span>','0 &lt; ω<sub>1</sub> &lt; ω<sub>2</sub>','The −3 dB relative-to-G edges are ω<sub>1</sub> and ω<sub>2</sub>; their geometric mean is the band center.'],
+    BSF:['BSF · inverse band transformation','Φ(ω) = <span class="division"><span>ω(ω<sub>2</sub> − ω<sub>1</sub>)</span><span>ω<sub>1</sub>ω<sub>2</sub> − ω²</span></span>','0 &lt; ω<sub>1</sub> &lt; ω<sub>2</sub>','The notch is at √(ω<sub>1</sub>ω<sub>2</sub>); the −3 dB relative-to-G edges are ω<sub>1</sub> and ω<sub>2</sub>.']
+  }[type];
+  $('mappingTitle').textContent=info[0];$('mappingFormula').innerHTML=info[1];
+  $('mappingFree').innerHTML='Free frequency parameter'+(type==='BPF'||type==='BSF'?'s: ':': ')+info[2]+'.';
+  $('mappingExplain').innerHTML=info[3];
+  $('candidateFree').innerHTML=`Free parameters: G &gt; 0, integer N ≥ 1, ${info[2]}. Under the mask, G₁ ≤ G ≤ G₂.`;
+  $('maskGuidance').textContent=MESSAGE[type];$('workChartTitle').textContent=type+' candidate magnitude and mask';
+  hideSolution();updateAll();
+ }
+ function drawProto(){const n=state.protoN;$('protoNReadout').textContent=n;$('protoAtTwo').textContent=(1/Math.sqrt(1+Math.pow(2,2*n))).toFixed(3);document.querySelectorAll('[data-proto]').forEach(b=>b.classList.toggle('sel',Number(b.dataset.proto)===n));
+  drawCanvas($('protoChart'),({ctx,w,h})=>{const L=56,R=18,T=15,B=40,px=x=>L+x/3*(w-L-R),py=y=>T+(1-y/1.05)*(h-T-B);axes(ctx,w,h,L,R,T,B,0,3,0,1.05,[0,.5,1,1.5,2,2.5,3],[0,.25,.5,.75,1],'ω (normalized angular frequency)','|H_N(jω)|');
+    ctx.save();ctx.strokeStyle='#b97846';ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(L,py(Math.SQRT1_2));ctx.lineTo(w-R,py(Math.SQRT1_2));ctx.stroke();ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(px(1),T);ctx.lineTo(px(1),h-B);ctx.stroke();ctx.restore();
+    [1,2,3,5,8,12,20].filter(k=>k!==n).forEach(k=>curve(ctx,x=>1/Math.sqrt(1+Math.pow(x,2*k)),0,3,px,py,260,'#c2ccd6',1.55));
+    curve(ctx,x=>1/Math.sqrt(1+Math.pow(x,2*n)),0,3,px,py,350,'#2365b5',3.2);
+    ctx.fillStyle='#b97846';ctx.font='12px sans-serif';ctx.fillText('1/√2',L+7,py(Math.SQRT1_2)-6);
+    ctx.beginPath();ctx.arc(px(1),py(Math.SQRT1_2),4,0,2*Math.PI);ctx.fillStyle='#b97846';ctx.fill();
+  });}
+ function axes(ctx,w,h,L,R,T,B,xmin,xmax,ymin,ymax,xticks,yticks,xlabel,ylabel){ctx.save();ctx.lineWidth=1;ctx.font='11px -apple-system,Arial,sans-serif';ctx.textBaseline='middle';
+  const px=x=>L+(x-xmin)/(xmax-xmin)*(w-L-R),py=y=>T+(ymax-y)/(ymax-ymin)*(h-T-B);
+  for(const y of yticks){const p=py(y);ctx.strokeStyle='#ebf0f5';ctx.beginPath();ctx.moveTo(L,p);ctx.lineTo(w-R,p);ctx.stroke();ctx.fillStyle='#657a90';ctx.textAlign='right';ctx.fillText(ymin<0?(y+''):Number(y.toFixed(2)).toString(),L-9,p)}
+  for(const x of xticks){const p=px(x);ctx.strokeStyle='#f0f3f7';ctx.beginPath();ctx.moveTo(p,T);ctx.lineTo(p,h-B);ctx.stroke();ctx.textAlign='center';ctx.fillStyle='#697d92';ctx.fillText(Number(x.toFixed(2)).toString(),p,h-B+17)}
+  ctx.strokeStyle='#96acc1';ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,h-B);ctx.lineTo(w-R,h-B);ctx.stroke();
+  ctx.fillStyle='#425b73';ctx.textAlign='center';ctx.font='12px -apple-system,Arial,sans-serif';ctx.fillText(xlabel,L+(w-L-R)/2,h-12);ctx.translate(15,T+(h-T-B)/2);ctx.rotate(-Math.PI/2);ctx.fillText(ylabel,0,0);ctx.restore();}
+ function curve(ctx,fn,x0,x1,px,py,steps,color,lw=2){ctx.save();ctx.beginPath();let started=false;for(let i=0;i<=steps;i++){const x=x0+(x1-x0)*i/steps,y=fn(x);if(!Number.isFinite(y)){started=false;continue}const p=px(x),q=py(y);if(!started){ctx.moveTo(p,q);started=true}else ctx.lineTo(p,q)}ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.lineJoin='round';ctx.stroke();ctx.restore()}
+ function drawCanvas(el,draw){const ratio=window.devicePixelRatio||1;const rect=el.getBoundingClientRect();const width=Math.max(240,rect.width),height=Math.max(120,rect.height);el.width=Math.round(width*ratio);el.height=Math.round(height*ratio);const ctx=el.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,width,height);draw({ctx,w:width,h:height});}
+ function drawSparks(){for(const t of TYPES){drawCanvas($('spark'+t),({ctx,w,h})=>{const L=4,R=4,T=4,B=4;let fn;
+   if(t==='LPF')fn=x=>1/Math.sqrt(1+(x/.32)**10);
+   else if(t==='HPF')fn=x=>x===0?0:1/Math.sqrt(1+(.68/x)**10);
+   else if(t==='BPF')fn=x=>x===0?0:1/Math.sqrt(1+(Math.abs((x*x-.25)/(.28*x)))**8);
+   else fn=x=>x===.5?0:1/Math.sqrt(1+(Math.abs(.28*x/(.25-x*x)))**8);
+   const px=x=>L+(w-L-R)*x,py=y=>T+(1-y)*(h-T-B);ctx.strokeStyle='#dbe4ed';ctx.beginPath();ctx.moveTo(L,h-B);ctx.lineTo(w-R,h-B);ctx.stroke();curve(ctx,fn,.001,.999,px,py,150,'#2365b5',2.2);
+  })}}
+ function graphDomain(s){const vals=Object.values(s.edges);const max=Math.max(...vals);return Math.max(2,Math.ceil(max*1.28/2)*2)}
+ function intervals(s,max){const e=s.edges;
+  if(s.type==='LPF')return {pass:[[0,e.p]],stop:[[e.s,max]]};
+  if(s.type==='HPF')return {pass:[[e.p,max]],stop:[[0,e.s]]};
+  if(s.type==='BPF')return {pass:[[e.p1,e.p2]],stop:[[0,e.s1],[e.s2,max]]};
+  return {pass:[[0,e.p1],[e.p2,max]],stop:[[e.s1,e.s2]]};}
+ function ticksUpTo(max){const step=max<=15?2:max<=30?5:max<=60?10:max<=100?20:25;const arr=[];for(let x=0;x<=max+1e-8;x+=step)arr.push(x);return arr}
+ function drawFilter(s){const max=graphDomain(s),itype=$('yScale').value,top=itype==='db'?Math.max(5,Math.ceil(p2db(s.g2)/10)*10+5):s.g2*1.10,bot=itype==='db'?-65:0;
+  drawCanvas($('filterChart'),({ctx,w,h})=>{const L=58,R=17,T=20,B=46,px=x=>L+x/max*(w-L-R),py=v=>T+(top-v)/(top-bot)*(h-T-B),ampToY=v=>itype==='db'?Math.max(-65,p2db(Math.max(1e-15,v))):v;
+    const yTicks=itype==='db'?[...new Set([Math.max(-65,Math.floor(top/10)*10),0,-10,-20,-30,-40,-50,-60])].filter(v=>v>=bot&&v<=top).sort((a,b)=>a-b):[0,.2,.4,.6,.8,1].map(v=>v*s.g2);
+    const bands=intervals(s,max);const fill=(ranges,threshold,side)=>{ctx.save();for(const [lo,hi] of ranges){const left=px(lo),width=Math.max(0,px(Math.min(max,hi))-left);if(width<=0)continue;const y=py(ampToY(threshold));const base=side==='below'?h-B:T;ctx.fillStyle='#f8e8ea';ctx.fillRect(left,Math.min(y,base),width,Math.abs(base-y));ctx.fillStyle='rgba(22,132,93,.035)';ctx.fillRect(left,side==='below'?T:y,width,side==='below'?y-T:h-B-y)}ctx.restore()};
+    fill(bands.pass,s.g1,'below');fill(bands.stop,s.ds,'above');
+    // The passband also has an upper bound G2. Paint the region above it as forbidden.
+    for(const [lo,hi] of bands.pass){const left=px(lo),width=Math.max(0,px(Math.min(max,hi))-left),y=py(ampToY(s.g2));ctx.fillStyle='rgba(248,232,234,.78)';ctx.fillRect(left,T,width,Math.max(0,y-T));}
+    axes(ctx,w,h,L,R,T,B,0,max,bot,top,ticksUpTo(max),yTicks,'ω / 2π (kHz)',itype==='db'?'Magnitude (dB)':'|Ĥ_N(jω)|');
+    ctx.save();ctx.setLineDash([7,5]);ctx.lineWidth=1.6;
+    for(const [lo,hi] of bands.pass){ctx.strokeStyle='#17805c';ctx.beginPath();ctx.moveTo(px(lo),py(ampToY(s.g1)));ctx.lineTo(px(hi),py(ampToY(s.g1)));ctx.stroke();ctx.beginPath();ctx.moveTo(px(lo),py(ampToY(s.g2)));ctx.lineTo(px(hi),py(ampToY(s.g2)));ctx.stroke()}
+    for(const [lo,hi] of bands.stop){ctx.strokeStyle='#a85a5d';ctx.beginPath();ctx.moveTo(px(lo),py(ampToY(s.ds)));ctx.lineTo(px(hi),py(ampToY(s.ds)));ctx.stroke()}
+    ctx.restore();
+    curve(ctx,x=>ampToY(magnitude(s,state.N,state,x)),0,max,px,py,900,'#2365b5',3.3);
+    // Dashed vertical guides mark the candidate's own -3 dB relative-to-G cutoff frequencies.
+    const cutoffs=(s.type==='LPF'||s.type==='HPF')?[state.wc]:[state.w1,state.w2];
+    ctx.save();ctx.setLineDash([5,4]);ctx.strokeStyle='#b87735';ctx.lineWidth=1.35;
+    for(const x of cutoffs)if(x>=0&&x<=max){ctx.beginPath();ctx.moveTo(px(x),T);ctx.lineTo(px(x),h-B);ctx.stroke();}
+    ctx.restore();
+
+    for(const [key,f] of Object.entries(s.edges)){ctx.save();ctx.strokeStyle='#a6bacd';ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(px(f),T);ctx.lineTo(px(f),h-B);ctx.stroke();ctx.restore();const v=magnitude(s,state.N,state,f);ctx.fillStyle='#2365b5';ctx.beginPath();ctx.arc(px(f),py(ampToY(v)),3.6,0,Math.PI*2);ctx.fill()}
+    const xname={p:'ωₚ',s:'ωₛ',p1:'ωₚ₁',p2:'ωₚ₂',s1:'ωₛ₁',s2:'ωₛ₂'};ctx.font='11px -apple-system,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#5d748e';for(const [k,x] of Object.entries(s.edges))ctx.fillText(xname[k],px(x),T+11);
+    if(itype==='db'){ctx.fillStyle='#657a90';ctx.textAlign='left';ctx.font='10px sans-serif';ctx.fillText('dB re amplitude 1',L+7,T+15)}
+  });}
+ function updateChecks(s){
+  const a=assess(s,state.N,state);
+  const t1=`Minimum passband |Ĥ_N| = ${fmt(a.pass,4)} at ${fmt(a.locPass,2)} kHz (require ≥ ${fmt(s.g1,4)})`,
+        t2=`Maximum stopband |Ĥ_N| = ${fmt(a.stop,4)} at ${fmt(a.locStop,2)} kHz (require ≤ ${fmt(s.ds,4)})`;
+  $('checkList').innerHTML=`<div class="check"><div><strong>Passband requirement</strong><span>${htmlEsc(t1)}</span></div><b class="status-pill ${a.passOK?'yes':'no'}">${a.passOK?'PASS':'FAIL'}</b></div><div class="check"><div><strong>Stopband requirement</strong><span>${htmlEsc(t2)}</span></div><b class="status-pill ${a.stopOK?'yes':'no'}">${a.stopOK?'PASS':'FAIL'}</b></div>`;
+  $('manualTip').textContent=a.passOK&&a.stopOK?'Both constraints pass. Can you reduce N and still satisfy the mask?':a.passOK?'The passband passes, but stopband rejection fails. Adjust the cutoff(s) or increase N.':a.stopOK?'The stopband passes, but the passband fails. Adjust the cutoff(s) or G.':'Both mask constraints fail. Try a larger N, then adjust the cutoff(s).';
+ }
+ function configureParam(s){
+  const maxE=Math.max(...Object.values(s.edges)),minE=Math.min(...Object.values(s.edges));
+  const hi=Math.max(3,maxE*1.8),lo=Math.max(0.01,Math.min(0.1,minE/10));
+  state.wc=cap(state.wc,lo,hi);state.w1=cap(state.w1,lo,hi-0.02);state.w2=cap(state.w2,state.w1+0.02,hi);
+  $('designNValue').textContent=state.N;
+  $('wcControl').classList.toggle('hidden',s.type==='BPF'||s.type==='BSF');
+  $('w1Control').classList.toggle('hidden',s.type==='LPF'||s.type==='HPF');
+  $('w2Control').classList.toggle('hidden',s.type==='LPF'||s.type==='HPF');
+  for(const [short,id,view] of [['wc','designWc','wc'],['w1','designW1','w1'],['w2','designW2','w2']]){
+    const slider=$(id);slider.min=lo;slider.max=hi;slider.step=.01;slider.value=state[short];
+    $(short+'Number').min=lo;$(short+'Number').max=hi;$(short+'Number').value=fmt(state[short],2);
+    $(view+'Value').textContent=fmt(state[short],2)+' kHz';
+    $(view+'Bounds').innerHTML=`<span>${fmt(lo,1)} kHz</span><span>${fmt(hi,1)} kHz</span>`;
+  }
+  if(s.type==='BPF'||s.type==='BSF'){
+    const b=state.w2-state.w1,center=Math.sqrt(state.w1*state.w2),optimum=transformed(s).center;
+    $('derivedBand').classList.remove('hidden');
+    $('derivedBand').innerHTML=`<strong>Derived (not free) quantities:</strong> B/(2π) = ${fmt(b,2)} kHz; ω₀/(2π) = √(ω₁ω₂)/(2π) = ${fmt(center,2)} kHz. For the minimum-order construction, try ω₀/(2π) ≈ ${fmt(optimum,2)} kHz.`;
+  }else $('derivedBand').classList.add('hidden');
+  state.G=state.lockGain?s.g2:cap(state.G,s.g1,s.g2);
+  $('lockGain').checked=state.lockGain;
+  $('designGain').disabled=state.lockGain;
+  $('designGain').min=s.g1;$('designGain').max=s.g2;$('designGain').step=Math.max(.0001,(s.g2-s.g1)/2000);
+  $('designGain').value=state.G;$('designGainValue').textContent=fmt(state.G,3);
+  $('gainBounds').innerHTML=`<span>G₁=${fmt(s.g1,2)}</span><span>G₂=${fmt(s.g2,2)}</span>`;
+ }
+ function updateGainHints(){for(const [id,out] of [['g2','g2db'],['g1','g1db'],['ds','dsdb']]){const v=Number($(id).value);$(out).textContent=v>0?`${fmt(p2db(v),1)} dB`:'—'}}
+ function updateAll(){
+  const s=readSpec();updateGainHints();const err=validate(s);
+  $('specError').classList.toggle('hidden',!err);$('specError').textContent=err||'';
+  if(err){hideSolution();$('filterChart').getContext('2d').clearRect(0,0,$('filterChart').width,$('filterChart').height);$('checkList').innerHTML='<div class="error">Correct the mask parameters to continue.</div>';$('manualTip').textContent='';latestValid=null;return}
+  latestValid=s;const solved=solve(s);
+  if(solved.error){hideSolution();$('specError').classList.remove('hidden');$('specError').textContent=solved.error;return}
+  if(state.revealed){state.solution=solved;renderSolution(solved,s)}
+  configureParam(s);updateChecks(s);drawFilter(s);
+ }
+ function hideSolution(){state.revealed=false;state.solution=null;$('revealPanel').classList.add('hidden');$('hideBtn').classList.add('hidden');$('revealBtn').classList.remove('hidden')}
+ function solutionItem(label,value){return `<div class="sol-item"><span>${label}</span><b>${value}</b></div>`}
+ function renderSolution(sol,s){
+  const r=sol.range,prior=sol.nMin>1?rangeAt(s,sol.nMin-1,sol.Ap,sol.As,sol.m):null;
+  const isBand=s.type==='BPF'||s.type==='BSF';
+  let out=solutionItem('Real-valued order bound',fmt(sol.nReal,3))+solutionItem('Minimum prototype order N',String(sol.nMin))+
+    solutionItem('Gain choice G = G₂',fmt(sol.G,4))+solutionItem('Transformed edge ratio R',fmt(sol.R,3))+
+    solutionItem(isBand?'Feasible derived B/(2π)':'Feasible ωc/(2π)',`[${fmt(r.lo,3)}, ${fmt(r.hi,3)}] kHz`)+
+    solutionItem('Realized transfer-function order',String(sol.physicalOrder));
+  if(isBand){const [w1,w2]=getCutoffPair(sol.m.center,sol.chosen);
+    out+=solutionItem('Chosen free ω₁/(2π)',fmt(w1,3)+' kHz')+solutionItem('Chosen free ω₂/(2π)',fmt(w2,3)+' kHz');
+  }else out+=solutionItem('Chosen free ωc/(2π)',fmt(sol.chosen,3)+' kHz');
+  $('solutionSummary').innerHTML=out;
+  const constTerm=`Aₚ=(G₂/G₁)²−1=${fmt(sol.Ap,3)}; Aₛ=(G₂/δₛ)²−1=${fmt(sol.As,3)}.`;
+  const boundaryText={LPF:'R = ωₛ/ωₚ',HPF:'R = ωₚ/ωₛ',BPF:'For the optimal band center ω₁ω₂ = ωₚ₁ωₚ₂, R = min(ω₁ω₂/ωₛ₁ − ωₛ₁, ωₛ₂ − ω₁ω₂/ωₛ₂)/(ωₚ₂−ωₚ₁)',BSF:'For the optimal notch center ω₁ω₂ = ωₛ₁ωₛ₂, R = min(ω₁ω₂/ωₚ₁ − ωₚ₁, ωₚ₂ − ω₁ω₂/ωₚ₂)/(ωₛ₂−ωₛ₁)'}[s.type];
+  const priorText=sol.nMin>1?`For N=${sol.nMin-1}, the derived feasible interval would be [${fmt(prior.lo,3)}, ${fmt(prior.hi,3)}] kHz, which is empty because the lower endpoint exceeds the upper endpoint.`:'N=1 is already the smallest possible order.';
+  const last=isBand?`The bandwidth interval here is an algebraic shortcut: B = ω₂ − ω₁ and ω₁ω₂ is set by the balanced center. Convert the selected B back into the actual free parameters ω₁, ω₂.`:'Select any ωc inside the feasible interval.';
+  $('solutionDerivation').innerHTML=`<strong>Derivation from the candidate filter</strong><ol><li>Choose G = G₂ (this minimizes the required Butterworth order). ${htmlEsc(constTerm)}</li><li>Use Φ(ω) to map the mask into prototype frequencies: <code>${htmlEsc(boundaryText)}</code>, giving R=${fmt(sol.R,3)}.</li><li>From the passband and stopband inequalities, <code>R^(2N) ≥ Aₛ/Aₚ</code>. Thus <code>N ≥ log(Aₛ/Aₚ)/(2 log R)</code>; round up to N=${sol.nMin}.</li><li>Determine which free cutoff parameter(s) are feasible after rounding. ${htmlEsc(last)}</li></ol><p style="margin:8px 0 0">${htmlEsc(priorText)}</p>`;
+ }
+ function reveal(){const s=readSpec();const sol=solve(s);if(sol.error)return;state.revealed=true;state.solution=sol;renderSolution(sol,s);$('revealPanel').classList.remove('hidden');$('hideBtn').classList.remove('hidden');$('revealBtn').classList.add('hidden')}
+ function applyDesign(){
+  if(!state.solution)return;
+  const sol=state.solution;
+  state.N=sol.nMin;state.G=sol.G;state.lockGain=true;
+  if(sol.type==='LPF'||sol.type==='HPF')state.wc=sol.chosen;
+  else [state.w1,state.w2]=getCutoffPair(sol.m.center,sol.chosen);
+  $('designN').max=Math.max(30,sol.nMin);$('designN').value=state.N;
+  updateAll();
+ }
+ function guess(){const s=readSpec();const sol=solve(s);if(sol.error)return;const g=Number($('guessN').value);if(!Number.isInteger(g)||g<=0){$('guessFeedback').textContent='Enter a positive integer order first.';return}if(g===sol.nMin)$('guessFeedback').textContent=`Correct! N=${g} is feasible, but N=${g-1} is not.`;else if(g<sol.nMin)$('guessFeedback').textContent=`N=${g} is too small: no choice of the free cutoff parameter(s) can satisfy the mask.`;else $('guessFeedback').textContent=`N=${g} can satisfy the mask, but a smaller order is possible. Keep searching.`;}
+ function resetMask(){selectType(state.type)}
+ function tightenStop(){const v=Number($('ds').value);if(Number.isFinite(v)&&v>0){$('ds').value=Math.max(.0001,v/Math.sqrt(4)).toFixed(5);updateAll()}}
+ function init(){
+  makeEdgeFields({type:state.type,edges:EXAMPLES[state.type].edges});
+  for(const b of document.querySelectorAll('[data-type]'))b.addEventListener('click',()=>selectType(b.dataset.type));
+  $('protoN').addEventListener('input',e=>{state.protoN=Number(e.target.value);drawProto()});
+  for(const b of document.querySelectorAll('[data-proto]'))b.addEventListener('click',()=>{$('protoN').value=b.dataset.proto;state.protoN=Number(b.dataset.proto);drawProto()});
+  for(const id of ['g1','g2','ds'])$(id).addEventListener('input',updateAll);
+  $('resetMask').addEventListener('click',resetMask);$('tightenStop').addEventListener('click',tightenStop);
+  $('designN').addEventListener('input',e=>{state.N=Number(e.target.value);updateAll()});
+  $('lockGain').addEventListener('change',e=>{state.lockGain=e.target.checked;updateAll()});
+  $('designGain').addEventListener('input',e=>{state.G=Number(e.target.value);updateAll()});
+  function changeCutoff(key,value){
+    if(!Number.isFinite(value)||value<=0){updateAll();return;}
+    const lo=Number($('designW1').min),hi=Number($('designW2').max);
+    if(key==='w1')state.w1=Math.min(cap(value,lo,hi),state.w2-0.02);
+    else if(key==='w2')state.w2=Math.max(cap(value,lo,hi),state.w1+0.02);
+    else state.wc=value;
+    updateAll();
+  }
+  for(const [key,slider,num] of [['wc','designWc','wcNumber'],['w1','designW1','w1Number'],['w2','designW2','w2Number']]){
+    $(slider).addEventListener('input',e=>changeCutoff(key,Number(e.target.value)));
+    $(num).addEventListener('change',e=>changeCutoff(key,Number(e.target.value)));
+  }
+  $('checkGuess').addEventListener('click',guess);$('guessN').addEventListener('keydown',e=>{if(e.key==='Enter')guess()});
+  $('revealBtn').addEventListener('click',reveal);$('hideBtn').addEventListener('click',hideSolution);
+  $('applyDesign').addEventListener('click',applyDesign);$('yScale').addEventListener('change',updateAll);
+  drawProto();drawSparks();selectType('LPF');
+  let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{drawProto();drawSparks();if(latestValid)drawFilter(latestValid)},120)},{passive:true});
+ }
+ // Testing interface: pure analytical functions only; nothing is transmitted.
+ window.ButterworthLab={solve,rangeAt,transformed,omega,magnitude,assess,EXAMPLES,getCutoffPair,state};
+ init();
+})();
+</script>
+</body>
+</html>
